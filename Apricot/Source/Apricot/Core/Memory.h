@@ -88,4 +88,19 @@ namespace Apricot { namespace Memory {
 		delete block;
 	}
 
+	inline void Copy(void* dest, const void* src, uint64 size)
+	{
+		memcpy(dest, src, size);
+	}
+
+	inline void SetZero(void* block, uint64 size)
+	{
+		memset(block, 0, size);
+	}
+
+	inline void Set(void* block, uint64 size, int value)
+	{
+		memset(block, value, size);
+	}
+
 } }

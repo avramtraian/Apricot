@@ -1,6 +1,8 @@
 #include "aepch.h"
 #include "Engine.h"
 
+#include "Platform.h"
+
 namespace Apricot {
 
 	Engine* Engine::s_Engine = nullptr;
@@ -21,7 +23,10 @@ namespace Apricot {
 
 		OnInitEngine();
 
+		while (true)
+		{
 
+		}
 
 		OnDestroyEngine();
 
@@ -30,11 +35,13 @@ namespace Apricot {
 
 	bool Engine::OnInitEngine()
 	{
+		AE_CORE_INFO("OnInitEngine()");
 		return true;
 	}
 
 	bool Engine::OnDestroyEngine()
 	{
+		AE_CORE_INFO("OnDestroyEngine()");
 		return true;
 	}
 
