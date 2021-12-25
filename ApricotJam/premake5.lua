@@ -1,5 +1,5 @@
 project "ApricotJam"
-    kind "ConsoleApp"
+    kind "WindowedApp"
     language "C++"
     cppdialect "C++20"
 
@@ -33,7 +33,11 @@ project "ApricotJam"
     files
     {
         "Source/**.h",
-        "Source/**.cpp"
+        "Source/**.cpp",
+
+        "resource.h",
+        "ApricotJam.rc",
+        "ApricotJam.aps"
     }
 
     includedirs
