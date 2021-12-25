@@ -53,8 +53,6 @@
 	#pragma error "Unknown configuration macro!"
 #endif
 
-
-
 /*
 * Debug settings
 */
@@ -67,6 +65,7 @@
 	#define AE_ENABLE_LOG_FATAL
 	#define AE_ENABLE_ASSERTS
 	#define AE_ENABLE_VERIFIES
+	#define AE_ENABLE_MEMORY_TRACE
 #elif AE_RELEASE
 	#define AE_ENABLE_LOG_WARN
 	#define AE_ENABLE_LOG_ERROR

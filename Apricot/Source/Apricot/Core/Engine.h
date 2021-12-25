@@ -23,6 +23,6 @@ namespace Apricot {
 		 static Engine* s_Engine;
 	};
 
-	extern Engine* CreateEngine();
+	extern Engine* CreateEngine(uint64& engineSize);
 
 }
