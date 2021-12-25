@@ -6,4 +6,5 @@ Binaries-Int
 # Project Files
 *.vcxproj
 *.vcxproj.user
+*.vcxproj.filters
 *.sln
