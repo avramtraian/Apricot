@@ -41,11 +41,13 @@ namespace Apricot {
 		* 
 		* @param type Determine the color of the message in the console
 		* @param message The message to be printed
+		* @param args The argument pack - It will be formatted
 		*/
 		template<typename... Args>
 		static void LogCoreMessage(Log type, const char* message, Args&&... args)
 		{
 			// TODO: Implement!
+			LogCoreMessage(type, message);
 		}
 
 	private:

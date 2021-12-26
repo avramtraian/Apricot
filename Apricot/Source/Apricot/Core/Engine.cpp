@@ -35,13 +35,15 @@ namespace Apricot {
 
 	bool Engine::OnInitEngine()
 	{
-		AE_CORE_INFO("OnInitEngine()");
+		AE_CORE_INFO("Engine::OnInitEngine()");
+		Memory::HMemoryDebugger::DebugLog();
 		return true;
 	}
 
 	bool Engine::OnDestroyEngine()
 	{
-		AE_CORE_INFO("OnDestroyEngine()");
+		AE_CORE_INFO("Engine::OnDestroyEngine()");
+		Memory::HMemoryDebugger::DebugLog();
 		return true;
 	}
 

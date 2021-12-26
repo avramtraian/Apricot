@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Base.h"
+#include "Apricot/DataStructures/Array.h"
 
 #include <type_traits>
 #include <new>
@@ -14,6 +15,8 @@ namespace Apricot { namespace Memory {
 		CoreSystems,
 		LinearAllocator,
 		StackAllocator,
+		String,
+		Vector,
 
 		MaxEnum
 	};
@@ -24,8 +27,8 @@ namespace Apricot { namespace Memory {
 		static void DebugLogAllocationSizes();
 		static void DebugLogAllocatiosCount();
 
-		static uint64 AllocationSizes[(uint32)AllocTag::MaxEnum];
-		static uint64 AllocationsCount[(uint32)AllocTag::MaxEnum];
+		static TArray<uint64, (uint64)(uint32)AllocTag::MaxEnum> AllocationSizes;
+		static TArray<uint64, (uint64)(uint32)AllocTag::MaxEnum> AllocationsCount;
 	};
 
 	inline void* Allocate(uint64 size, AllocTag tag = AllocTag::General)
@@ -41,8 +44,11 @@ namespace Apricot { namespace Memory {
 	inline void Free(void* block, uint64 size, AllocTag tag = AllocTag::General)
 	{
 #ifdef AE_ENABLE_MEMORY_TRACE
-		HMemoryDebugger::AllocationSizes[(uint32)tag] -= size;
-		HMemoryDebugger::AllocationsCount[(uint32)tag]--;
+		if (block != nullptr)
+		{
+			HMemoryDebugger::AllocationSizes[(uint32)tag] -= size;
+			HMemoryDebugger::AllocationsCount[(uint32)tag]--;
+		}
 #endif
 
 		return ::operator delete(block, size);
@@ -60,7 +66,7 @@ namespace Apricot { namespace Memory {
 	}
 
 	template<typename T, typename... Args>
-	inline T* PlacementNew(AllocTag tag, void* address, Args&&... args)
+	inline T* PlacementNew(void* address, Args&&... args)
 	{
 		return new(address) T(std::forward<Args>(args)...);
 	}
@@ -81,8 +87,11 @@ namespace Apricot { namespace Memory {
 	inline void Delete(T* block, uint64 size, AllocTag tag = AllocTag::General)
 	{
 #ifdef AE_ENABLE_MEMORY_TRACE
-		HMemoryDebugger::AllocationSizes[(uint32)tag] -= size;
-		HMemoryDebugger::AllocationsCount[(uint32)tag]--;
+		if (block != nullptr)
+		{
+			HMemoryDebugger::AllocationSizes[(uint32)tag] -= size;
+			HMemoryDebugger::AllocationsCount[(uint32)tag]--;
+		}
 #endif
 
 		delete block;

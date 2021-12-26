@@ -39,8 +39,7 @@ namespace Apricot {
 		};
 
 		uint64 messageSize = strlen(message);
-		// TODO:
-		// AE_CORE_ASSERT(logTypeStrSize + messageSize < s_MessageBufferSize - 1, "Message buffer overflow!");
+		AE_CORE_VERIFY(logTypeStrSize + messageSize < s_MessageBufferSize - 1, "Message buffer overflow!");
 
 		Memory::Copy(s_MessageBuffer, logTypeStrings[(uint8)type], logTypeStrSize);
 		Memory::Copy(s_MessageBuffer + logTypeStrSize, message, messageSize);
