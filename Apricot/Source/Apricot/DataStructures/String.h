@@ -6,6 +6,55 @@
 namespace Apricot {
 
 	template<typename T>
+	inline uint64 CStrLength(const T* string)
+	{
+		STATIC_ASSERT(false, "");
+	}
+
+	template<>
+	inline uint64 CStrLength(const char8* string)
+	{
+		return (uint64)strlen(string);
+	}
+
+	template<>
+	inline uint64 CStrLength(const char16* string)
+	{
+		return (uint64)wcslen(string);
+	}
+
+	template<typename T>
+	struct THStringAlias
+	{
+		T* Data = nullptr;
+		uint64 Capacity = 0;
+		uint64 Size = 0;
+	};
+
+	template<typename T, uint64 S>
+	struct THStackStringAlias
+	{
+		T Data[S] = { 0 };
+		uint64 Size = 0;
+	};
+
+	template<typename T>
+	struct THStringViewAlias
+	{
+		const T* String = nullptr;
+		uint64 Size = 0;
+	};
+
+	template<typename T>
+	class TString;
+
+	template<typename T, uint64 S>
+	class TStackString;
+
+	template<typename T>
+	class TStringView;
+
+	template<typename T>
 	class TString
 	{
 	public:
@@ -17,7 +66,7 @@ namespace Apricot {
 		TString(const TString& other)
 		{
 			ReAllocate(other.m_Size);
-			Memory::Copy(m_Data, other.m_Data, m_Size * sizeof(T));
+			Memory::Copy(m_Data, other.m_Data, other.m_Size * sizeof(T));
 			m_Size = other.m_Size;
 		}
 
@@ -34,7 +83,7 @@ namespace Apricot {
 		TString(const T* other)
 		{
 			AE_CORE_ASSERT(other != nullptr, "Invalid argument!");
-			m_Size = strlen(other) + 1;
+			m_Size = CStrLength(other) + 1;
 			ReAllocate(m_Size);
 			Memory::Copy(m_Data, other, m_Size * sizeof(T));
 		}
@@ -67,6 +116,29 @@ namespace Apricot {
 			AE_CORE_ASSERT(capacity > 0, "Invalid argument!");
 			ReAllocate(capacity);
 			Clear();
+		}
+
+		template<uint64 S>
+		TString(const TStackString<T, S>& stack)
+		{
+			const THStackStringAlias<T, S>* alias = reinterpret_cast<const THStackStringAlias<T, S>*>(&stack);
+
+			ReAllocate(alias->Size);
+			Memory::Copy(m_Data, alias->Data, alias->Size * sizeof(T));
+			m_Size = alias->Size;
+		}
+
+		TString<T>(const TStringView<T>& view)
+		{
+			const THStringViewAlias<T>* alias = reinterpret_cast<const THStringViewAlias<T>*>(&view);
+
+			if (m_Capacity < alias->Size)
+			{
+				ReAllocate(alias->Size);
+			}
+
+			Memory::Copy(m_Data, alias->String, alias->Size * sizeof(T));
+			m_Size = alias->Size;
 		}
 
 		~TString()
@@ -102,7 +174,7 @@ namespace Apricot {
 
 		TString<T>& operator=(const T* other)
 		{
-			uint64 size = strlen(other) + 1;
+			uint64 size = CStrLength(other) + 1;
 
 			if (m_Capacity < size)
 			{
@@ -112,6 +184,31 @@ namespace Apricot {
 			Memory::Copy(m_Data, other, size * sizeof(T));
 			m_Size = size;
 
+			return *this;
+		}
+
+		template<uint64 S>
+		TString<T>& operator=(const TStackString<T, S>& stack)
+		{
+			const THStackStringAlias<T, S>* alias = reinterpret_cast<const THStackStringAlias<T, S>*>(&stack);
+
+			ReAllocate(alias->Size);
+			Memory::Copy(m_Data, alias->Data, alias->Size * sizeof(T));
+			m_Size = alias->Size;
+			return *this;
+		}
+
+		TString<T>& operator=(const TStringView<T>& view)
+		{
+			const THStringViewAlias<T>* alias = reinterpret_cast<const THStringViewAlias<T>*>(&view);
+
+			if (m_Capacity < alias->Size)
+			{
+				ReAllocate(alias->Size);
+			}
+
+			Memory::Copy(m_Data, alias->String, alias->Size * sizeof(T));
+			m_Size = alias->Size;
 			return *this;
 		}
 
@@ -208,7 +305,7 @@ namespace Apricot {
 		*/
 		TString<T>& Append(const T* string)
 		{
-			Impl_Append(string, strlen(string));
+			Impl_Append(string, CStrLength(string));
 			return *this;
 		}
 
@@ -223,17 +320,6 @@ namespace Apricot {
 		{
 			Impl_Append(string, stringSize);
 			return *this;
-		}
-
-	public:
-		template<typename... Args>
-		static TString<T> Format(const TString<T>& string, Args&&... args)
-		{
-			TString<T> formatted(string.Size());
-
-
-
-			return formatted;
 		}
 
 	private:
@@ -309,10 +395,9 @@ namespace Apricot {
 		* It includes the null-terminating character.
 		*/
 		uint64 m_Size = 0;
-	};
 
-	using String = TString<char>;
-	using WString = TString<wchar_t>;
+		friend class StringFormatter;
+	};
 
 	template<typename T, uint64 S>
 	class TStackString
@@ -327,18 +412,19 @@ namespace Apricot {
 		template<uint64 Q>
 		TStackString(const TStackString<T, Q>& other)
 		{
-			STATIC_ASSERT(S >= T, "Possible TStackString buffer overflow!");
+			STATIC_ASSERT(S >= Q, "Possible TStackString buffer overflow!");
 
-			m_Size = other.m_Size;
-			Memory::Copy(m_Data, other.m_Data, m_Size * sizeof(T));
+			m_Size = other.Size();
+			Memory::Copy(m_Data, other.Data(), m_Size * sizeof(T));
 		}
 
 		TStackString(const T* string)
 		{
 			// + null-terminating character
-			m_Size = strlen(string) + 1;
-			AE_CORE_VERIFY(m_Size <= S, "Overflowing the TStackString buffer!");
+			uint64 stringSize = CStrLength(string) + 1;
+			AE_CORE_VERIFY_RETURN(stringSize <= S, RETURN_VOID, "Overflowing the TStackString buffer!");
 
+			m_Size = stringSize;
 			Memory::Copy(m_Data, string, m_Size * sizeof(T));
 		}
 
@@ -350,6 +436,24 @@ namespace Apricot {
 			Memory::Copy(m_Data, string, m_Size * sizeof(T));
 		}
 
+		TStackString(const TString<T>& string)
+		{
+			const THStringAlias<T>* alias = reinterpret_cast<const THStringAlias<T>*>(&string);
+			AE_CORE_VERIFY_RETURN(alias->Size <= S, RETURN_VOID, "TStackString buffer overflow!");
+
+			m_Size = alias->Size;
+			Memory::Copy(m_Data, alias->Data, m_Size * sizeof(T));
+		}
+
+		TStackString(const TStringView<T>& view)
+		{
+			const THStringViewAlias<T>* alias = reinterpret_cast<const THStringViewAlias<T>*>(&view);
+			AE_CORE_VERIFY_RETURN(alias->Size <= S, RETURN_VOID, "TStackString buffer overflow!");
+
+			m_Size = alias->Size;
+			Memory::Copy(m_Data, alias->String, m_Size * sizeof(T));
+		}
+
 	public:
 		template<uint64 Q>
 		TStackString<T, S>& operator=(const TStackString<T, Q>& other)
@@ -358,6 +462,26 @@ namespace Apricot {
 
 			m_Size = other.m_Size;
 			Memory::Copy(m_Data, other.m_Data, m_Size * sizeof(T));
+			return *this;
+		}
+
+		TStackString<T, S>& operator=(const TString<T>& string)
+		{
+			const THStringAlias<T>* alias = reinterpret_cast<const THStringAlias<T>*>(&string);
+			AE_CORE_VERIFY_RETURN(alias->Size <= S, *this, "TStackString buffer overflow!");
+
+			m_Size = alias->Size;
+			Memory::Copy(m_Data, alias->Data, m_Size * sizeof(T));
+			return *this;
+		}
+
+		TStackString<T, S>& operator=(const TStringView<T>& view)
+		{
+			const THStringViewAlias<T>* alias = reinterpret_cast<const THStringViewAlias<T>*>(&view);
+			AE_CORE_VERIFY_RETURN(alias->Size <= S, *this, "TStackString buffer overflow!");
+
+			m_Size = alias->Size;
+			Memory::Copy(m_Data, alias->String, m_Size * sizeof(T));
 			return *this;
 		}
 
@@ -374,63 +498,133 @@ namespace Apricot {
 		}
 
 	public:
-		inline T* Data() const { return m_Data; }
+		inline T* Data() const { return const_cast<T*>(&m_Data[0]); }
 		inline uint64 MaxSize() const { return S; }
 		inline uint64 Size() const { return m_Size; }
 
-	public:
-		template<typename... Args>
-		static TStackString<T, S> Format(const TStackString<T, S>& string, Args&&... args)
+		T PushBack(T character)
 		{
-			TStackString<T, S> formatted;
-
-			bool insideArg = false;
-			uint64 argBegin = 0;
-			uint64 argEnd = 0;
-			uint64 argSize = 0;
-			uint64 formattedOffset = 0;
-
-			for (uint64 index = 0; index < string.Size(); index++)
-			{
-				const T character = string[index];
-				if (character == '{')
-				{
-					argBegin = index;
-					insideArg = true;
-				}
-				else if (character == '}')
-				{
-					argEnd = index + 1;
-					argSize = argEnd - argBegin;
-					insideArg = false;
-				}
-				else if (!insideArg)
-				{
-					formatted[formattedOffset] = character;
-					formattedOffset++;
-				}
-			}
-
-			return formatted;
+			AE_CORE_ASSERT(m_Size < S, "TStackString buffer overflow!")
+			m_Data[m_Size - 1] = character;
+			m_Data[m_Size] = 0;
+			m_Size++;
+			return character;
 		}
-
-	private:
 
 	private:
 		T m_Data[S] = { 0 };
 		// Includes the null-terminating character
 		uint64 m_Size = 0;
+
+		friend class StringFormatter;
 	};
 
-	// String allocated completely on the stack
-	using String16 = TStackString<char, 16>;
-	using String32 = TStackString<char, 32>;
-	using String64 = TStackString<char, 64>;
-	using String128 = TStackString<char, 128>;
+	template<typename T>
+	class TStringView
+	{
+	public:
+		TStringView()
+		{
 
-	using WString16 = TStackString<wchar_t, 16>;
-	using WString32 = TStackString<wchar_t, 32>;
-	using WString64 = TStackString<wchar_t, 64>;
-	using WString128 = TStackString<wchar_t, 128>;
+		}
+
+		TStringView(const TStringView<T>& other)
+		{
+			m_String = other.m_String;
+			m_Size = other.m_Size;
+		}
+
+		TStringView(const T* string)
+		{
+			m_String = string;
+			m_Size = CStrLength(m_String) + 1;
+		}
+
+		TStringView(const T* string, uint64 size)
+		{
+			m_String = string;
+			m_Size = size;
+		}
+
+		TStringView(const TString<T>& string)
+		{
+			const THStringAlias<T>* alias = reinterpret_cast<const THStringAlias<T>*>(&string);
+			m_String = alias->Data;
+			m_Size = alias->Size;
+		}
+
+		template<uint64 S>
+		TStringView(const TStackString<T, S>& stack)
+		{
+			const THStackStringAlias<T, S>* alias = reinterpret_cast<const THStackStringAlias<T, S>*>(&stack);
+			m_String = alias->Data;
+			m_Size = alias->Size;
+		}
+
+	public:
+		TStringView<T>& operator=(const TStringView<T>& other)
+		{
+			m_String = other.m_String;
+			m_Size = other.m_Size;
+			return *this;
+		}
+
+		TStringView<T>& operator=(const T* string)
+		{
+			m_String = string;
+			m_Size = CStrLength(string) + 1;
+			return *this;
+		}
+
+		TStringView<T>& operator=(const TString<T>& string)
+		{
+			const THStringAlias<T>* alias = reinterpret_cast<const THStringAlias<T>*>(&string);
+			m_String = alias->Data;
+			m_Size = alias->Size;
+			return *this;
+		}
+
+		template<uint64 S>
+		TStringView<T>& operator=(const TStackString<T, S>& stack)
+		{
+			const THStackStringAlias<T, S>* alias = reinterpret_cast<const THStackStringAlias<T, S>*>(&stack);
+			m_String = alias->Data;
+			m_Size = alias->Size;
+			return *this;
+		}
+
+		const T& operator[](uint64 index) const
+		{
+			AE_CORE_ASSERT(index < m_Size, "Index out of range!");
+			return m_String[index];
+		}
+
+	public:
+		const T* String() const { return m_String; }
+		uint64 Size() const { return m_String; }
+
+	private:
+		const T* m_String = nullptr;
+		uint64 m_Size = 0;
+	};
+
+	// Strings allocated on the heap
+	using String = TString<char8>;
+	using WString = TString<char16>;
+
+	// Strings allocated completely on the stack
+	using String16		= TStackString<char8, 16>;
+	using String32		= TStackString<char8, 32>;
+	using String64		= TStackString<char8, 64>;
+	using String128		= TStackString<char8, 128>;
+
+	using WString16		= TStackString<char16, 16>;
+	using WString32		= TStackString<char16, 32>;
+	using WString64		= TStackString<char16, 64>;
+	using WString128	= TStackString<char16, 128>;
+
+	// StringViews
+	using StringView	= TStringView<char8>;
+	using WStringView	= TStringView<char16>;
 
 }

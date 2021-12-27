@@ -2,6 +2,7 @@ project "AE"
     kind "SharedLib"
     language "C++"
     cppdialect "C++20"
+    staticruntime "off"
 
     filter { "system:windows", "configurations:Debug_Game" }
 
@@ -50,6 +51,7 @@ project "AE"
     }
 
     filter { "system:windows" }
+        systemversion "latest"
         defines
         {
             "AE_PLATFORM_WINDOWS"

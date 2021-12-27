@@ -66,7 +66,7 @@
 	#define AE_ENABLE_ASSERTS
 	#define AE_ENABLE_VERIFIES
 	#define AE_ENABLE_MEMORY_TRACE
-#elif AE_RELEASE
+#elif defined(AE_RELEASE)
 	#define AE_ENABLE_LOG_INFO
 	#define AE_ENABLE_LOG_WARN
 	#define AE_ENABLE_LOG_ERROR
@@ -89,7 +89,7 @@
 */
 #ifdef AE_COMPILER_MSVC
 	#define STATIC_ASSERT(...) static_assert(__VA_ARGS__)
-	#define DEBUGBREAK() __debugbreak();
+	#define DEBUGBREAK() __debugbreak()
 #else
 	#define STATIC_ASSERT(...) 
 	#define DEBUGBREAK() 

@@ -33,7 +33,7 @@ namespace Apricot {
 		* @param type Determine the color of the message in the console
 		* @param message The message to be printed
 		*/
-		static void LogCoreMessage(Log type, const char* message);
+		static void LogCoreMessage(Log type, const char8* message);
 
 		/*
 		* Prints a message to the console
@@ -44,14 +44,13 @@ namespace Apricot {
 		* @param args The argument pack - It will be formatted
 		*/
 		template<typename... Args>
-		static void LogCoreMessage(Log type, const char* message, Args&&... args)
+		static void LogCoreMessage(Log type, const char8* message, Args&&... args)
 		{
-			// TODO: Implement!
 			LogCoreMessage(type, message);
 		}
 
 	private:
-		static char* s_MessageBuffer;
+		static char8* s_MessageBuffer;
 		static uint64 s_MessageBufferSize;
 	};
 

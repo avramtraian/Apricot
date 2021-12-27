@@ -14,7 +14,7 @@ namespace Apricot {
 		Platform::CreateConsole();
 
 		s_MessageBufferSize = 1024;
-		s_MessageBuffer = (char*)Memory::Allocate(s_MessageBufferSize, Memory::AllocTag::CoreSystems);
+		s_MessageBuffer = (char8*)Memory::Allocate(s_MessageBufferSize, Memory::AllocTag::CoreSystems);
 	}
 
 	void Logger::Destroy()
@@ -22,13 +22,13 @@ namespace Apricot {
 		Memory::Free(s_MessageBuffer, s_MessageBufferSize, Memory::AllocTag::CoreSystems);
 	}
 
-	void Logger::LogCoreMessage(Log type, const char* message)
+	void Logger::LogCoreMessage(Log type, const char8* message)
 	{
-		static uint32 colors[(uint8)Log::MaxEnum] = { 64, 14, 12, 2, 13, 8 };
+		static uint32 colors[(uint8)Log::MaxEnum] = { 64, 12, 14, 2, 13, 8 };
 
 		// Doesn't include the null-terminating character
 		static const uint16 logTypeStrSize = sizeof("[FATAL]: ") - 1;
-		static const char* logTypeStrings[(uint8)Log::MaxEnum] =
+		static const char8* logTypeStrings[(uint8)Log::MaxEnum] =
 		{
 			"[FATAL]: ",
 			"[ERROR]: ",

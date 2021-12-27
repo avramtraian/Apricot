@@ -2,6 +2,7 @@ project "ApricotJam"
     kind "WindowedApp"
     language "C++"
     cppdialect "C++20"
+    staticruntime "off"
 
     filter { "system:windows", "configurations:Debug_Game" }
 
@@ -60,6 +61,7 @@ project "ApricotJam"
     }
 
     filter { "system:windows" }
+        systemversion "latest"
         defines
         {
             "AE_PLATFORM_WINDOWS"
