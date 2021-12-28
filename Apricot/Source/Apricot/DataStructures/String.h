@@ -229,6 +229,8 @@ namespace Apricot {
 		inline uint64 Capacity() const { return m_Capacity; }
 		inline uint64 Size() const { return m_Size; }
 
+		inline const T* c_str() const { return m_Data; }
+
 		/*
 		* Set the size to 1 (null-terminating character only).
 		* It doesn't actually deletes the data, or modifies the capacity of the string.
@@ -502,6 +504,8 @@ namespace Apricot {
 		inline uint64 MaxSize() const { return S; }
 		inline uint64 Size() const { return m_Size; }
 
+		inline const T* c_str() const { return m_Data; }
+
 		T PushBack(T character)
 		{
 			AE_CORE_ASSERT(m_Size < S, "TStackString buffer overflow!")
@@ -601,7 +605,9 @@ namespace Apricot {
 
 	public:
 		const T* String() const { return m_String; }
-		uint64 Size() const { return m_String; }
+		uint64 Size() const { return m_Size; }
+
+		inline const T* c_str() const { return m_String; }
 
 	private:
 		const T* m_String = nullptr;

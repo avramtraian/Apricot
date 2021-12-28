@@ -8,6 +8,7 @@ namespace Apricot {
 
 	char* Logger::s_MessageBuffer = nullptr;
 	uint64 Logger::s_MessageBufferSize = 0;
+	Memory::LinearAllocator Logger::s_ArgsAllocator;
 
 	void Logger::Init()
 	{
@@ -15,11 +16,17 @@ namespace Apricot {
 
 		s_MessageBufferSize = 1024;
 		s_MessageBuffer = (char8*)Memory::Allocate(s_MessageBufferSize, Memory::AllocTag::CoreSystems);
+
+		void* argsMemoryBlock = Memory::Allocate(AE_KILOBYTES(8), Memory::AllocTag::CoreSystems);
+		Memory::LinearAllocator::Create(&s_ArgsAllocator, AE_KILOBYTES(8), argsMemoryBlock);
 	}
 
 	void Logger::Destroy()
 	{
 		Memory::Free(s_MessageBuffer, s_MessageBufferSize, Memory::AllocTag::CoreSystems);
+
+		Memory::Free(s_ArgsAllocator.MemoryBlock(), s_ArgsAllocator.GetTotalSize(), Memory::AllocTag::CoreSystems);
+		Memory::LinearAllocator::Destroy(&s_ArgsAllocator);
 	}
 
 	void Logger::LogCoreMessage(Log type, const char8* message)
@@ -46,6 +53,402 @@ namespace Apricot {
 		s_MessageBuffer[logTypeStrSize + messageSize] = '\n';
 
 		Platform::PrintToConsole(s_MessageBuffer, logTypeStrSize + messageSize + 1, colors[(uint8)type]);
+	}
+
+	template<typename T, typename Q>
+	APRICOT_API THFormatter<T>& operator<<(THFormatter<T>& formatter, const Q& value)
+	{
+		STATIC_ASSERT(false, "Implrmrnt THFormatter<T>& operator<<(THFormatter<T>&, const Q&) in order to format this type!");
+		return formatter;
+	}
+
+	template<typename T, typename Q>
+	APRICOT_API THFormatter<T>& operator<<(THFormatter<T>& formatter, const Q* value)
+	{
+		STATIC_ASSERT(false, "Implrmrnt THFormatter<T>& operator<<(THFormatter<T>&, const Q*) in order to format this type!");
+		return formatter;
+	}
+
+	template<>
+	APRICOT_API THFormatter<char8>& operator<<(THFormatter<char8>& formatter, const uint8& value)
+	{
+		if (value == 0)
+		{
+			formatter.Data = (char8*)formatter.Allocator->Allocate(sizeof(char8));
+			formatter.Data[0] = '0';
+			formatter.Size = sizeof(char8);
+			return formatter;
+		}
+
+		uint64 requiredAllocationSize = 0;
+		auto tempValue = value;
+
+		uint8 digits = 0;
+		while (tempValue != 0)
+		{
+			digits++;
+			requiredAllocationSize += sizeof(char8);
+			tempValue /= 10;
+		}
+
+		char8* allocation = (char8*)formatter.Allocator->Allocate(requiredAllocationSize);
+		formatter.Data = allocation;
+		formatter.Size = requiredAllocationSize;
+
+		tempValue = value;
+		uint64 offset = 0;
+		while (tempValue != 0)
+		{
+			allocation[digits - offset - 1] = '0' + tempValue % 10;
+			tempValue /= 10;
+			offset++;
+		}
+
+		return formatter;
+	}
+
+	template<>
+	APRICOT_API THFormatter<char8>& operator<<(THFormatter<char8>& formatter, const uint16& value)
+	{
+		if (value == 0)
+		{
+			formatter.Data = (char8*)formatter.Allocator->Allocate(sizeof(char8));
+			formatter.Data[0] = '0';
+			formatter.Size = sizeof(char8);
+			return formatter;
+		}
+
+		uint64 requiredAllocationSize = 0;
+		auto tempValue = value;
+
+		uint8 digits = 0;
+		while (tempValue != 0)
+		{
+			digits++;
+			requiredAllocationSize += sizeof(char8);
+			tempValue /= 10;
+		}
+
+		char8* allocation = (char8*)formatter.Allocator->Allocate(requiredAllocationSize);
+		formatter.Data = allocation;
+		formatter.Size = requiredAllocationSize;
+
+		tempValue = value;
+		uint64 offset = 0;
+		while (tempValue != 0)
+		{
+			allocation[digits - offset - 1] = '0' + tempValue % 10;
+			tempValue /= 10;
+			offset++;
+		}
+
+		return formatter;
+	}
+
+	template<>
+	APRICOT_API THFormatter<char8>& operator<<(THFormatter<char8>& formatter, const uint32& value)
+	{
+		if (value == 0)
+		{
+			formatter.Data = (char8*)formatter.Allocator->Allocate(sizeof(char8));
+			formatter.Data[0] = '0';
+			formatter.Size = sizeof(char8);
+			return formatter;
+		}
+
+		uint64 requiredAllocationSize = 0;
+		auto tempValue = value;
+
+		uint8 digits = 0;
+		while (tempValue != 0)
+		{
+			digits++;
+			requiredAllocationSize += sizeof(char8);
+			tempValue /= 10;
+		}
+
+		char8* allocation = (char8*)formatter.Allocator->Allocate(requiredAllocationSize);
+		formatter.Data = allocation;
+		formatter.Size = requiredAllocationSize;
+
+		tempValue = value;
+		uint64 offset = 0;
+		while (tempValue != 0)
+		{
+			allocation[digits - offset - 1] = '0' + tempValue % 10;
+			tempValue /= 10;
+			offset++;
+		}
+
+		return formatter;
+	}
+
+	template<>
+	APRICOT_API THFormatter<char8>& operator<<(THFormatter<char8>& formatter, const uint64& value)
+	{
+		if (value == 0)
+		{
+			formatter.Data = (char8*)formatter.Allocator->Allocate(sizeof(char8));
+			formatter.Data[0] = '0';
+			formatter.Size = sizeof(char8);
+			return formatter;
+		}
+
+		uint64 requiredAllocationSize = 0;
+		auto tempValue = value;
+
+		uint8 digits = 0;
+		while (tempValue != 0)
+		{
+			digits++;
+			requiredAllocationSize += sizeof(char8);
+			tempValue /= 10;
+		}
+
+		char8* allocation = (char8*)formatter.Allocator->Allocate(requiredAllocationSize);
+		formatter.Data = allocation;
+		formatter.Size = requiredAllocationSize;
+
+		tempValue = value;
+		uint64 offset = 0;
+		while (tempValue != 0)
+		{
+			allocation[digits - offset - 1] = '0' + tempValue % 10;
+			tempValue /= 10;
+			offset++;
+		}
+
+		return formatter;
+	}
+
+	template<>
+	APRICOT_API THFormatter<char8>& operator<<(THFormatter<char8>& formatter, const int8& value)
+	{
+		if (value == 0)
+		{
+			formatter.Data = (char8*)formatter.Allocator->Allocate(sizeof(char8));
+			formatter.Data[0] = '0';
+			formatter.Size = sizeof(char8);
+			return formatter;
+		}
+
+		uint64 requiredAllocationSize = 0;
+		uint8 sign = 0;
+		auto tempValue = value;
+		if (value < 0)
+		{
+			sign = 1;
+			tempValue *= -1;
+			requiredAllocationSize += sizeof(char8);
+		}
+
+		uint8 digits = 0;
+		while (tempValue != 0)
+		{
+			digits++;
+			requiredAllocationSize += sizeof(char8);
+			tempValue /= 10;
+		}
+
+		char8* allocation = (char8*)formatter.Allocator->Allocate(requiredAllocationSize);
+		formatter.Data = allocation;
+		formatter.Size = requiredAllocationSize / sizeof(char8);
+
+		tempValue = value;
+		if (value < 0)
+		{
+			tempValue *= -1;
+			allocation[0] = '-';
+		}
+
+		uint64 offset = 0;
+		while (tempValue != 0)
+		{
+			allocation[digits + sign - offset - 1] = '0' + tempValue % 10;
+			tempValue /= 10;
+			offset++;
+		}
+
+		return formatter;
+	}
+
+	template<>
+	APRICOT_API THFormatter<char8>& operator<<(THFormatter<char8>& formatter, const int16& value)
+	{
+		if (value == 0)
+		{
+			formatter.Data = (char8*)formatter.Allocator->Allocate(sizeof(char8));
+			formatter.Data[0] = '0';
+			formatter.Size = sizeof(char8);
+			return formatter;
+		}
+
+		uint64 requiredAllocationSize = 0;
+		uint8 sign = 0;
+		auto tempValue = value;
+		if (value < 0)
+		{
+			sign = 1;
+			tempValue *= -1;
+			requiredAllocationSize += sizeof(char8);
+		}
+
+		uint8 digits = 0;
+		while (tempValue != 0)
+		{
+			digits++;
+			requiredAllocationSize += sizeof(char8);
+			tempValue /= 10;
+		}
+
+		char8* allocation = (char8*)formatter.Allocator->Allocate(requiredAllocationSize);
+		formatter.Data = allocation;
+		formatter.Size = requiredAllocationSize / sizeof(char8);
+
+		tempValue = value;
+		if (value < 0)
+		{
+			tempValue *= -1;
+			allocation[0] = '-';
+		}
+
+		uint64 offset = 0;
+		while (tempValue != 0)
+		{
+			allocation[digits + sign - offset - 1] = '0' + tempValue % 10;
+			tempValue /= 10;
+			offset++;
+		}
+
+		return formatter;
+	}
+
+	template<>
+	APRICOT_API THFormatter<char8>& operator<<(THFormatter<char8>& formatter, const int32& value)
+	{
+		if (value == 0)
+		{
+			formatter.Data = (char8*)formatter.Allocator->Allocate(sizeof(char8));
+			formatter.Data[0] = '0';
+			formatter.Size = sizeof(char8);
+			return formatter;
+		}
+
+		uint64 requiredAllocationSize = 0;
+		uint8 sign = 0;
+		auto tempValue = value;
+		if (value < 0)
+		{
+			sign = 1;
+			tempValue *= -1;
+			requiredAllocationSize += sizeof(char8);
+		}
+
+		uint8 digits = 0;
+		while (tempValue != 0)
+		{
+			digits++;
+			requiredAllocationSize += sizeof(char8);
+			tempValue /= 10;
+		}
+
+		char8* allocation = (char8*)formatter.Allocator->Allocate(requiredAllocationSize);
+		formatter.Data = allocation;
+		formatter.Size = requiredAllocationSize / sizeof(char8);
+
+		tempValue = value;
+		if (value < 0)
+		{
+			tempValue *= -1;
+			allocation[0] = '-';
+		}
+
+		uint64 offset = 0;
+		while (tempValue != 0)
+		{
+			allocation[digits + sign - offset - 1] = '0' + tempValue % 10;
+			tempValue /= 10;
+			offset++;
+		}
+
+		return formatter;
+	}
+
+	template<>
+	APRICOT_API THFormatter<char8>& operator<<(THFormatter<char8>& formatter, const int64& value)
+	{
+		if (value == 0)
+		{
+			formatter.Data = (char8*)formatter.Allocator->Allocate(sizeof(char8));
+			formatter.Data[0] = '0';
+			formatter.Size = sizeof(char8);
+			return formatter;
+		}
+
+		uint64 requiredAllocationSize = 0;
+		uint8 sign = 0;
+		auto tempValue = value;
+		if (value < 0)
+		{
+			sign = 1;
+			tempValue *= -1;
+			requiredAllocationSize += sizeof(char8);
+		}
+
+		uint8 digits = 0;
+		while (tempValue != 0)
+		{
+			digits++;
+			requiredAllocationSize += sizeof(char8);
+			tempValue /= 10;
+		}
+
+		char8* allocation = (char8*)formatter.Allocator->Allocate(requiredAllocationSize);
+		formatter.Data = allocation;
+		formatter.Size = requiredAllocationSize / sizeof(char8);
+
+		tempValue = value;
+		if (value < 0)
+		{
+			tempValue *= -1;
+			allocation[0] = '-';
+		}
+
+		uint64 offset = 0;
+		while (tempValue != 0)
+		{
+			allocation[digits + sign - offset - 1] = '0' + tempValue % 10;
+			tempValue /= 10;
+			offset++;
+		}
+
+		return formatter;
+	}
+
+	template<>
+	APRICOT_API THFormatter<char8>& operator<<(THFormatter<char8>& formatter, const char8* value)
+	{
+		formatter.Size = strlen(value);
+		formatter.Data = (char8*)formatter.Allocator->Allocate(formatter.Size * sizeof(char8));
+		Memory::Copy(formatter.Data, value, formatter.Size * sizeof(char8));
+
+		return formatter;
+	}
+
+	template<>
+	APRICOT_API THFormatter<char8>& operator<<(THFormatter<char8>& formatter, const String& value)
+	{
+		char8* allocation = formatter.Allocate((value.Size() - 1) * sizeof(char8));
+		Memory::Copy(allocation, value.Data(), formatter.Size * sizeof(char8));
+		return formatter;
+	}
+
+	template<>
+	APRICOT_API THFormatter<char8>& operator<<(THFormatter<char8>& formatter, const StringView& value)
+	{
+		char8* allocation = formatter.Allocate((value.Size() - 1) * sizeof(char8));
+		Memory::Copy(allocation, value.String(), formatter.Size * sizeof(char8));
+		return formatter;
 	}
 
 }

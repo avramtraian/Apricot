@@ -32,6 +32,15 @@ namespace Apricot { namespace Memory {
 		void* Allocate(uint64 size);
 		void FreeAll();
 
+		// Helpers
+		uint8* MemoryBlock() const { return m_MemoryBlock; }
+		bool OwnsMemoryBlock() const { return m_bOwnsMemory; }
+		uint64 GetTotalSize() const { return m_TotalSize; }
+		uint64 GetAllocated() const { return m_Allocated; }
+		void* GetCurrentMark() const { return m_MemoryBlock + m_Allocated; }
+		uint64 GetRemainingSize() const { return m_TotalSize - m_Allocated; }
+		bool HasEnoughMemory(uint64 size) const { return (size <= GetRemainingSize()); }
+
 	public:
 		static void Create(LinearAllocator* allocator, uint64 size, void* memoryBlock = nullptr);
 		static void Destroy(LinearAllocator* allocator);
@@ -52,6 +61,15 @@ namespace Apricot { namespace Memory {
 
 		StackAllocator(const StackAllocator&) = delete;
 		StackAllocator& operator=(const StackAllocator&) = delete;
+
+		// Helpers
+		uint8* MemoryBlock() const { return m_MemoryBlock; }
+		bool OwnsMemoryBlock() const { return m_bOwnsMemory; }
+		uint64 GetTotalSize() const { return m_TotalSize; }
+		uint64 GetAllocated() const { return m_Allocated; }
+		void* GetCurrentMark() const { return m_MemoryBlock + m_Allocated; }
+		uint64 GetRemainingSize() const { return m_TotalSize - m_Allocated; }
+		bool HasEnoughMemory(uint64 size) const { return (size <= GetRemainingSize()); }
 
 		void* Allocate(uint64 size);
 		void Free(uint64 size);
