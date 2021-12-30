@@ -4,45 +4,27 @@ project "AE"
     cppdialect "C++20"
     staticruntime "off"
 
-    filter { "system:windows", "configurations:Debug_Game" }
-
-        targetdir ("%{wks.location}/Binaries/Win64-Debug")
-        objdir ("%{wks.location}/Binaries-Int/%{prj.name}")
-
-    filter { "system:windows", "configurations:Release_Game" }
-
-        targetdir ("%{wks.location}/Binaries/Win64-Release")
-        objdir ("%{wks.location}/Binaries-Int/%{prj.name}")
-
-    filter { "system:windows", "configurations:Shipping_Game" }
-
-        targetdir ("%{wks.location}/Binaries/Win64-Shipping")
-        objdir ("%{wks.location}/Binaries-Int/%{prj.name}")
-
-    filter { "system:windows", "configurations:Debug_Editor" }
-
-        targetdir ("%{wks.location}/Binaries/Win64-DebugEd")
-        objdir ("%{wks.location}/Binaries-Int/%{prj.name}")
-
-    filter { "system:windows", "configurations:Release_Editor" }
-
-        targetdir ("%{wks.location}/Binaries/Win64-ReleaseEd")
-        objdir ("%{wks.location}/Binaries-Int/%{prj.name}")
-
-    filter {}
-
     pchheader "aepch.h"
     pchsource "Source/aepch.cpp"
 
     files
     {
         "Source/**.h",
-        "Source/**.cpp"
+        "Source/**.cpp",
+
+        "Vendor/optick/Include/**.h"
     }
 
     includedirs
     {
-        "Source/"
+        "Source",
+
+        "%{IncludeDirs.optick}"
+    }
+
+    links
+    {
+        "OptickCore.lib"
     }
 
     defines
@@ -50,6 +32,20 @@ project "AE"
         "AE_EXPORT_DLL"
     }
 
+    filter { "configurations:Debug_Game or configurations:Debug_Editor" }
+        libdirs
+        {
+            "Vendor/optick/Binaries/Win64-Debug"
+        }
+        
+    filter { "configurations:Release_Game or Release_Editor" }
+        libdirs
+        {
+            "Vendor/optick/Binaries/Win64-Release"
+        }
+        
+    filter {}
+        
     filter { "system:windows" }
         systemversion "latest"
         defines
@@ -61,6 +57,10 @@ project "AE"
         defines
         {
             "AE_CONFIG_DEBUG_GAME"
+        }
+        postbuildcommands
+        {
+
         }
 
     filter { "configurations:Release_Game" }
@@ -86,3 +86,50 @@ project "AE"
         {
             "AE_CONFIG_RELEASE_EDITOR"
         }
+
+    filter { "system:windows", "configurations:Debug_Game" }
+
+        targetdir ("%{wks.location}/Binaries/Win64-Debug")
+        objdir ("%{wks.location}/Binaries-Int/%{prj.name}")
+
+        postbuildcommands
+        {
+            "copy Vendor\\optick\\Binaries\\Win64-Debug\\OptickCore.dll %{wks.location}\\Binaries\\Win64-Debug"
+        }
+
+    filter { "system:windows", "configurations:Release_Game" }
+
+        targetdir ("%{wks.location}/Binaries/Win64-Release")
+        objdir ("%{wks.location}/Binaries-Int/%{prj.name}")
+
+        postbuildcommands
+        {
+            "copy Vendor\\optick\\Binaries\\Win64-Release\\OptickCore.dll %{wks.location}\\Binaries\\Win64-Release"
+        }
+
+    filter { "system:windows", "configurations:Shipping_Game" }
+
+        targetdir ("%{wks.location}/Binaries/Win64-Shipping")
+        objdir ("%{wks.location}/Binaries-Int/%{prj.name}")
+
+    filter { "system:windows", "configurations:Debug_Editor" }
+
+        targetdir ("%{wks.location}/Binaries/Win64-DebugEd")
+        objdir ("%{wks.location}/Binaries-Int/%{prj.name}")
+
+        postbuildcommands
+        {
+            "copy Vendor\\optick\\Binaries\\Win64-Debug\\OptickCore.dll %{wks.location}\\Binaries\\Win64-DebugEd"
+        }
+
+    filter { "system:windows", "configurations:Release_Editor" }
+
+        targetdir ("%{wks.location}/Binaries/Win64-ReleaseEd")
+        objdir ("%{wks.location}/Binaries-Int/%{prj.name}")
+
+        postbuildcommands
+        {
+            "copy Vendor\\optick\\Binaries\\Win64-Release\\OptickCore.dll %{wks.location}\\Binaries\\Win64-ReleaseEd"
+        }
+
+    filter {}

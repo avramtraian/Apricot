@@ -2,6 +2,7 @@
 #include "Engine.h"
 
 #include "Memory.h"
+#include "Profiler.h"
 
 namespace Apricot {
 
@@ -28,6 +29,8 @@ namespace Apricot {
 		HTime lastFrameTime = Platform::GetPerformanceTime();
 		while (m_bIsRunning)
 		{
+			AE_PERFORMANCE_BEGIN_FRAME("MainThread");
+
 			HTime now = Platform::GetPerformanceTime();
 			HTimestep timestep = now - lastFrameTime;
 			lastFrameTime = now;

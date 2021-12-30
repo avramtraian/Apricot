@@ -19,6 +19,7 @@ namespace Apricot { namespace Memory {
 		None = 0,
 		General,
 		CoreSystems,
+		Optick,
 		LinearAllocator,
 		StackAllocator,
 		String,

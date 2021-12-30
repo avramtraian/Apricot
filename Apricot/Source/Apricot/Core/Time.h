@@ -13,7 +13,7 @@ namespace Apricot {
 			: Time(time) {}
 
 		static HTime Sec  (uint64 seconds)      { return HTime(seconds      * 1000 * 1000 * 1000); }
-		static HTime Mili (uint64 milseconds)   { return HTime(milseconds   * 1000 * 1000); }
+		static HTime Mili (uint64 miliseconds)  { return HTime(miliseconds  * 1000 * 1000); }
 		static HTime Micro(uint64 microseconds) { return HTime(microseconds * 1000); }
 		static HTime Nano (uint64 nanoseconds)  { return HTime(nanoseconds); }
 
@@ -64,29 +64,4 @@ namespace Apricot {
 		float32 DeltaTime = 0.0f;
 	};
 
-	class APRICOT_API ScopedTimer
-	{
-	public:
-		ScopedTimer(const char* name);
-		~ScopedTimer();
-
-	public:
-		void EndRecording();
-
-	private:
-		HTime m_StartingTime;
-		String64 m_TimerName;
-	};
-
 }
-
-/*
-* 
-*/
-#ifdef AE_ENABLE_SCOPED_TIMERS
-	#define AE_PERFORMANCE_SCOPE(TimerName) Apricot::ScopedTimer scTimer(TimerName)
-	#define AE_PERFORMANCE_FUNCTION()       Apricot::ScopedTimer fnTimer(__FUNCSIG__)
-#else
-	#define AE_PERFORMANCE_SCOPE(TimerName) 
-	#define AE_PERFORMANCE_FUNCTION() 
-#endif

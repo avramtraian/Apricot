@@ -14,11 +14,12 @@ workspace "Apricot"
 
 IncludeDirs = {};
 IncludeDirs["AE"] = "%{wks.location}/Apricot/Source"
+IncludeDirs["optick"] = "%{wks.location}/Apricot/Vendor/optick/Include"
 
 group "Core"
     include "Apricot"
 group "Tools"
     include "ApricotJam"
 group "Dependencies"
-
+    
 group ""

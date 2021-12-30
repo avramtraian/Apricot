@@ -46,8 +46,10 @@ project "ApricotJam"
 
     includedirs
     {
+        "Source",
+
         "%{IncludeDirs.AE}",
-        "Source"
+        "%{IncludeDirs.optick}"
     }
 
     links
