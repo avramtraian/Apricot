@@ -21,6 +21,7 @@ namespace Apricot {
 
 	private:
 		 static Engine* s_Engine;
+		 bool m_bIsRunning = true;
 	};
 
 	extern Engine* CreateEngine(uint64& engineSize);

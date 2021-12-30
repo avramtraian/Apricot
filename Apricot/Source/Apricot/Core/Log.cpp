@@ -15,7 +15,7 @@ namespace Apricot {
 		Platform::CreateConsole();
 
 		s_MessageBufferSize = 1024;
-		s_MessageBuffer = (char8*)Memory::Allocate(s_MessageBufferSize, Memory::AllocTag::CoreSystems);
+		s_MessageBuffer = (char8*)Memory::Allocate(s_MessageBufferSize * sizeof(char8), Memory::AllocTag::CoreSystems);
 
 		void* argsMemoryBlock = Memory::Allocate(AE_KILOBYTES(8), Memory::AllocTag::CoreSystems);
 		Memory::LinearAllocator::Create(&s_ArgsAllocator, AE_KILOBYTES(8), argsMemoryBlock);
@@ -23,7 +23,7 @@ namespace Apricot {
 
 	void Logger::Destroy()
 	{
-		Memory::Free(s_MessageBuffer, s_MessageBufferSize, Memory::AllocTag::CoreSystems);
+		Memory::Free(s_MessageBuffer, s_MessageBufferSize * sizeof(char8), Memory::AllocTag::CoreSystems);
 
 		Memory::Free(s_ArgsAllocator.MemoryBlock(), s_ArgsAllocator.GetTotalSize(), Memory::AllocTag::CoreSystems);
 		Memory::LinearAllocator::Destroy(&s_ArgsAllocator);
@@ -419,6 +419,144 @@ namespace Apricot {
 		{
 			allocation[digits + sign - offset - 1] = '0' + tempValue % 10;
 			tempValue /= 10;
+			offset++;
+		}
+
+		return formatter;
+	}
+
+	template<>
+	APRICOT_API THFormatter<char8>& operator<<(THFormatter<char8>& formatter, const float32& value)
+	{
+		int64 valueInt = (int64)value;
+
+		// Digits from right to left
+		uint8 integralDigits[32] = {};
+		uint8 integralDigitsCount = 0;
+
+		// Digits from left to right
+		uint8 fractionalDigits[32] = {};
+		uint8 fractionalDigitsCount = 0;
+
+		uint8 bIsNegative = false;
+
+		if (valueInt == 0)
+		{
+			integralDigitsCount = 1;
+			integralDigits[0] = 0;
+		}
+		else if (valueInt < 0)
+		{
+			valueInt = -valueInt;
+			bIsNegative = true;
+		}
+
+		while (valueInt != 0)
+		{
+			integralDigits[integralDigitsCount] = valueInt % 10;
+			integralDigitsCount++;
+			valueInt /= 10;
+		}
+
+		uint64 offset = 10;
+		float32 positiveValue = bIsNegative ? -value : value;
+		for (uint64 index = 0; index < AEC_FLOAT_LOG_PRECISION; index++)
+		{
+			int64 temp = (int64)(positiveValue * (float32)offset);
+			fractionalDigits[fractionalDigitsCount] = temp % 10;
+			fractionalDigitsCount++;
+			offset *= 10;
+		}
+
+		char8* allocation = formatter.Allocate((bIsNegative + integralDigitsCount + 1 + fractionalDigitsCount) * sizeof(char8));
+		offset = 0;
+		if (bIsNegative)
+		{
+			allocation[offset] = '-';
+			offset++;
+		}
+
+		for (uint64 index = integralDigitsCount; index > 0; index--)
+		{
+			allocation[offset] = '0' + integralDigits[index - 1];
+			offset++;
+		}
+
+		allocation[offset] = '.';
+		offset++;
+
+		for (uint64 index = 0; index < fractionalDigitsCount; index++)
+		{
+			allocation[offset] = '0' + fractionalDigits[index];
+			offset++;
+		}
+
+		return formatter;
+	}
+
+	template<>
+	APRICOT_API THFormatter<char8>& operator<<(THFormatter<char8>& formatter, const float64& value)
+	{
+		int64 valueInt = (int64)value;
+
+		// Digits from right to left
+		uint8 integralDigits[32] = {};
+		uint8 integralDigitsCount = 0;
+
+		// Digits from left to right
+		uint8 fractionalDigits[32] = {};
+		uint8 fractionalDigitsCount = 0;
+
+		uint8 bIsNegative = false;
+		
+		if (valueInt == 0)
+		{
+			integralDigitsCount = 1;
+			integralDigits[0] = 0;
+		}
+		else if (valueInt < 0)
+		{
+			valueInt = -valueInt;
+			bIsNegative = true;
+		}
+
+		while (valueInt != 0)
+		{
+			integralDigits[integralDigitsCount] = valueInt % 10;
+			integralDigitsCount++;
+			valueInt /= 10;
+		}
+
+		uint64 offset = 10;
+		float64 positiveValue = bIsNegative ? -value : value;
+		for (uint64 index = 0; index < AEC_FLOAT_LOG_PRECISION; index++)
+		{
+			int64 temp = (int64)(positiveValue * (float64)offset);
+			fractionalDigits[fractionalDigitsCount] = temp % 10;
+			fractionalDigitsCount++;
+			offset *= 10;
+		}
+
+		char8* allocation = formatter.Allocate((bIsNegative + integralDigitsCount + 1 + fractionalDigitsCount) * sizeof(char8));
+		offset = 0;
+		if (bIsNegative)
+		{
+			allocation[offset] = '-';
+			offset++;
+		}
+
+		for (uint64 index = integralDigitsCount; index > 0; index--)
+		{
+			allocation[offset] = '0' + integralDigits[index - 1];
+			offset++;
+		}
+
+		allocation[offset] = '.';
+		offset++;
+
+		for (uint64 index = 0; index < fractionalDigitsCount; index++)
+		{
+			allocation[offset] = '0' + fractionalDigits[index];
 			offset++;
 		}
 

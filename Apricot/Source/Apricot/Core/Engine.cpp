@@ -9,23 +9,28 @@ namespace Apricot {
 
 	Engine::Engine()
 	{
-		
+		AE_PERFORMANCE_FUNCTION();
 	}
 
 	Engine::~Engine()
 	{
-
+		AE_PERFORMANCE_FUNCTION();
 	}
 
 	int32 Engine::Run(const char* commandArgs)
 	{
+		AE_PERFORMANCE_FUNCTION();
+
 		s_Engine = this;
 
 		OnInitEngine();
 
-		while (true)
+		HTime lastFrameTime = Platform::GetPerformanceTime();
+		while (m_bIsRunning)
 		{
-
+			HTime now = Platform::GetPerformanceTime();
+			HTimestep timestep = now - lastFrameTime;
+			lastFrameTime = now;
 		}
 
 		OnDestroyEngine();
@@ -35,13 +40,16 @@ namespace Apricot {
 
 	bool Engine::OnInitEngine()
 	{
+		AE_PERFORMANCE_FUNCTION();
+
 		AE_CORE_INFO("Engine::OnInitEngine()");
-		Memory::HMemoryDebugger::DebugLog();
 		return true;
 	}
 
 	bool Engine::OnDestroyEngine()
 	{
+		AE_PERFORMANCE_FUNCTION();
+
 		AE_CORE_INFO("Engine::OnDestroyEngine()");
 		Memory::HMemoryDebugger::DebugLog();
 		return true;
