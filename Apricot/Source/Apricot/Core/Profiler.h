@@ -3,7 +3,9 @@
 #include "Base.h"
 #include "Time.h"
 
-#include <optick/optick.h>
+#ifdef AE_ENABLE_PERFORMANCE_PROFILING
+#include <Optick/optick.h>
+#endif
 
 namespace Apricot {
 

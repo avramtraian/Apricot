@@ -33,22 +33,27 @@
 	#define AE_DEBUG
 	#define AE_GAME
 	#define AE_CONFIGURATION "Debug"
+	#define AE_ENGINE_TYPE "Game"
 #elif AE_CONFIG_RELEASE_GAME
 	#define AE_RELEASE
 	#define AE_GAME
 	#define AE_CONFIGURATION "Release"
+	#define AE_ENGINE_TYPE "Game"
 #elif AE_CONFIG_SHIPPING_GAME
 	#define AE_SHIPPING
 	#define AE_GAME
 	#define AE_CONFIGURATION "Shipping"
+	#define AE_ENGINE_TYPE "Game"
 #elif AE_CONFIG_DEBUG_EDITOR
 	#define AE_DEBUG
 	#define AE_EDITOR
 	#define AE_CONFIGURATION "Debug"
+	#define AE_ENGINE_TYPE "Editor"
 #elif AE_CONFIG_RELEASE_EDITOR
 	#define AE_RELEASE
 	#define AE_EDITOR
 	#define AE_CONFIGURATION "Release"
+	#define AE_ENGINE_TYPE "Editor"
 #else
 	#pragma error "Unknown configuration macro!"
 #endif
@@ -73,7 +78,6 @@
 	#define AE_ENABLE_LOG_ERROR
 	#define AE_ENABLE_LOG_FATAL
 	#define AE_ENABLE_VERIFIES
-	#define AE_ENABLE_PERFORMANCE_PROFILING
 #endif
 
 

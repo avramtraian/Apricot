@@ -1,100 +1,100 @@
 project "ApricotJam"
-    kind "WindowedApp"
-    language "C++"
-    cppdialect "C++20"
-    staticruntime "off"
+	kind "WindowedApp"
+	language "C++"
+	cppdialect "C++20"
+	staticruntime "off"
 
-    filter { "system:windows", "configurations:Debug_Game" }
+	pchheader "ajpch.h"
+	pchsource "Source/ajpch.cpp"
 
-        targetdir ("%{wks.location}/Binaries/Win64-Debug")
-        objdir ("%{wks.location}/Binaries-Int/%{prj.name}")
+	files {
+		"Source/**.h",
+		"Source/**.cpp",
 
-    filter { "system:windows", "configurations:Release_Game" }
+		"resource.h",
+		"ApricotJam.rc",
+		"ApricotJam.aps"
+	}
 
-        targetdir ("%{wks.location}/Binaries/Win64-Release")
-        objdir ("%{wks.location}/Binaries-Int/%{prj.name}")
+	includedirs {
+		"Source",
 
-    filter { "system:windows", "configurations:Shipping_Game" }
+		"%{IncludeDirs.AE}",
+		"%{IncludeDirs.Optick}"
+	}
 
-        targetdir ("%{wks.location}/Binaries/Win64-Shipping")
-        objdir ("%{wks.location}/Binaries-Int/%{prj.name}")
+	links {
+		"AE"
+	}
 
-    filter { "system:windows", "configurations:Debug_Editor" }
+	defines {
+		"AE_IMPORT_DLL"
+	}
 
-        targetdir ("%{wks.location}/Binaries/Win64-DebugEd")
-        objdir ("%{wks.location}/Binaries-Int/%{prj.name}")
+	filter { "system:windows" }
+		systemversion "latest"
+		defines {
+			"AE_PLATFORM_WINDOWS"
+		}
 
-    filter { "system:windows", "configurations:Release_Editor" }
+	filter { "configurations:Debug_Editor" }
+		defines {
+			"AE_CONFIG_DEBUG_EDITOR"
+		}
 
-        targetdir ("%{wks.location}/Binaries/Win64-ReleaseEd")
-        objdir ("%{wks.location}/Binaries-Int/%{prj.name}")
+		symbols "on"
+		optimize "off"
 
-    filter {}
+		filter { "configurations:Debug_Editor", "system:windows" }
+			targetdir "%{wks.location}/Binaries/Win64-DebugEd"
+			objdir "%{wks.location}/Binaries-Int/Win64/%{prj.name}"
+			
+	filter { "configurations:Debug_Game" }
+		defines {
+			"AE_CONFIG_DEBUG_GAME"
+		}
 
-    pchheader "ajpch.h"
-    pchsource "Source/ajpch.cpp"
+		symbols "on"
+		optimize "off"
 
-    files
-    {
-        "Source/**.h",
-        "Source/**.cpp",
+		filter { "configurations:Debug_Game", "system:windows" }
+			targetdir "%{wks.location}/Binaries/Win64-Debug"
+			objdir "%{wks.location}/Binaries-Int/Win64/%{prj.name}"
+			
+	filter { "configurations:Release_Editor" }
+		defines {
+			"AE_CONFIG_RELEASE_EDITOR"
+		}
 
-        "resource.h",
-        "ApricotJam.rc",
-        "ApricotJam.aps"
-    }
+		symbols "off"
+		optimize "full"
 
-    includedirs
-    {
-        "Source",
+		filter { "configurations:Release_Editor", "system:windows" }
+			targetdir "%{wks.location}/Binaries/Win64-ReleaseEd"
+			objdir "%{wks.location}/Binaries-Int/Win64/%{prj.name}"
+			
+	filter { "configurations:Release_Game" }
+		defines {
+			"AE_CONFIG_RELEASE_GAME"
+		}
 
-        "%{IncludeDirs.AE}",
-        "%{IncludeDirs.optick}"
-    }
+		symbols "off"
+		optimize "full"
 
-    links
-    {
-        "AE"
-    }
+		filter { "configurations:Release_Game", "system:windows" }
+			targetdir "%{wks.location}/Binaries/Win64-Release"
+			objdir "%{wks.location}/Binaries-Int/Win64/%{prj.name}"
+			
+	filter { "configurations:Shipping_Game" }
+		defines {
+			"AE_CONFIG_SHIPPING_GAME"
+		}
 
-    defines
-    {
-        "AE_IMPORT_DLL"
-    }
+		symbols "off"
+		optimize "speed"
 
-    filter { "system:windows" }
-        systemversion "latest"
-        defines
-        {
-            "AE_PLATFORM_WINDOWS"
-        }
-
-    filter { "configurations:Debug_Game" }
-        defines
-        {
-            "AE_CONFIG_DEBUG_GAME"
-        }
-
-    filter { "configurations:Release_Game" }
-        defines
-        {
-            "AE_CONFIG_RELEASE_GAME"
-        }
-
-    filter { "configurations:Shipping_Game" }
-        defines
-        {
-            "AE_CONFIG_SHIPPING_GAME"
-        }
-
-    filter { "configurations:Debug_Editor" }
-        defines
-        {
-            "AE_CONFIG_DEBUG_EDITOR"
-        }
-
-    filter { "configurations:Release_Editor" }
-        defines
-        {
-            "AE_CONFIG_RELEASE_EDITOR"
-        }
+		filter { "configurations:Shipping_Game", "system:windows" }
+			targetdir "%{wks.location}/Binaries/Win64-Shipping"
+			objdir "%{wks.location}/Binaries-Int/Win64/%{prj.name}"
+			
+	filter {}

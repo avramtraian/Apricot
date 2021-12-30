@@ -14,7 +14,7 @@ workspace "Apricot"
 
 IncludeDirs = {};
 IncludeDirs["AE"] = "%{wks.location}/Apricot/Source"
-IncludeDirs["optick"] = "%{wks.location}/Apricot/Vendor/optick/Include"
+IncludeDirs["Optick"] = "%{wks.location}/Apricot/Vendor/Optick/Include"
 
 group "Core"
     include "Apricot"

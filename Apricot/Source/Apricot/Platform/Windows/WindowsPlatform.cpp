@@ -63,22 +63,22 @@ namespace Apricot {
 
 	HTime Platform::GetPerformanceTime()
 	{
-		LARGE_INTEGER l_PerformanceTimerNow;
-		BOOL result = QueryPerformanceCounter(&l_PerformanceTimerNow);
+		LARGE_INTEGER performanceTimerNow;
+		BOOL result = QueryPerformanceCounter(&performanceTimerNow);
 		AE_CORE_VERIFY(result, "Couldn't QueryPerformanceFrequency. Aborting.");
 
-		LARGE_INTEGER l_ElapsedNanoseconds;
+		LARGE_INTEGER elapsedNanoseconds;
 		// Get the number of ticks
-		l_ElapsedNanoseconds.QuadPart = l_PerformanceTimerNow.QuadPart - s_Platform->PerformanceCounterStart.QuadPart;
+		elapsedNanoseconds.QuadPart = performanceTimerNow.QuadPart - s_Platform->PerformanceCounterStart.QuadPart;
 
 		// Transforms the "time" in nanoseconds (from seconds).
-		l_ElapsedNanoseconds.QuadPart *= 1000000000;
+		elapsedNanoseconds.QuadPart *= 1000000000;
 
 		// Divide the number of ticks by the frequency. Without the above multiplication, it will return
 		// an approximation in seconds.
-		l_ElapsedNanoseconds.QuadPart /= s_Platform->PerformanceFrequency.QuadPart;
+		elapsedNanoseconds.QuadPart /= s_Platform->PerformanceFrequency.QuadPart;
 
-		return l_ElapsedNanoseconds.QuadPart;
+		return elapsedNanoseconds.QuadPart;
 	}
 
 	void Platform::SleepFor(HTime duration)

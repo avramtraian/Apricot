@@ -46,6 +46,9 @@ namespace Apricot {
 		AE_PERFORMANCE_FUNCTION();
 
 		AE_CORE_INFO("Engine::OnInitEngine()");
+		AE_CORE_INFO("    Platform:      {}", AE_PLATFORM);
+		AE_CORE_INFO("    Configuration: {}", AE_CONFIGURATION);
+		AE_CORE_INFO("    Engine Type:   {}", AE_ENGINE_TYPE);
 		return true;
 	}
 
