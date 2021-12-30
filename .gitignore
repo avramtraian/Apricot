@@ -3,6 +3,9 @@
 Binaries
 Binaries-Int
 
+# Exceptions
+!Apricot/Vendor/optick/Binaries
+
 # Project Files
 *.vcxproj
 *.vcxproj.user
