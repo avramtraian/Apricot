@@ -7,7 +7,7 @@
 
 namespace Apricot {
 
-	class PerformanceProfiler
+	class APRICOT_API PerformanceProfiler
 	{
 	public:
 		static void Init();

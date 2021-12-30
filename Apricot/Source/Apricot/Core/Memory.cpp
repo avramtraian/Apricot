@@ -13,6 +13,7 @@ namespace Apricot { namespace Memory {
 		"NONE            ",
 		"GENERAL         ",
 		"CORE_SYSTEMS    ",
+		"OPTICK          ",
 		"ALLOCATOR_LINEAR",
 		"ALLOCATOR_STACK ",
 		"STRING          ",
