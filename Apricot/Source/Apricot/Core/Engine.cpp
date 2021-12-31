@@ -3,10 +3,11 @@
 
 #include "Memory.h"
 #include "Profiler.h"
+#include "Platform.h"
 
 namespace Apricot {
 
-	Engine* Engine::s_Engine = nullptr;
+	Engine* GEngine = nullptr;
 
 	Engine::Engine()
 	{
@@ -22,7 +23,7 @@ namespace Apricot {
 	{
 		AE_PERFORMANCE_FUNCTION();
 
-		s_Engine = this;
+		GEngine = this;
 
 		OnInitEngine();
 
@@ -41,6 +42,23 @@ namespace Apricot {
 		return 0;
 	}
 
+	void Engine::OnForceShutdown()
+	{
+		if (!m_bIsRunning)
+		{
+			return;
+		}
+
+		m_bIsRunning = false;
+		Logger::Destroy();
+		PerformanceProfiler::Destroy();
+		Platform::Destroy();
+
+		Memory::HMemoryDebugger::DebugLog();
+
+		std::exit(-2);
+	}
+
 	bool Engine::OnInitEngine()
 	{
 		AE_PERFORMANCE_FUNCTION();
@@ -49,6 +67,7 @@ namespace Apricot {
 		AE_CORE_INFO("    Platform:      {}", AE_PLATFORM);
 		AE_CORE_INFO("    Configuration: {}", AE_CONFIGURATION);
 		AE_CORE_INFO("    Engine Type:   {}", AE_ENGINE_TYPE);
+
 		return true;
 	}
 

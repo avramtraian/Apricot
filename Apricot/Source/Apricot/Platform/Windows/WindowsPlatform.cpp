@@ -86,6 +86,37 @@ namespace Apricot {
 		Sleep((DWORD)duration.Miliseconds());
 	}
 
+	namespace Utils {
+
+		static uint32 ConvertMessageBoxFlags(MessageBoxFlags flags)
+		{
+			switch (flags)
+			{
+				case MessageBoxFlags::None:  return 0;
+				case MessageBoxFlags::Error: return MB_ICONERROR;
+			}
+			AE_CORE_ASSERT_RETURN(false, 0, "Invalid MessageBoxFlags!");
+		}
+
+	}
+
+	MessageBoxButton Platform::DisplayMessageBox(const char8* title, const char8* message, MessageBoxFlags flags)
+	{
+		switch (MessageBoxA(NULL, message, title, Utils::ConvertMessageBoxFlags(flags)))
+		{
+			case IDABORT:    return MessageBoxButton::Abort;
+			case IDCANCEL:   return MessageBoxButton::Cancel;
+			case IDCONTINUE: return MessageBoxButton::Continue;
+			case IDIGNORE:   return MessageBoxButton::Ignore;
+			case IDYES:      return MessageBoxButton::Yes;
+			case IDNO:       return MessageBoxButton::No;
+			case IDOK:       return MessageBoxButton::Ok;
+			case IDRETRY:    return MessageBoxButton::Retry;
+			case IDTRYAGAIN: return MessageBoxButton::TryAgain;
+			default:         return MessageBoxButton::None;
+		};
+	}
+
 }
 
 #endif

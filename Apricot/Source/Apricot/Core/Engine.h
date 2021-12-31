@@ -15,15 +15,18 @@ namespace Apricot {
 	public:
 		int32 Run(const char* commandArgs);
 
+		void OnForceShutdown();
+
 	private:
 		virtual bool OnInitEngine();
 		virtual bool OnDestroyEngine();
 
 	private:
-		 static Engine* s_Engine;
 		 bool m_bIsRunning = true;
 	};
 
 	extern Engine* CreateEngine(uint64& engineSize);
+
+	extern Engine* GEngine;
 
 }

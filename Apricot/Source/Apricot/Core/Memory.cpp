@@ -8,7 +8,7 @@ namespace Apricot { namespace Memory {
 	uint64 HMemoryDebugger::TotalFreedMemory[];
 	uint64 HMemoryDebugger::TotalAllocatedMemory[];
 
-	static const char* s_AllocationNames[] =
+	static const char8* s_AllocationNames[] =
 	{
 		"NONE            ",
 		"GENERAL         ",
@@ -19,6 +19,42 @@ namespace Apricot { namespace Memory {
 		"STRING          ",
 		"VECTOR          "
 	};
+
+	static const char8* s_MemoryUnitNames[] =
+	{
+		"B",
+		"KB",
+		"MB",
+		"GB"
+	};
+
+	namespace Utils {
+
+		static float64 GetUnit(uint64 bytes)
+		{
+			if (bytes >= AE_GIGABYTES(1))
+				return (float64)bytes / (float64)(AE_GIGABYTES(1));
+			else if (bytes >= AE_MEGABYTES(1))
+				return (float64)bytes / (float64)(AE_MEGABYTES(1));
+			else if (bytes >= AE_KILOBYTES(1))
+				return (float64)bytes / (float64)(AE_KILOBYTES(1));
+			else
+				return (float64)bytes;
+		}
+
+		static const char8* GetUnitName(uint64 bytes)
+		{
+			if (bytes >= AE_GIGABYTES(1))
+				return s_MemoryUnitNames[3];
+			else if (bytes >= AE_MEGABYTES(1))
+				return s_MemoryUnitNames[2];
+			else if (bytes >= AE_KILOBYTES(1))
+				return s_MemoryUnitNames[1];
+			else
+				return s_MemoryUnitNames[0];
+		}
+
+	}
 
 	void HMemoryDebugger::DebugLog(
 		bool bTotalAllocated   /*= true*/, bool bTotalFreed         /*= true*/,
@@ -33,12 +69,12 @@ namespace Apricot { namespace Memory {
 
 			if (bTotalAllocated)
 			{
-				AE_CORE_DEBUG("      TotalAllocatedMemory:    {}{}", TotalAllocatedMemory[index], "B");
+				AE_CORE_DEBUG("      TotalAllocatedMemory:    {}{}", Utils::GetUnit(TotalAllocatedMemory[index]), Utils::GetUnitName(TotalAllocatedMemory[index]));
 			}
 
 			if (bTotalFreed)
 			{
-				AE_CORE_DEBUG("      TotalFreedMemory:        {}{}", TotalFreedMemory[index], "B");
+				AE_CORE_DEBUG("      TotalFreedMemory:        {}{}", Utils::GetUnit(TotalFreedMemory[index]), Utils::GetUnitName(TotalAllocatedMemory[index]));
 			}
 
 			AE_CORE_DEBUG("      -----------------------------------");
@@ -56,7 +92,7 @@ namespace Apricot { namespace Memory {
 
 			if (bActiveAllocated)
 			{
-				AE_CORE_DEBUG("      ActiveAllocatedMemory:   {}{}", TotalAllocatedMemory[index] - TotalFreedMemory[index], "B");
+				AE_CORE_DEBUG("      ActiveAllocatedMemory:   {}{}", Utils::GetUnit(TotalAllocatedMemory[index] - TotalFreedMemory[index]), Utils::GetUnitName(TotalAllocatedMemory[index] - TotalFreedMemory[index]));
 			}
 			if (bActiveAllocations)
 			{

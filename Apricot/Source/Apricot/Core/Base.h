@@ -6,7 +6,7 @@
 #ifdef AE_PLATFORM_WINDOWS
 	#define AE_PLATFORM "Windows"
 #else
-	#pragma error "Apricot only supports Windows!"
+	#error "Apricot only supports Windows!"
 #endif
 
 
@@ -55,7 +55,7 @@
 	#define AE_CONFIGURATION "Release"
 	#define AE_ENGINE_TYPE "Editor"
 #else
-	#pragma error "Unknown configuration macro!"
+	#error "Unknown configuration macro!"
 #endif
 
 /*
@@ -88,17 +88,25 @@
 #ifdef _MSC_BUILD
 	#define AE_COMPILER_MSVC
 #else
-	#pragma error "Unknown compiler!"
+	#error "Unknown compiler!"
 #endif
 /*
-* Language keywords
+* Compiler keywords
 */
 #ifdef AE_COMPILER_MSVC
 	#define STATIC_ASSERT(...) static_assert(__VA_ARGS__)
 	#define DEBUGBREAK() __debugbreak()
+	#define LINE_MACRO __LINE__
+	#define FILE_MACRO __FILE__
+	#define FUNCTION_MACRO __FUNCTION__
+	#define FUNCTION_SIG_MACRO __FUNCSIG__
 #else
 	#define STATIC_ASSERT(...) 
 	#define DEBUGBREAK() 
+	#define LINE_MACRO 
+	#define FILE_MACRO 
+	#define FUNCTION_MACRO 
+	#define FUNCTION_SIG_MACRO 
 #endif
 
 
@@ -125,6 +133,26 @@
 
 	using char8		= char;
 	using char16	= wchar_t;
+#else
+#include <stdint.h>
+	using uint8   = uint8_t;
+	using uint16  = uint16_t;
+	using uint32  = uint32_t;
+	using uint64  = uint64_t;
+
+	using int8    = int8_t;
+	using int16   = int16_t;
+	using int32   = int32_t;
+	using int64   = int64_t;
+
+	using float32 = float;
+	using float64 = double;
+
+	using bool8   = bool;
+	using bool32  = int;
+
+	using char8   = char;
+	using char16  = wchar_t;
 #endif
 
 STATIC_ASSERT(sizeof(uint8)		== 1, "sizeof(uint8) expected to be 8 bits!"	);

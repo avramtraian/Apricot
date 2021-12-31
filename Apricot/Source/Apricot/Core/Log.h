@@ -4,6 +4,8 @@
 #include "Base.h"
 #include "Allocators.h"
 
+#include "Apricot/Utils/RawStringFormatter.h"
+
 namespace Apricot {
 	
 	/*
@@ -19,73 +21,6 @@ namespace Apricot {
 		Fatal, Error, Warn, Info, Debug, Trace,
 		MaxEnum
 	};
-
-	/*
-	* The class in charge of formatting any type.
-	* Has strong relationship with the 'THFormatter<T>& operator<<(THFormatter<T>&, const Q&)' function.
-	* 
-	* @param T The type of string's characters (char8 or char16).
-	*/
-	template<typename T>
-	struct THFormatter
-	{
-	public:
-		/*
-		* Internal usage only.
-		* You should never instantiate a THFormatter on your own.
-		*/
-		THFormatter(Memory::LinearAllocator* allocator)
-			: Allocator(allocator) {}
-	
-		/*
-		* A thin wrapper function for the allocator's interface.
-		* It sets the formatter's Size to the requested memory block size.
-		* It's recommended to use this function.
-		* 
-		* @param size The size (in bytes) of the requested allocation.
-		* @returns Pointer to the allocated memory. It is the same as 'Data'.
-		*/
-		T* Allocate(uint64 size)
-		{
-			Data = (T*)Allocator->Allocate(size);
-			Size = size;
-			return Data;
-		}
-
-	public:
-		/*
-		* The allocator used to allocate memory for the string.
-		*/
-		Memory::LinearAllocator* Allocator = nullptr;
-		
-		/*
-		* The address in the allocator where the string is.
-		*/
-		T* Data = nullptr;
-
-		/*
-		* The size (in bytes) of the string.
-		* Excludes the null-terminating character.
-		*/
-		uint64 Size = 0;
-	};
-
-	/*
-	* Implement a template specialization of this function in order to format any type.
-	* Remember that the size SHOULD NEVER include the null-terminating character.
-	* Also, there is no need for the null-terminating character to exist.
-	* We are more space efficient without it.
-	* 
-	* @param typename T The type of characters of the returned string (char8 or char16).
-	* @param typename Q The type of the class you want to format.
-	* 
-	* @param formatter The struct to fill with the string buffer.
-	* @param value The value to be formatted.
-	*/
-	template<typename T, typename Q>
-	APRICOT_API THFormatter<T>& operator<<(THFormatter<T>& formatter, const Q& value);
-	template<typename T, typename Q>
-	APRICOT_API THFormatter<T>& operator<<(THFormatter<T>& formatter, const Q* value);
 
 	/*
 	* The class in charge of every logging operation.
@@ -106,7 +41,7 @@ namespace Apricot {
 
 		/*
 		* Prints a message to the console.
-		* It formats the variadic arguments via THArgumentString<T> struct.
+		* Can format the message
 		* 
 		* @param type Determine the color of the message in the console.
 		* @param message The message to be printed.
@@ -127,77 +62,11 @@ namespace Apricot {
 
 			// Fill the formatters.
 			uint64 argumentsCount = 0;
-			GetArgumentsAsStrings(arguments, argumentsCount, std::forward<Args>(args)...);
-
-			// Iterate over the message's characters.
-			char8* formatted = (char8*)s_ArgsAllocator.GetCurrentMark();
-			int64 index = -1;
-			uint64 argumentIndex = 0;
-			bool bInsideArg = false;
-			do
-			{
-				index++;
-				switch (message[index])
-				{
-					case '{':
-					{
-						if (bInsideArg)
-						{
-							// This calls the none arguments override. So it's safe.
-							LogCoreMessage(Log::Warn, "Possible formatting issues!");
-						}
-						bInsideArg = true;
-						break;
-					}
-					case '}':
-					{
-						if (!bInsideArg)
-						{
-							// This calls the none arguments override. So it's safe.
-							LogCoreMessage(Log::Warn, "Possible formatting issues!");
-						}
-						bInsideArg = false;
-
-						char8* buffer = (char8*)s_ArgsAllocator.Allocate(arguments[argumentIndex].Size);
-						Memory::Copy(buffer, arguments[argumentIndex].Data, arguments[argumentIndex].Size);
-						argumentIndex++;
-
-						break;
-					}
-					default:
-					{
-						if (!bInsideArg)
-						{
-							char8* buffer = (char8*)s_ArgsAllocator.Allocate(sizeof(char8));
-							*buffer = message[index];
-						}
-						break;
-					}
-				}
-			} while (message[index] != 0);
+			const char8* formatted = RawStringFormatter::Format(s_ArgsAllocator, arguments, AEC_MAX_LOG_ARGUMENT_COUNT, argumentsCount, message, std::forward<Args>(args)...);
 
 			// Send the formatted message to the platform layer (indirectly).
 			LogCoreMessage(type, formatted);
 		}
-
-	private:
-		/*
-		* Internal usage only.
-		* 
-		* @param typename T The type of the argument.
-		*/
-		template<typename T, typename... Args>
-		static void GetArgumentsAsStrings(THFormatter<char8>* arguments, uint64& index, const T& argument, Args&&... args)
-		{
-			arguments[index++] << argument;
-			GetArgumentsAsStrings(arguments, index, std::forward<Args>(args)...);
-		}
-
-		/*
-		* Internal usage only.
-		* Default case for iterating the parameter pack.
-		*/
-		static void GetArgumentsAsStrings(THFormatter<char8>* arguments, uint64& index) {}
 
 	private:
 		/*
@@ -272,3 +141,5 @@ namespace Apricot {
 #else
 	#define AE_CORE_TRACE(...) 
 #endif
+
+#undef EXCLUDE_STRING

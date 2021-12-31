@@ -5,6 +5,20 @@
 
 namespace Apricot {
 
+	enum class MessageBoxButton : uint8
+	{
+		None = 0,
+		Abort, Cancel, Continue, Ignore,
+		Yes, No, Ok,
+		Retry, TryAgain
+	};
+
+	enum class MessageBoxFlags : uint8
+	{
+		None = 0,
+		Error,
+	};
+
 	class APRICOT_API Platform
 	{
 	public:
@@ -18,6 +32,8 @@ namespace Apricot {
 		static HTime GetPerformanceTime();
 
 		static void SleepFor(HTime duration);
+
+		static MessageBoxButton DisplayMessageBox(const char8* title, const char8* message, MessageBoxFlags flags);
 	};
 
 }
