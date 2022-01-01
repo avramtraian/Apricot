@@ -1,3 +1,5 @@
+// Part of Apricot Engine. 2022-2022.
+
 #pragma once
 
 /*
@@ -72,12 +74,14 @@
 	#define AE_ENABLE_VERIFIES
 	#define AE_ENABLE_MEMORY_TRACE
 	#define AE_ENABLE_PERFORMANCE_PROFILING
+	#define AE_ENABLE_FILESYSTEM_ERROR_CHECK
 #elif defined(AE_RELEASE)
 	#define AE_ENABLE_LOG_INFO
 	#define AE_ENABLE_LOG_WARN
 	#define AE_ENABLE_LOG_ERROR
 	#define AE_ENABLE_LOG_FATAL
 	#define AE_ENABLE_VERIFIES
+	#define AE_ENABLE_FILESYSTEM_ERROR_CHECK
 #endif
 
 

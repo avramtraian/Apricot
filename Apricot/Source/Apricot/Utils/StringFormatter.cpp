@@ -1,3 +1,5 @@
+// Part of Apricot Engine. 2022-2022.
+
 #include "aepch.h"
 #include "StringFormatter.h"
 
@@ -227,10 +229,21 @@ namespace Apricot {
 	template<>
 	APRICOT_API THFormatter<char8>& operator<<(THFormatter<char8>& formatter, const char8* value)
 	{
-		formatter.Size = strlen(value);
+		formatter.Size = CStrLength(value);
 		formatter.Data = (char8*)formatter.Allocator->Allocate(formatter.Size * sizeof(char8));
 		Memory::Copy(formatter.Data, value, formatter.Size * sizeof(char8));
 
+		return formatter;
+	}
+
+	template<>
+	APRICOT_API THFormatter<char8>& operator<<(THFormatter<char8>& formatter, const char16* value)
+	{
+		char8* allocated = formatter.Allocate(CStrLength(value) * sizeof(char8));
+		for (uint64 index = 0; index < formatter.Size; index++)
+		{
+			allocated[index] = (char8)value[index];
+		}
 		return formatter;
 	}
 
