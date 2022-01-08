@@ -178,4 +178,5 @@ STATIC_ASSERT(sizeof(bool32)	== 4, "sizeof(bool32) expected to be 32 bits!"	);
 STATIC_ASSERT(sizeof(char8)		== 1, "sizeof(char8) expected to be 8 bits!"	);
 STATIC_ASSERT(sizeof(char16)	== 2, "sizeof(char16) expected to be 16 bits!"	);
 
+/* Disables dll-interface compiler warning. It is usually generated around templates. */
 #pragma warning (disable: 4251)
