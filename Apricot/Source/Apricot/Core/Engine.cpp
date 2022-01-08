@@ -7,6 +7,8 @@
 #include "Profiler.h"
 #include "Platform.h"
 
+#include "Apricot/Filesystem/Filesystem.h"
+
 namespace Apricot {
 
 	Engine* GEngine = nullptr;
@@ -70,12 +72,22 @@ namespace Apricot {
 		AE_CORE_INFO("    Configuration: {}", AE_CONFIGURATION);
 		AE_CORE_INFO("    Engine Type:   {}", AE_ENGINE_TYPE);
 
+		// Core-Systems initialization
+		{
+			Filesystem::Init();
+		}
+
 		return true;
 	}
 
 	bool Engine::OnDestroyEngine()
 	{
 		AE_PERFORMANCE_FUNCTION();
+
+		// Core-Systems destruction
+		{
+			Filesystem::Destroy();
+		}
 
 		AE_CORE_INFO("Engine::OnDestroyEngine()");
 		Memory::HMemoryDebugger::DebugLog();

@@ -2,6 +2,11 @@
 
 #include "aepch.h"
 
+///////////////////////////////////////////////////////////////////////////////
+//////////////----  APRICOT PLATFORM WINDOWS IMPLEMENTATION  ----//////////////
+///////////////----  THIS FILE IS COMPILED ONLY ON WINDOWS  ----///////////////
+///////////////////////////////////////////////////////////////////////////////
+
 #ifdef AE_PLATFORM_WINDOWS
 
 #include "Apricot/Core/Platform.h"
@@ -98,6 +103,7 @@ namespace Apricot {
 				case MessageBoxFlags::Error: return MB_ICONERROR;
 			}
 			AE_CORE_ASSERT_RETURN(false, 0, "Invalid MessageBoxFlags!");
+			return 0;
 		}
 
 	}

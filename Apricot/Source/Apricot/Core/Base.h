@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Config.h"
+
 /*
 * Platform detection
 */

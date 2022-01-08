@@ -15,6 +15,7 @@ namespace Apricot { namespace Memory {
 		"NONE            ",
 		"GENERAL         ",
 		"CORE_SYSTEMS    ",
+		"FILESYSTEM      ",
 		"OPTICK          ",
 		"ALLOCATOR_LINEAR",
 		"ALLOCATOR_STACK ",
@@ -76,7 +77,7 @@ namespace Apricot { namespace Memory {
 
 			if (bTotalFreed)
 			{
-				AE_CORE_DEBUG("      TotalFreedMemory:        {}{}", Utils::GetUnit(TotalFreedMemory[index]), Utils::GetUnitName(TotalAllocatedMemory[index]));
+				AE_CORE_DEBUG("      TotalFreedMemory:        {}{}", Utils::GetUnit(TotalFreedMemory[index]), Utils::GetUnitName(TotalFreedMemory[index]));
 			}
 
 			AE_CORE_DEBUG("      -----------------------------------");
