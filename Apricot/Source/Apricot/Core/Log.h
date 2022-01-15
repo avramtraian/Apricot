@@ -52,6 +52,11 @@ namespace Apricot {
 		template<typename... Args>
 		static void LogCoreMessage(Log type, const char8* message, Args&&... args)
 		{
+			if (!s_bIsConsoleEnabled)
+			{
+				return;
+			}
+
 			// Reset the allocator.
 			s_ArgsAllocator.FreeAll();
 
@@ -64,7 +69,7 @@ namespace Apricot {
 
 			// Fill the formatters.
 			uint64 argumentsCount = 0;
-			const char8* formatted = RawStringFormatter::Format(s_ArgsAllocator, arguments, AEC_MAX_LOG_ARGUMENT_COUNT, argumentsCount, message, std::forward<Args>(args)...);
+			const char8* formatted = RawStringFormatter::FormatComplex(s_ArgsAllocator, arguments, AEC_MAX_LOG_ARGUMENT_COUNT, argumentsCount, message, std::forward<Args>(args)...);
 
 			// Send the formatted message to the platform layer (indirectly).
 			LogCoreMessage(type, formatted);
@@ -86,6 +91,8 @@ namespace Apricot {
 		* It gets reseted every time we start formatting a string.
 		*/
 		static Memory::LinearAllocator s_ArgsAllocator;
+
+		static bool8 s_bIsConsoleEnabled;
 	};
 
 }

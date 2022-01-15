@@ -159,7 +159,7 @@ namespace Apricot { namespace Filesystem {
 		*/
 		void Pop(uint64 size)
 		{
-			AE_CORE_VERIFY_RETURN(size <= m_Buffer.Size(), RETURN_VOID, "");
+			AE_CORE_VERIFY_RETURN(size <= m_Buffer.Size(), AE_VOID, "");
 			m_Buffer.Resize(m_Buffer.Size() - size);
 		}
 

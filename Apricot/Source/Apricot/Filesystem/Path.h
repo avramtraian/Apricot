@@ -446,17 +446,23 @@ namespace Apricot { namespace Filesystem {
 		template<uint64 R>
 		TStackPath(const TStackPath<R>& other)
 		{
-			STATIC_ASSERT(R <= S, "Possible TStackPath buffer overflow!");
+			AE_STATIC_ASSERT(R <= S, "Possible TStackPath buffer overflow!");
 
 			Memory::Copy(m_Data, other.m_Data, other.m_Size * sizeof(char16));
 			m_Size = other.m_Size;
 		}
 
+		TStackPath(const char16* other)
+		{
+			m_Size = CStrLength(other) + 1;
+			Memory::Copy(m_Data, other, m_Size * sizeof(char16));
+		}
+
 	public:
 		template<uint64 R>
-		TStackPath& operator=(const TStackPath<R>& other)
+		TStackPath<R>& operator=(const TStackPath<R>& other)
 		{
-			STATIC_ASSERT(R <= S, "Possible TStackPath buffer overflow!");
+			AE_STATIC_ASSERT(R <= S, "Possible TStackPath buffer overflow!");
 
 			Memory::Copy(m_Data, other.m_Data, other.m_Size * sizeof(char16));
 			m_Size = other.m_Size;
@@ -464,10 +470,37 @@ namespace Apricot { namespace Filesystem {
 			return *this;
 		}
 
+		TStackPath<S> operator+(const char16* other) const
+		{
+			return Append_Impl<S>(other, CStrLength(other) + 1);
+		}
+
 	public:
 		char16* Data() const { return const_cast<char16*>(&m_Data[0]); }
 		uint64 MaxSize() const { return S; }
 		uint64 Size() const { return m_Size; }
+
+	private:
+		template<uint64 R>
+		TStackPath<R> Append_Impl(const char16* other, uint64 otherSize) const
+		{
+			AE_STATIC_ASSERT(S >= R, "TStackPath buffer overflow!");
+
+			TStackPath<R> newString;
+			newString.m_Size = m_Size + otherSize - 1;
+			Memory::Copy(newString.m_Data, m_Data, (m_Size - 1) * sizeof(char16));
+
+			uint8 offset = 0;
+			if (m_Data[m_Size - 2] != '/' && other[0] != '/')
+			{
+				newString.m_Data[m_Size - 1] = '/';
+				offset = 1;
+			}
+
+			Memory::Copy(newString.m_Data + m_Size - 1 + offset, other, otherSize * sizeof(char16));
+
+			return newString;
+		}
 
 	public:
 		/*

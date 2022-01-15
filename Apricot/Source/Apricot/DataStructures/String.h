@@ -5,12 +5,14 @@
 #include "Apricot/Core/Base.h"
 #include "Apricot/Core/Memory.h"
 
+#define AE_STRING_NPOS static_cast<uint64>(-1)
+
 namespace Apricot {
 
 	template<typename T>
 	inline uint64 CStrLength(const T* string)
 	{
-		STATIC_ASSERT(false, "");
+		AE_STATIC_ASSERT(false, "");
 	}
 
 	template<>
@@ -416,7 +418,7 @@ namespace Apricot {
 		template<uint64 Q>
 		TStackString(const TStackString<T, Q>& other)
 		{
-			STATIC_ASSERT(S >= Q, "Possible TStackString buffer overflow!");
+			AE_STATIC_ASSERT(S >= Q, "Possible TStackString buffer overflow!");
 
 			m_Size = other.Size();
 			Memory::Copy(m_Data, other.Data(), m_Size * sizeof(T));
@@ -426,7 +428,7 @@ namespace Apricot {
 		{
 			// + null-terminating character
 			uint64 stringSize = CStrLength(string) + 1;
-			AE_CORE_VERIFY_RETURN(stringSize <= S, RETURN_VOID, "Overflowing the TStackString buffer!");
+			AE_CORE_VERIFY_RETURN(stringSize <= S, AE_VOID, "Overflowing the TStackString buffer!");
 
 			m_Size = stringSize;
 			Memory::Copy(m_Data, string, m_Size * sizeof(T));
@@ -443,7 +445,7 @@ namespace Apricot {
 		TStackString(const TString<T>& string)
 		{
 			const THStringAlias<T>* alias = reinterpret_cast<const THStringAlias<T>*>(&string);
-			AE_CORE_VERIFY_RETURN(alias->Size <= S, RETURN_VOID, "TStackString buffer overflow!");
+			AE_CORE_VERIFY_RETURN(alias->Size <= S, AE_VOID, "TStackString buffer overflow!");
 
 			m_Size = alias->Size;
 			Memory::Copy(m_Data, alias->Data, m_Size * sizeof(T));
@@ -452,7 +454,7 @@ namespace Apricot {
 		TStackString(const TStringView<T>& view)
 		{
 			const THStringViewAlias<T>* alias = reinterpret_cast<const THStringViewAlias<T>*>(&view);
-			AE_CORE_VERIFY_RETURN(alias->Size <= S, RETURN_VOID, "TStackString buffer overflow!");
+			AE_CORE_VERIFY_RETURN(alias->Size <= S, AE_VOID, "TStackString buffer overflow!");
 
 			m_Size = alias->Size;
 			Memory::Copy(m_Data, alias->String, m_Size * sizeof(T));
@@ -462,7 +464,7 @@ namespace Apricot {
 		template<uint64 Q>
 		TStackString<T, S>& operator=(const TStackString<T, Q>& other)
 		{
-			STATIC_ASSERT(S >= T, "Possible TStackString buffer overflow!");
+			AE_STATIC_ASSERT(S >= T, "Possible TStackString buffer overflow!");
 
 			m_Size = other.m_Size;
 			Memory::Copy(m_Data, other.m_Data, m_Size * sizeof(T));
@@ -501,10 +503,22 @@ namespace Apricot {
 			return m_Data[index];
 		}
 
+		bool operator==(const T* other) const
+		{
+			return Impl_Equals(other, CStrLength(other) + 1);
+		}
+
+		bool operator!=(const T* other) const
+		{
+			return !Impl_Equals(other, CStrLength(other) + 1);
+		}
+
 	public:
 		inline T* Data() const { return const_cast<T*>(&m_Data[0]); }
 		inline uint64 MaxSize() const { return S; }
 		inline uint64 Size() const { return m_Size; }
+
+		void Impl_SetSize(uint64 newSize) { m_Size = newSize; }
 
 		inline const T* c_str() const { return m_Data; }
 
@@ -515,6 +529,127 @@ namespace Apricot {
 			m_Data[m_Size] = 0;
 			m_Size++;
 			return character;
+		}
+
+		TStackString<T, S> ToLowerCase() const
+		{
+			TStackString<T, S> lowerCase;
+			lowerCase.m_Size = m_Size;
+
+			static uint64 difference = (uint64)'a' - (uint64)'A';
+			for (uint64 index = 0; index < m_Size; index++)
+			{
+				if ('A' <= m_Data[index] && m_Data[index] <= 'Z')
+				{
+					lowerCase[index] = m_Data[index] + (T)difference;
+				}
+				else
+				{
+					lowerCase[index] = m_Data[index];
+				}
+			}
+
+			return lowerCase;
+		}
+
+		uint64 Find(const T* search, uint64 intervalFirst = 0, uint64 intervalLast = 0) const
+		{
+			return Impl_Find(search, CStrLength(search), intervalFirst, intervalLast);
+		}
+
+		TStackString<T, S> Substr(uint64 first, uint64 last = 0) const
+		{
+			if (last == 0)
+			{
+				last = m_Size;
+			}
+			AE_CORE_ASSERT_RETURN(first < last && last <= m_Size, {}, "Invalid parameters!");
+			
+			TStackString<T, S> substr;
+			substr.m_Size = last - first;
+			Memory::Copy(substr.m_Data, m_Data + first, substr.m_Size);
+
+			if (substr.m_Data[substr.m_Size - 1] != 0)
+			{
+				substr.m_Size++;
+				substr.m_Data[substr.m_Size - 1] = 0;
+			}
+
+			return substr;
+		}
+
+		template<typename Func>
+		void ForEachWord(Func callback) const
+		{
+			if (m_Size < 2)
+			{
+				return;
+			}
+
+			int64 begin = -1;
+			for (uint64 index = 0; index < m_Size; index++)
+			{
+				if (m_Data[index] == ' ' || m_Data[index] == 0)
+				{
+					uint64 wordSize = index - begin;
+					if (wordSize > 1 || m_Data[begin] != ' ')
+					{
+						TStackString<T, S> word = Substr(begin + 1, index);
+						callback(word);
+					}
+
+					begin = index;
+				}
+			}
+		}
+
+	private:
+		bool Impl_Equals(const T* other, uint64 otherSize) const
+		{
+			if (m_Size != otherSize)
+			{
+				return false;
+			}
+
+			for (uint64 index = 0; index < m_Size; index++)
+			{
+				if (m_Data[index] != other[index])
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		uint64 Impl_Find(const T* search, uint64 searchSize, uint64 intervalFirst, uint64 intervalLast) const
+		{
+			if (intervalLast == 0)
+			{
+				intervalLast = m_Size;
+			}
+
+			AE_CORE_ASSERT_RETURN(intervalFirst < intervalLast && intervalLast <= m_Size, AE_STRING_NPOS, "Invalid parameters!");
+
+			for (uint64 offset = intervalFirst; offset < intervalLast - searchSize; offset++)
+			{
+				bool8 bWasFound = true;
+				for (uint64 index = 0; index < searchSize; index++)
+				{
+					if (m_Data[offset + index] != search[index])
+					{
+						bWasFound = false;
+						break;
+					}
+				}
+
+				if (bWasFound)
+				{
+					return offset;
+				}
+			}
+
+			return AE_STRING_NPOS;
 		}
 
 	private:
@@ -625,11 +760,13 @@ namespace Apricot {
 	using String32		= TStackString<char8, 32>;
 	using String64		= TStackString<char8, 64>;
 	using String128		= TStackString<char8, 128>;
+	using String256     = TStackString<char8, 256>;
 
 	using WString16		= TStackString<char16, 16>;
 	using WString32		= TStackString<char16, 32>;
 	using WString64		= TStackString<char16, 64>;
 	using WString128	= TStackString<char16, 128>;
+	using WString256	= TStackString<char16, 256>;
 
 	// StringViews
 	using StringView	= TStringView<char8>;

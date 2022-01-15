@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Base.h"
+#include "EngineConfiguration.h"
 
 namespace Apricot {
 
@@ -15,13 +16,17 @@ namespace Apricot {
 		Engine& operator=(const Engine&) = delete;
 
 	public:
-		int32 Run(const char* commandArgs);
+		int32 Run(const char8* commandArgs);
 
 		void OnForceShutdown();
 
 	private:
+		virtual bool OnPreInitEngine(const char8* commandLine);
 		virtual bool OnInitEngine();
 		virtual bool OnDestroyEngine();
+
+	public:
+		 EngineConfig Config;
 
 	private:
 		 bool m_bIsRunning = true;

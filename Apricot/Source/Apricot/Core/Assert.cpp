@@ -6,24 +6,36 @@
 #include "Engine.h"
 #include "Platform.h"
 
+// Note: It should be already included by the pch.
+#ifdef AE_PLATFORM_WINDOWS
+#include <Windows.h>
+#endif
+
 namespace Apricot {
 
-	void Assert::OnFatalAssert(const char8* condition, const char8* file, uint64 line, const char8* funcSig, const char8* message)
+#ifdef AE_PLATFORM_WINDOWS
+
+	APRICOT_API void OnCoreAssert(const char8* condition, const char8* file, uint64 line, const char8* funcSig, const char8* message)
 	{
 		Memory::LinearAllocator allocator(AE_KILOBYTES(32));
-		THFormatter<char8>* formatters = (THFormatter<char8>*)allocator.Allocate(5 * sizeof(THFormatter<char8>));
-		for (uint64 index = 0; index < 5; index++)
-		{
-			Memory::PlacementNew<THFormatter<char8>>(formatters + index, &allocator);
-		}
+		const char8* formatted = RawStringFormatter::Format(allocator, "Assertion failed! Apricot Engine has crashed!\n\n{}\n\n{}\n\n[FILE] {}\n[LINE] {}\n[FUNC] {}\n", condition, message, file, line, funcSig);
 
-		uint64 argsCount = 0;
-		const char8* formatted = RawStringFormatter::Format(allocator, formatters, 5, argsCount, "Assertion failed! Apricot Engine has crashed!\n\n{}\n\n{}\n\n[FILE] {}\n[LINE] {}\n[FUNC] {}\n", condition, message, file, line, funcSig);
-
-		if (Platform::DisplayMessageBox("Apricot Engine crashed! Assertion failed!", formatted, MessageBoxFlags::Error) == MessageBoxButton::Ok)
+		auto button = MessageBoxA(NULL, formatted, "Apricot Engine crashed!", MB_ICONERROR | MB_OK);
+		if (button == IDOK)
 		{
 			GEngine->OnForceShutdown();
 		}
 	}
+
+	APRICOT_API void OnBaseAssert(const char8* condition, const char8* file, uint64 line, const char8* funcSig, const char8* message)
+	{
+		auto button = MessageBoxA(NULL, message, "Apricot Engine crashed!", MB_ICONERROR | MB_OK);
+		if (button == IDOK)
+		{
+			GEngine->OnForceShutdown();
+		}
+	}
+
+#endif
 
 }

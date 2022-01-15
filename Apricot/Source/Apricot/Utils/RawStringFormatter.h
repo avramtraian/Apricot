@@ -84,6 +84,31 @@ namespace Apricot {
 	public:
 		/*
 		* Formats a string. Doesn't allocate any memory on the heap (works only with allocators).
+		*
+		* @param typename T Type of string (char8 or char16).
+		* @param typename... Args Argument pack.
+		*
+		* @param allocator Allocator used for allocating memory.
+		* @param message C-Style string with the (unformatted) message.
+		* @param args Argument pack.
+		*
+		* @returns The formatted string.
+		*/
+		template<typename T, typename... Args>
+		static const T* Format(Memory::LinearAllocator& allocator, const T* message, Args&&... args)
+		{
+			THFormatter<char8>* formatters = (THFormatter<char8>*)allocator.Allocate(AEC_CSTR_MAX_FORMATTERS * sizeof(THFormatter<char8>));
+			for (uint64 index = 0; index < AEC_CSTR_MAX_FORMATTERS; index++)
+			{
+				Memory::PlacementNew<THFormatter<char8>>(formatters + index, &allocator);
+			}
+
+			uint64 usedFormattersCount = 0;
+			return FormatComplex(allocator, formatters, AEC_CSTR_MAX_FORMATTERS, usedFormattersCount, message, std::forward<Args>(args)...);
+		}
+
+		/*
+		* Formats a string. Doesn't allocate any memory on the heap (works only with allocators).
 		* 
 		* @param typename T Type of string (char8 or char16).
 		* @param typename... Args Argument pack.
@@ -98,7 +123,7 @@ namespace Apricot {
 		* @returns The formatted string.
 		*/
 		template<typename T, typename... Args>
-		static const T* Format(Memory::LinearAllocator& allocator, THFormatter<T>* formatters, uint64 formattersCount, uint64& outFormattersCount, const T* message, Args&&... args)
+		static const T* FormatComplex(Memory::LinearAllocator& allocator, THFormatter<T>* formatters, uint64 formattersCount, uint64& outFormattersCount, const T* message, Args&&... args)
 		{
 			// Fill the formatters.
 			outFormattersCount = 0;

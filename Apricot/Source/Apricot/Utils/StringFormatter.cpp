@@ -8,14 +8,14 @@ namespace Apricot {
 	template<typename T, typename Q>
 	APRICOT_API THFormatter<T>& operator<<(THFormatter<T>& formatter, const Q& value)
 	{
-		STATIC_ASSERT(false, "Implement THFormatter<T>& operator<<(THFormatter<T>&, const Q&) in order to format this type!");
+		AE_STATIC_ASSERT(false, "Implement THFormatter<T>& operator<<(THFormatter<T>&, const Q&) in order to format this type!");
 		return formatter;
 	}
 
 	template<typename T, typename Q>
 	APRICOT_API THFormatter<T>& operator<<(THFormatter<T>& formatter, const Q* value)
 	{
-		STATIC_ASSERT(false, "Implement THFormatter<T>& operator<<(THFormatter<T>&, const Q*) in order to format this type!");
+		AE_STATIC_ASSERT(false, "Implement THFormatter<T>& operator<<(THFormatter<T>&, const Q*) in order to format this type!");
 		return formatter;
 	}
 

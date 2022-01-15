@@ -5,34 +5,48 @@
 
 #include "Memory.h"
 #include "Platform.h"
+#include "Engine.h"
 
 namespace Apricot {
 
 	char* Logger::s_MessageBuffer = nullptr;
 	uint64 Logger::s_MessageBufferSize = 0;
 	Memory::LinearAllocator Logger::s_ArgsAllocator;
+	bool8 Logger::s_bIsConsoleEnabled;
 
 	void Logger::Init()
 	{
-		Platform::CreateConsole();
+		s_bIsConsoleEnabled = GEngine->Config.bStartWithConsole;
+		if (s_bIsConsoleEnabled)
+		{
+			Platform::CreateConsole();
 
-		s_MessageBufferSize = 1024;
-		s_MessageBuffer = (char8*)Memory::Allocate(s_MessageBufferSize * sizeof(char8), Memory::AllocTag::CoreSystems);
+			s_MessageBufferSize = 1024;
+			s_MessageBuffer = (char8*)Memory::Allocate(s_MessageBufferSize * sizeof(char8), Memory::AllocTag::CoreSystems);
 
-		void* argsMemoryBlock = Memory::Allocate(AE_KILOBYTES(8), Memory::AllocTag::CoreSystems);
-		Memory::LinearAllocator::Create(&s_ArgsAllocator, AE_KILOBYTES(8), argsMemoryBlock);
+			void* argsMemoryBlock = Memory::Allocate(AE_KILOBYTES(8), Memory::AllocTag::CoreSystems);
+			Memory::LinearAllocator::Create(&s_ArgsAllocator, AE_KILOBYTES(8), argsMemoryBlock);
+		}
 	}
 
 	void Logger::Destroy()
 	{
-		Memory::Free(s_MessageBuffer, s_MessageBufferSize * sizeof(char8), Memory::AllocTag::CoreSystems);
+		if (s_bIsConsoleEnabled)
+		{
+			Memory::Free(s_MessageBuffer, s_MessageBufferSize * sizeof(char8), Memory::AllocTag::CoreSystems);
 
-		Memory::Free(s_ArgsAllocator.MemoryBlock(), s_ArgsAllocator.GetTotalSize(), Memory::AllocTag::CoreSystems);
-		Memory::LinearAllocator::Destroy(&s_ArgsAllocator);
+			Memory::Free(s_ArgsAllocator.MemoryBlock(), s_ArgsAllocator.GetTotalSize(), Memory::AllocTag::CoreSystems);
+			Memory::LinearAllocator::Destroy(&s_ArgsAllocator);
+		}
 	}
 
 	void Logger::LogCoreMessage(Log type, const char8* message)
 	{
+		if (!s_bIsConsoleEnabled)
+		{
+			return;
+		}
+
 		static uint32 colors[(uint8)Log::MaxEnum] = { 64, 12, 14, 2, 13, 8 };
 
 		// Doesn't include the null-terminating character

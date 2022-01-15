@@ -31,6 +31,18 @@
 
 
 /*
+* Platform specific defines.
+*/
+#ifdef AE_PLATFORM_WINDOWS
+	#define AE_VULKAN
+	#define AE_D3D12
+	#define AE_D3D11
+	#define AE_OPENGL
+#endif
+
+
+
+/*
 * Configuration detection
 */
 #ifdef AE_CONFIG_DEBUG_GAME
@@ -100,19 +112,19 @@
 * Compiler keywords
 */
 #ifdef AE_COMPILER_MSVC
-	#define STATIC_ASSERT(...) static_assert(__VA_ARGS__)
-	#define DEBUGBREAK() __debugbreak()
-	#define LINE_MACRO __LINE__
-	#define FILE_MACRO __FILE__
-	#define FUNCTION_MACRO __FUNCTION__
-	#define FUNCTION_SIG_MACRO __FUNCSIG__
+	#define AE_STATIC_ASSERT(...) static_assert(__VA_ARGS__)
+	#define AE_DEBUGBREAK() __debugbreak()
+	#define AE_LINE __LINE__
+	#define AE_FILE __FILE__
+	#define AE_FUNCTION __FUNCTION__
+	#define AE_FUNCTION_SIG __FUNCSIG__
 #else
-	#define STATIC_ASSERT(...) 
-	#define DEBUGBREAK() 
-	#define LINE_MACRO 
-	#define FILE_MACRO 
-	#define FUNCTION_MACRO 
-	#define FUNCTION_SIG_MACRO 
+	#define AE_STATIC_ASSERT(...) 
+	#define AE_DEBUGBREAK() 
+	#define AE_LINE 
+	#define AE_FILE 
+	#define AE_FUNCTION 
+	#define AE_FUNCTION_SIG 
 #endif
 
 
@@ -161,24 +173,24 @@
 	using char16  = wchar_t;
 #endif
 
-STATIC_ASSERT(sizeof(uint8)		== 1, "sizeof(uint8) expected to be 8 bits!"	);
-STATIC_ASSERT(sizeof(uint16)	== 2, "sizeof(uint16) expected to be 16 bits!"	);
-STATIC_ASSERT(sizeof(uint32)	== 4, "sizeof(uint32) expected to be 32 bits!"	);
-STATIC_ASSERT(sizeof(uint64)	== 8, "sizeof(uint64) expected to be 64 bits!"	);
+AE_STATIC_ASSERT(sizeof(uint8)		== 1, "sizeof(uint8) expected to be 8 bits!"	);
+AE_STATIC_ASSERT(sizeof(uint16)	== 2, "sizeof(uint16) expected to be 16 bits!"	);
+AE_STATIC_ASSERT(sizeof(uint32)	== 4, "sizeof(uint32) expected to be 32 bits!"	);
+AE_STATIC_ASSERT(sizeof(uint64)	== 8, "sizeof(uint64) expected to be 64 bits!"	);
 
-STATIC_ASSERT(sizeof(int8)		== 1, "sizeof(int8) expected to be 8 bits!"		);
-STATIC_ASSERT(sizeof(int16)		== 2, "sizeof(int16) expected to be 16 bits!"	);
-STATIC_ASSERT(sizeof(int32)		== 4, "sizeof(int32) expected to be 32 bits!"	);
-STATIC_ASSERT(sizeof(int64)		== 8, "sizeof(int64) expected to be 64 bits!"	);
+AE_STATIC_ASSERT(sizeof(int8)		== 1, "sizeof(int8) expected to be 8 bits!"		);
+AE_STATIC_ASSERT(sizeof(int16)		== 2, "sizeof(int16) expected to be 16 bits!"	);
+AE_STATIC_ASSERT(sizeof(int32)		== 4, "sizeof(int32) expected to be 32 bits!"	);
+AE_STATIC_ASSERT(sizeof(int64)		== 8, "sizeof(int64) expected to be 64 bits!"	);
 
-STATIC_ASSERT(sizeof(float32)	== 4, "sizeof(float32) expected to be 32 bits!"	);
-STATIC_ASSERT(sizeof(float64)	== 8, "sizeof(float64) expected to be 64 bits!"	);
+AE_STATIC_ASSERT(sizeof(float32)	== 4, "sizeof(float32) expected to be 32 bits!"	);
+AE_STATIC_ASSERT(sizeof(float64)	== 8, "sizeof(float64) expected to be 64 bits!"	);
 
-STATIC_ASSERT(sizeof(bool8)		== 1, "sizeof(bool8) expected to be 8 bits!"	);
-STATIC_ASSERT(sizeof(bool32)	== 4, "sizeof(bool32) expected to be 32 bits!"	);
+AE_STATIC_ASSERT(sizeof(bool8)		== 1, "sizeof(bool8) expected to be 8 bits!"	);
+AE_STATIC_ASSERT(sizeof(bool32)	== 4, "sizeof(bool32) expected to be 32 bits!"	);
 
-STATIC_ASSERT(sizeof(char8)		== 1, "sizeof(char8) expected to be 8 bits!"	);
-STATIC_ASSERT(sizeof(char16)	== 2, "sizeof(char16) expected to be 16 bits!"	);
+AE_STATIC_ASSERT(sizeof(char8)		== 1, "sizeof(char8) expected to be 8 bits!"	);
+AE_STATIC_ASSERT(sizeof(char16)	== 2, "sizeof(char16) expected to be 16 bits!"	);
 
 /* Disables dll-interface compiler warning. It is usually generated around templates. */
 #pragma warning (disable: 4251)
