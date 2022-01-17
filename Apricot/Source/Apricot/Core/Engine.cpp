@@ -9,6 +9,11 @@
 
 #include "Apricot/Filesystem/Filesystem.h"
 
+#include "Apricot/Events/ApplicationEvents.h"
+#include "Apricot/Events/WindowEvents.h"
+#include "Apricot/Events/KeyboardEvents.h"
+#include "Apricot/Events/MouseEvents.h"
+
 namespace Apricot {
 
 	Engine* GEngine = nullptr;
@@ -25,8 +30,7 @@ namespace Apricot {
 	{
 		GEngine = this;
 
-		OnPreInitEngine(commandArgs);
-		OnInitEngine();
+		OnInitEngine(commandArgs);
 
 		HTime lastFrameTime = Platform::GetPerformanceTime();
 		while (m_bIsRunning)
@@ -41,6 +45,27 @@ namespace Apricot {
 		OnDestroyEngine();
 
 		return 0;
+	}
+
+	void Engine::OnEvent(Event* e)
+	{
+		AE_CORE_TRACE("Event: {}", (uint16)e->GetType());
+
+		static EventDispatchMap map;
+		map.OnWindowClosed = [](const WindowClosedEvent* e) -> bool8 { return GEngine->OnWindowClosed(e); };
+		map.OnWindowResized = [](const WindowResizedEvent* e) -> bool8 { return GEngine->OnWindowResized(e); };
+		map.OnWindowMoved = [](const WindowMovedEvent* e) -> bool8 { return GEngine->OnWindowMoved(e); };
+
+		map.OnKeyPressed = [](const KeyPressedEvent* e) -> bool8 { return GEngine->OnKeyPressed(e); };
+		map.OnKeyReleased = [](const KeyReleasedEvent* e) -> bool8 { return GEngine->OnKeyReleased(e); };
+
+		map.OnMouseMoved = [](const MouseMovedEvent* e) -> bool8 { return GEngine->OnMouseMoved(e); };
+		map.OnMouseButtonPressed = [](const MouseButtonPressedEvent* e) -> bool8 { return GEngine->OnMouseButtonPressed(e); };
+		map.OnMouseButtonReleased = [](const MouseButtonReleasedEvent* e) -> bool8 { return GEngine->OnMouseButtonReleased(e); };
+		map.OnMouseWheelScrolled = [](const MouseWheelScrolledEvent* e) -> bool8 { return GEngine->OnMouseWheelScrolled(e); };
+
+		EventDispatcher dispatcher(e, &map);
+		dispatcher.Dispatch();
 	}
 
 	void Engine::OnForceShutdown()
@@ -60,17 +85,11 @@ namespace Apricot {
 		std::exit(-2);
 	}
 
-	bool Engine::OnPreInitEngine(const char8* commandLine)
+	bool Engine::OnInitEngine(const char8* commandLine)
 	{
 		EngineConfig::Init(commandLine);
 		Logger::Init();
-		PerformanceProfiler::Init();
 
-		return true;
-	}
-
-	bool Engine::OnInitEngine()
-	{
 		AE_CORE_INFO("Engine::OnInitEngine()");
 		AE_CORE_INFO("    Platform:      {}", AE_PLATFORM);
 		AE_CORE_INFO("    Configuration: {}", AE_CONFIGURATION);
@@ -78,6 +97,8 @@ namespace Apricot {
 
 		// Core-Systems initialization
 		{
+			PerformanceProfiler::Init();
+
 			Filesystem::Init();
 		}
 
@@ -101,6 +122,51 @@ namespace Apricot {
 		EngineConfig::Destroy();
 
 		return true;
+	}
+
+	bool8 Engine::OnWindowClosed(const WindowClosedEvent* e)
+	{
+		return false;
+	}
+
+	bool8 Engine::OnWindowResized(const WindowResizedEvent* e)
+	{
+		return false;
+	}
+
+	bool8 Engine::OnWindowMoved(const WindowMovedEvent* e)
+	{
+		return false;
+	}
+
+	bool8 Engine::OnKeyPressed(const KeyPressedEvent* e)
+	{
+		return false;
+	}
+
+	bool8 Engine::OnKeyReleased(const KeyReleasedEvent* e)
+	{
+		return false;
+	}
+
+	bool8 Engine::OnMouseMoved(const MouseMovedEvent* e)
+	{
+		return false;
+	}
+
+	bool8 Engine::OnMouseButtonPressed(const MouseButtonPressedEvent* e)
+	{
+		return false;
+	}
+
+	bool8 Engine::OnMouseButtonReleased(const MouseButtonReleasedEvent* e)
+	{
+		return false;
+	}
+
+	bool8 Engine::OnMouseWheelScrolled(const MouseWheelScrolledEvent* e)
+	{
+		return false;
 	}
 
 }
