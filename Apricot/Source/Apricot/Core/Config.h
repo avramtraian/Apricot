@@ -17,3 +17,8 @@
 * Filesystem configurations.
 */
 #define AEC_FILESYSTEM_PATH_BUFFERS_COUNT 2
+
+/*
+* Configuration files.
+*/
+#define AEC_MAX_CONFIG_FILE_VALUE_SIZE 256

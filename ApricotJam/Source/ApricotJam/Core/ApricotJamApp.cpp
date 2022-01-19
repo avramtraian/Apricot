@@ -11,9 +11,9 @@ namespace Apricot {
 		virtual ~CherryJamEngine() override = default;
 	};
 
-	Engine* CreateEngine(uint64& engineSize)
+	Engine* CreateEngine(uint64& outEngineSize)
 	{
-		engineSize = sizeof(CherryJamEngine);
+		outEngineSize = sizeof(CherryJamEngine);
 		return Memory::New<CherryJamEngine>(Memory::AllocTag::CoreSystems);
 	}
 

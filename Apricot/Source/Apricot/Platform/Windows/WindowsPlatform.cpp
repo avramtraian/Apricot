@@ -11,6 +11,8 @@
 
 #include "Apricot/Core/Platform.h"
 
+#include "Apricot/Filesystem/Filesystem.h"
+
 #include <Windows.h>
 #include <stdio.h>
 
@@ -21,26 +23,25 @@ namespace Apricot {
 		LARGE_INTEGER PerformanceCounterStart;
 		LARGE_INTEGER PerformanceFrequency;
 	};
-	static HPlatformData* s_Platform = nullptr;
+	static HPlatformData s_Platform;
 
 	void Platform::Init()
 	{
-		s_Platform = (HPlatformData*)Memory::Allocate(sizeof(HPlatformData), Memory::AllocTag::CoreSystems);
-
-		BOOL result = QueryPerformanceCounter(&s_Platform->PerformanceCounterStart);
+		BOOL result = QueryPerformanceCounter(&s_Platform.PerformanceCounterStart);
 		AE_CORE_VERIFY(result, "Couldn't QueryPerformanceCounter. Aborting.");
 
-		result = QueryPerformanceFrequency(&s_Platform->PerformanceFrequency);
+		result = QueryPerformanceFrequency(&s_Platform.PerformanceFrequency);
 		AE_CORE_VERIFY(result, "Couldn't QueryPerformanceFrequency. Aborting.");
 	}
 
 	void Platform::Destroy()
 	{
-		Memory::Free(s_Platform, sizeof(HPlatformData), Memory::AllocTag::CoreSystems);
+		
 	}
 
 	void Platform::CreateConsole()
 	{
+#ifdef AE_ENABLE_CONSOLE
 		AttachConsole(ATTACH_PARENT_PROCESS);
 		AllocConsole();
 
@@ -50,22 +51,27 @@ namespace Apricot {
 		freopen_s(&e, "CON", "w", stderr);
 		FILE* i;
 		freopen_s(&i, "CON", "r", stdin);
+#endif
 	}
 
 	void Platform::PrintToConsole(const char* buffer, uint64 bufferSize, uint32 color)
 	{
+#ifdef AE_ENABLE_CONSOLE
 		static HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 
 		SetConsoleTextAttribute(consoleHandle, (WORD)color);
 		WriteConsoleA(consoleHandle, buffer, (DWORD)(bufferSize / sizeof(char)), NULL, NULL);
+#endif
 	}
 
 	void Platform::PrintToConsole(const wchar_t* buffer, uint64 bufferSize, uint32 color)
 	{
+#ifdef AE_ENABLE_CONSOLE
 		static HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 
 		SetConsoleTextAttribute(consoleHandle, (WORD)color);
 		WriteConsoleW(consoleHandle, buffer, (DWORD)(bufferSize / sizeof(wchar_t)), NULL, NULL);
+#endif
 	}
 
 	HTime Platform::GetPerformanceTime()
@@ -76,14 +82,14 @@ namespace Apricot {
 
 		LARGE_INTEGER elapsedNanoseconds;
 		// Get the number of ticks
-		elapsedNanoseconds.QuadPart = performanceTimerNow.QuadPart - s_Platform->PerformanceCounterStart.QuadPart;
+		elapsedNanoseconds.QuadPart = performanceTimerNow.QuadPart - s_Platform.PerformanceCounterStart.QuadPart;
 
 		// Transforms the "time" in nanoseconds (from seconds).
 		elapsedNanoseconds.QuadPart *= 1000000000;
 
 		// Divide the number of ticks by the frequency. Without the above multiplication, it will return
 		// an approximation in seconds.
-		elapsedNanoseconds.QuadPart /= s_Platform->PerformanceFrequency.QuadPart;
+		elapsedNanoseconds.QuadPart /= s_Platform.PerformanceFrequency.QuadPart;
 
 		return elapsedNanoseconds.QuadPart;
 	}
@@ -123,6 +129,56 @@ namespace Apricot {
 			case IDTRYAGAIN: return MessageBoxButton::TryAgain;
 			default:         return MessageBoxButton::None;
 		};
+	}
+
+	bool8 Platform::ReadConfigFile(const char16* filepath, ConfigFileKey* keys, uint64 keysCount)
+	{
+		for (uint64 index = 0; index < keysCount; index++)
+		{
+			ConfigFileKey& key = keys[index];
+			BOOL result = GetPrivateProfileString(key.Section, key.Key, key.Default, key.Value, (DWORD)key.ValueSize, filepath);
+
+			if (!result)
+			{
+				switch (GetLastError())
+				{
+					case ERROR_FILE_NOT_FOUND:
+					{
+						AE_CORE_ERROR("Failed to read configuration! Section: '{}', Key: '{}'. ERROR_FILE_NOT_FOUND");
+						return false;
+					}
+					default:
+					{
+						AE_CORE_ERROR("Failed to read configuration! Section: '{}', Key: '{}'. ERROR_UNKNOWN.");
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
+	bool8 Platform::WriteConfigFile(const char16* filepath, ConfigFileKey* keys, uint64 keysCount)
+	{
+		if (!Filesystem::Exists(filepath))
+		{
+			Filesystem::CreateDirectories(Filesystem::Path(filepath).Parent());
+		}
+
+		for (uint64 index = 0; index < keysCount; index++)
+		{
+			ConfigFileKey& key = keys[index];
+			BOOL result = WritePrivateProfileString(key.Section, key.Key, key.Value, filepath);
+
+			if (!result)
+			{
+				AE_CORE_ERROR("Failed to read configuration! Section: '{}', Key: '{}'. ERROR_UNKNOWN.");
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 }

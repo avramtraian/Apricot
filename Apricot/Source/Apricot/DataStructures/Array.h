@@ -70,7 +70,7 @@ namespace Apricot {
 		}
 
 	public:
-		T* Data() const { return m_Data; }
+		T* Data() const { return (T*)(&m_Data[0]); }
 		uint64 Size() const { return S; }
 
 	private:

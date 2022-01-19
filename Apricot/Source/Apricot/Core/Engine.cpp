@@ -87,6 +87,8 @@ namespace Apricot {
 
 	bool Engine::OnInitEngine(const char8* commandLine)
 	{
+		Filesystem::Init();
+
 		EngineConfig::Init(commandLine);
 		Logger::Init();
 
@@ -95,12 +97,7 @@ namespace Apricot {
 		AE_CORE_INFO("    Configuration: {}", AE_CONFIGURATION);
 		AE_CORE_INFO("    Engine Type:   {}", AE_ENGINE_TYPE);
 
-		// Core-Systems initialization
-		{
-			PerformanceProfiler::Init();
-
-			Filesystem::Init();
-		}
+		PerformanceProfiler::Init();
 
 		return true;
 	}

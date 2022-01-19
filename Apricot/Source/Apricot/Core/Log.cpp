@@ -42,6 +42,7 @@ namespace Apricot {
 
 	void Logger::LogCoreMessage(Log type, const char8* message)
 	{
+#ifdef AE_ENABLE_CONSOLE
 		if (!s_bIsConsoleEnabled)
 		{
 			return;
@@ -69,6 +70,7 @@ namespace Apricot {
 		s_MessageBuffer[logTypeStrSize + messageSize] = '\n';
 
 		Platform::PrintToConsole(s_MessageBuffer, logTypeStrSize + messageSize + 1, colors[(uint8)type]);
+#endif
 	}
 
 }

@@ -24,6 +24,8 @@ namespace Apricot {
 		static void Init(const char8* commandLine);
 		static void Destroy();
 
+		static void Flush();
+
 	private:
 		EngineConfig() = default;
 		EngineConfig(const EngineConfig&) = delete;
@@ -33,23 +35,23 @@ namespace Apricot {
 		Version EngineVersion = Version(0, 0, 1);
 		Version GameVersion = Version(0, 0, 1);
 
-		// NOTE: In order to not pollute a lot of engine code with rendering stuff, we can't include "Renderer.h".
-		// So we have to store the rendering API like this.
-		// This translates to RenderingAPI::None.
+		/*
+		* NOTE: In order to not pollute a lot of core-engine code with rendering stuff, we can't include "Renderer.h".
+		* So we have to store the rendering API as an uint8.
+		* The default value translates to RenderingAPI::None.
+		*/
 		uint8 RenderingAPI = 0;
+		bool8 bHasChanged_RenderingAPI = true;
 
+		/*
+		* This flag is evaluated only on the initialization of the engine.
+		* If AE_ENABLE_CONSOLE isn't defined, this does nothing at all.
+		*/
 		bool8 bStartWithConsole = true;
+		bool8 bHasChanged_bStartWithConsole = true;
 
 		friend class Engine;
 	};
-
-	class APRICOT_API ConfigSerializer
-	{
-	public:
-		static bool8 ReadGlobalEngineConfig(const Filesystem::Path256& filepath);
-		static bool8 WriteGlobalEngineConfig(const Filesystem::Path256& filepath);
-	};
-
 
 	//////////////////////////---- AVAILABLE FLAGS ----//////////////////////////
 

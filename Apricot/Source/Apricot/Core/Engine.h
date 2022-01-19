@@ -47,7 +47,7 @@ namespace Apricot {
 		 bool m_bIsRunning = true;
 	};
 
-	extern Engine* CreateEngine(uint64& engineSize);
+	extern Engine* CreateEngine(uint64& outEngineSize);
 
 	extern Engine* GEngine;
 
