@@ -1,76 +1,94 @@
-// Part of Apricot Engine. 2022-2022.
-
 #include "aepch.h"
 #include "Log.h"
+#include "Assert.h"
 
 #include "Memory.h"
+#include "Apricot/STL/String.h"
 #include "Platform.h"
-#include "Engine.h"
 
 namespace Apricot {
+	
 
-	char* Logger::s_MessageBuffer = nullptr;
-	uint64 Logger::s_MessageBufferSize = 0;
-	Memory::LinearAllocator Logger::s_ArgsAllocator;
-	bool8 Logger::s_bIsConsoleEnabled;
+	// TODO: Don't do these!
+	char8 Logger::s_Buffer[32000] = { 0 };
+	static char8 s_LogBuffer[32000] = {0};
+
+	static const char8* s_LogTypes[] =
+	{
+		"[FATAL]: ",
+		"[ERROR]: ",
+		"[WARN]:  ",
+		"[INFO]:  ",
+		"[DEBUG]: ",
+		"[TRACE]: ",
+	};
+
+	static const uint64 s_LogTypeSize = sizeof("[FATAL]: ") - 1;
+
+	static Platform::ConsoleTextColor s_LogTypesColors[] =
+	{
+		Platform::ConsoleTextColor::Black_RedBg,
+		Platform::ConsoleTextColor::BrightRed,
+		Platform::ConsoleTextColor::PaleYellow,
+		Platform::ConsoleTextColor::Green,
+		Platform::ConsoleTextColor::DarkPurple,
+		Platform::ConsoleTextColor::Gray
+	};
+
+	APRICOT_API void ReportBaseAssert(const char8* condition, const char8* file, uint64 line, const char8* func, const char8* message)
+	{
+
+	}
+
+	APRICOT_API void ReportCoreAssert(const char8* condition, const char8* file, uint64 line, const char8* func, const char8* message)
+	{
+
+	}
+
+	APRICOT_API void ReportBaseVerify(const char8* condition, const char8* file, uint64 line, const char8* func, const char8* message)
+	{
+
+	}
+
+	APRICOT_API void ReportCoreVerify(const char8* condition, const char8* file, uint64 line, const char8* func, const char8* message)
+	{
+
+	}
 
 	void Logger::Init()
 	{
-		s_bIsConsoleEnabled = GEngine->Config.bStartWithConsole;
-		if (s_bIsConsoleEnabled)
-		{
-			Platform::CreateConsole();
+		Platform::Console_Attach();
 
-			s_MessageBufferSize = 1024;
-			s_MessageBuffer = (char8*)Memory::Allocate(s_MessageBufferSize * sizeof(char8), Memory::AllocTag::CoreSystems);
-
-			void* argsMemoryBlock = Memory::Allocate(AE_KILOBYTES(8), Memory::AllocTag::CoreSystems);
-			Memory::LinearAllocator::Create(&s_ArgsAllocator, AE_KILOBYTES(8), argsMemoryBlock);
-		}
+		AE_CORE_TRACE("Logger initialized succesfully!");
 	}
 
 	void Logger::Destroy()
 	{
-		if (s_bIsConsoleEnabled)
-		{
-			Memory::Free(s_MessageBuffer, s_MessageBufferSize * sizeof(char8), Memory::AllocTag::CoreSystems);
-
-			Memory::Free(s_ArgsAllocator.MemoryBlock(), s_ArgsAllocator.GetTotalSize(), Memory::AllocTag::CoreSystems);
-			Memory::LinearAllocator::Destroy(&s_ArgsAllocator);
-		}
+		Platform::Console_Free();
 	}
 
-	void Logger::LogCoreMessage(Log type, const char8* message)
+	void Logger::Write(Log type, const char8* message)
 	{
-#ifdef AE_ENABLE_CONSOLE
-		if (!s_bIsConsoleEnabled)
-		{
-			return;
-		}
+		uint64 messageSize = Str_Length(message);
+		AE_BASE_VERIFY(s_LogTypeSize + messageSize + 1 <= sizeof(s_Buffer) / sizeof(char8), "Log buffer overflow!");
 
-		static uint32 colors[(uint8)Log::MaxEnum] = { 64, 12, 14, 2, 13, 8 };
+		Memory_Copy(s_LogBuffer, s_LogTypes[(uint8)type], s_LogTypeSize);
+		Memory_Copy(s_LogBuffer + s_LogTypeSize, message, messageSize);
+		s_LogBuffer[s_LogTypeSize + messageSize] = '\n';
 
-		// Doesn't include the null-terminating character
-		static const uint16 logTypeStrSize = sizeof("[FATAL]: ") - 1;
-		static const char8* logTypeStrings[(uint8)Log::MaxEnum] =
-		{
-			"[FATAL]: ",
-			"[ERROR]: ",
-			"[WARN]:  ",
-			"[INFO]:  ",
-			"[DEBUG]: ",
-			"[TRACE]: ",
-		};
+		Platform::Console_Write(s_LogBuffer, s_LogTypeSize + messageSize + 1, s_LogTypesColors[(uint8)type]);
+	}
 
-		uint64 messageSize = strlen(message);
-		AE_CORE_VERIFY(logTypeStrSize + messageSize < s_MessageBufferSize - 1, "Message buffer overflow!");
+	void Logger::WriteError(Log type, const char8* message)
+	{
+		uint64 messageSize = Str_Length(message);
+		AE_BASE_VERIFY(s_LogTypeSize + messageSize + 1 <= sizeof(s_Buffer) / sizeof(char8), "Log buffer overflow!");
 
-		Memory::Copy(s_MessageBuffer, logTypeStrings[(uint8)type], logTypeStrSize);
-		Memory::Copy(s_MessageBuffer + logTypeStrSize, message, messageSize);
-		s_MessageBuffer[logTypeStrSize + messageSize] = '\n';
+		Memory_Copy(s_LogBuffer, s_LogTypes[(uint8)type], s_LogTypeSize);
+		Memory_Copy(s_LogBuffer + s_LogTypeSize, message, messageSize);
+		s_LogBuffer[s_LogTypeSize + messageSize] = '\n';
 
-		Platform::PrintToConsole(s_MessageBuffer, logTypeStrSize + messageSize + 1, colors[(uint8)type]);
-#endif
+		Platform::Console_WriteError(s_LogBuffer, s_LogTypeSize + messageSize + 1, s_LogTypesColors[(uint8)type]);
 	}
 
 }

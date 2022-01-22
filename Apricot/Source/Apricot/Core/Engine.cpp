@@ -1,13 +1,8 @@
-// Part of Apricot Engine. 2022-2022.
-
 #include "aepch.h"
 #include "Engine.h"
 
 #include "Memory.h"
-#include "Profiler.h"
 #include "Platform.h"
-
-#include "Apricot/Filesystem/Filesystem.h"
 
 #include "Apricot/Events/ApplicationEvents.h"
 #include "Apricot/Events/WindowEvents.h"
@@ -18,39 +13,38 @@ namespace Apricot {
 
 	Engine* GEngine = nullptr;
 
-	Engine::Engine()
+	int32 Engine::Run(const char8* commandLine)
 	{
-	}
-
-	Engine::~Engine()
-	{
-	}
-
-	int32 Engine::Run(const char8* commandArgs)
-	{
+		if (GEngine)
+		{
+			return AE_EXIT_UNKNOWN;
+		}
 		GEngine = this;
 
-		OnInitEngine(commandArgs);
-
-		HTime lastFrameTime = Platform::GetPerformanceTime();
-		while (m_bIsRunning)
+		if (!OnEngineInitialize(commandLine))
 		{
-			AE_PERFORMANCE_BEGIN_FRAME("MainThread");
-
-			HTime now = Platform::GetPerformanceTime();
-			HTimestep timestep = now - lastFrameTime;
-			lastFrameTime = now;
+			return AE_EXIT_FAILED_INIT;
 		}
 
-		OnDestroyEngine();
+		AE_CORE_DEBUG("Heelo {} times engine {} sads {}", 49237598432344.840395, -123, (const char8*)"bonjour");
 
-		return 0;
+		AE_CORE_DEBUG("{}", MemoryDebugger::GetUsageString());
+
+		while (true)
+		{
+			
+		}
+
+		if (!OnEngineDestroy())
+		{
+			return AE_EXIT_FAILED_DESTROY;
+		}
+
+		return AE_EXIT_SUCCESS;
 	}
 
 	void Engine::OnEvent(Event* e)
 	{
-		AE_CORE_TRACE("Event: {}", (uint16)e->GetType());
-
 		static EventDispatchMap map;
 		map.OnWindowClosed = [](const WindowClosedEvent* e) -> bool8 { return GEngine->OnWindowClosed(e); };
 		map.OnWindowResized = [](const WindowResizedEvent* e) -> bool8 { return GEngine->OnWindowResized(e); };
@@ -68,55 +62,16 @@ namespace Apricot {
 		dispatcher.Dispatch();
 	}
 
-	void Engine::OnForceShutdown()
+	bool8 Engine::OnEngineInitialize(const char8* commandLine)
 	{
-		if (!m_bIsRunning)
-		{
-			return;
-		}
-
-		m_bIsRunning = false;
-		Logger::Destroy();
-		PerformanceProfiler::Destroy();
-		Platform::Destroy();
-
-		Memory::HMemoryDebugger::DebugLog();
-
-		std::exit(-2);
-	}
-
-	bool Engine::OnInitEngine(const char8* commandLine)
-	{
-		Filesystem::Init();
-
-		EngineConfig::Init(commandLine);
 		Logger::Init();
-
-		AE_CORE_INFO("Engine::OnInitEngine()");
-		AE_CORE_INFO("    Platform:      {}", AE_PLATFORM);
-		AE_CORE_INFO("    Configuration: {}", AE_CONFIGURATION);
-		AE_CORE_INFO("    Engine Type:   {}", AE_ENGINE_TYPE);
-
-		PerformanceProfiler::Init();
 
 		return true;
 	}
 
-	bool Engine::OnDestroyEngine()
+	bool8 Engine::OnEngineDestroy()
 	{
-		AE_PERFORMANCE_FUNCTION();
-
-		// Core-Systems destruction
-		{
-			Filesystem::Destroy();
-		}
-
-		AE_CORE_INFO("Engine::OnDestroyEngine()");
-		Memory::HMemoryDebugger::DebugLog();
-
-		PerformanceProfiler::Destroy();
 		Logger::Destroy();
-		EngineConfig::Destroy();
 
 		return true;
 	}

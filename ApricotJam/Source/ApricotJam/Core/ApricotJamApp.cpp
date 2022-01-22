@@ -1,20 +1,29 @@
 // Part of Apricot Engine. 2022-2022.
 
 #include "ajpch.h"
+
 #include <Apricot/Core/EntryPoint.h>
+#include <Apricot/Core/Engine.h>
 
 namespace Apricot {
-
-	class CherryJamEngine : public Engine
+	
+	class ApricotJamEngine : public Engine
 	{
 	public:
-		virtual ~CherryJamEngine() override = default;
+		
 	};
 
-	Engine* CreateEngine(uint64& outEngineSize)
+	Engine* CreateEngine()
 	{
-		outEngineSize = sizeof(CherryJamEngine);
-		return Memory::New<CherryJamEngine>(Memory::AllocTag::CoreSystems);
+		ApricotJamEngine* engine = (ApricotJamEngine*)Memory_Alloc(sizeof(ApricotJamEngine), AllocTag::Core);
+		Memory_Placement<ApricotJamEngine>(engine);
+		return engine;
+	}
+
+	void DeleteEngine(Engine* engine)
+	{
+		((ApricotJamEngine*)engine)->~ApricotJamEngine();
+		Memory_Free(engine, sizeof(ApricotJamEngine), AllocTag::Core);
 	}
 
 }

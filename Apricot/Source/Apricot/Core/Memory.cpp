@@ -1,108 +1,112 @@
-// Part of Apricot Engine. 2022-2022.
-
 #include "aepch.h"
 #include "Memory.h"
 
-namespace Apricot { namespace Memory {
+#include "Platform.h"
 
-	uint64 HMemoryDebugger::TotalDeallocations[];
-	uint64 HMemoryDebugger::TotalAllocations[];
-	uint64 HMemoryDebugger::TotalFreedMemory[];
-	uint64 HMemoryDebugger::TotalAllocatedMemory[];
+namespace Apricot {
 
-	static const char8* s_AllocationNames[] =
+	uint64 MemoryDebugger::AllocatedTagged[] = { 0 };
+	uint64 MemoryDebugger::FreedTagged[] = { 0 };
+	uint64 MemoryDebugger::AllocationsCountTagged[] = { 0 };
+	uint64 MemoryDebugger::DeallocationsCountTagged[] = { 0 };
+
+	APRICOT_API void Memory_Init()
 	{
-		"NONE            ",
-		"GENERAL         ",
-		"CORE_SYSTEMS    ",
-		"FILESYSTEM      ",
-		"OPTICK          ",
-		"ALLOCATOR_LINEAR",
-		"ALLOCATOR_STACK ",
-		"STRING          ",
-		"VECTOR          "
-	};
-
-	static const char8* s_MemoryUnitNames[] =
-	{
-		"B",
-		"KB",
-		"MB",
-		"GB"
-	};
-
-	namespace Utils {
-
-		static float64 GetUnit(uint64 bytes)
-		{
-			if (bytes >= AE_GIGABYTES(1))
-				return (float64)bytes / (float64)(AE_GIGABYTES(1));
-			else if (bytes >= AE_MEGABYTES(1))
-				return (float64)bytes / (float64)(AE_MEGABYTES(1));
-			else if (bytes >= AE_KILOBYTES(1))
-				return (float64)bytes / (float64)(AE_KILOBYTES(1));
-			else
-				return (float64)bytes;
-		}
-
-		static const char8* GetUnitName(uint64 bytes)
-		{
-			if (bytes >= AE_GIGABYTES(1))
-				return s_MemoryUnitNames[3];
-			else if (bytes >= AE_MEGABYTES(1))
-				return s_MemoryUnitNames[2];
-			else if (bytes >= AE_KILOBYTES(1))
-				return s_MemoryUnitNames[1];
-			else
-				return s_MemoryUnitNames[0];
-		}
-
+		MemoryDebugger::Init();
 	}
 
-	void HMemoryDebugger::DebugLog(
-		bool bTotalAllocated   /*= true*/, bool bTotalFreed         /*= true*/,
-		bool bTotalAllocations /*= true*/, bool bTotalDeallocations /*= true*/,
-		bool bActiveAllocated  /*= true*/, bool bActiveAllocations  /*= true*/
-	)
+	APRICOT_API void Memory_Destroy()
 	{
-		AE_CORE_DEBUG("##--- MEMORY DEBUG INFORMATION ---##");
-		for (uint64 index = 0; index < (uint64)AllocTag::MaxEnum; index++)
-		{
-			AE_CORE_DEBUG("  * {}", s_AllocationNames[index]);
-
-			if (bTotalAllocated)
-			{
-				AE_CORE_DEBUG("      TotalAllocatedMemory:    {}{}", Utils::GetUnit(TotalAllocatedMemory[index]), Utils::GetUnitName(TotalAllocatedMemory[index]));
-			}
-
-			if (bTotalFreed)
-			{
-				AE_CORE_DEBUG("      TotalFreedMemory:        {}{}", Utils::GetUnit(TotalFreedMemory[index]), Utils::GetUnitName(TotalFreedMemory[index]));
-			}
-
-			AE_CORE_DEBUG("      -----------------------------------");
-
-			if (bTotalAllocations)
-			{
-				AE_CORE_DEBUG("      TotalAllocations:        {}", TotalAllocations[index]);
-			}
-			if (bTotalDeallocations)
-			{
-				AE_CORE_DEBUG("      TotalDeallocations:      {}", TotalDeallocations[index]);
-			}
-
-			AE_CORE_DEBUG("      -----------------------------------");
-
-			if (bActiveAllocated)
-			{
-				AE_CORE_DEBUG("      ActiveAllocatedMemory:   {}{}", Utils::GetUnit(TotalAllocatedMemory[index] - TotalFreedMemory[index]), Utils::GetUnitName(TotalAllocatedMemory[index] - TotalFreedMemory[index]));
-			}
-			if (bActiveAllocations)
-			{
-				AE_CORE_DEBUG("      ActiveAllocations:       {}", TotalAllocations[index] - TotalDeallocations[index]);
-			}
-		}
-		AE_CORE_DEBUG("##--------------------------------##");
+		MemoryDebugger::Destroy();
 	}
 
-} }
+	APRICOT_API void* Memory_Alloc(uint64 size, AllocTag tag)
+	{
+#ifdef AE_ENABLE_MEMORY_TRACE
+
+		MemoryDebugger::AllocatedTagged        [(uint16)tag] += size;
+		MemoryDebugger::AllocationsCountTagged [(uint16)tag] += 1;
+
+#endif
+
+		return Platform::Memory_Allocate(size, false);
+	}
+
+	APRICOT_API void Memory_Free(void* address, uint64 size, AllocTag tag)
+	{
+#ifdef AE_ENABLE_MEMORY_TRACE
+
+		MemoryDebugger::FreedTagged[(uint16)tag] += size;
+		MemoryDebugger::DeallocationsCountTagged[(uint16)tag] += 1;
+
+#endif
+
+		Platform::Memory_Free(address, size);
+	}
+
+	APRICOT_API void Memory_Copy(void* destination, const void* source, uint64 size)
+	{
+		Platform::Memory_Copy(destination, source, size);
+	}
+
+	APRICOT_API void Memory_Set(void* destination, int32 value, uint64 size)
+	{
+		Platform::Memory_Set(destination, value, size);
+	}
+
+	APRICOT_API void Memory_Zero(void* destination, uint64 size)
+	{
+		Platform::Memory_Zero(destination, size);
+	}
+
+	void MemoryDebugger::Init()
+	{
+#ifdef AE_ENABLE_MEMORY_TRACE
+
+		Memory_ZeroArray(AllocatedTagged);
+		Memory_ZeroArray(FreedTagged);
+
+		Memory_ZeroArray(AllocationsCountTagged);
+		Memory_ZeroArray(DeallocationsCountTagged);
+
+#endif
+	}
+
+	void MemoryDebugger::Destroy()
+	{
+#ifdef AE_ENABLE_MEMORY_TRACE
+#endif
+	}
+
+	char8* MemoryDebugger::GetUsageString()
+	{
+#ifdef AE_ENABLE_MEMORY_TRACE
+
+		static char8 buffer[2048] = { 0 };
+
+		static const char8* allocTagStrs[] =
+		{
+			"NONE   ",
+			"UNKNOWN",
+			"CORE   ",
+		};
+
+		static const char8* format =
+			"Tagged Memory Usage:\n"
+			"    - {}: {}B\n"
+			"    - {}: {}B\n"
+			"    - {}: {}B\n";
+
+		Format(format, buffer, AE_ARRAY_LENGTH(buffer), 
+			allocTagStrs[(uint16)AllocTag::None],    AllocatedTagged[(uint16)AllocTag::None]    - FreedTagged[(uint16)AllocTag::None],
+			allocTagStrs[(uint16)AllocTag::Unknown], AllocatedTagged[(uint16)AllocTag::Unknown] - FreedTagged[(uint16)AllocTag::Unknown],
+			allocTagStrs[(uint16)AllocTag::Core],    AllocatedTagged[(uint16)AllocTag::Core]    - FreedTagged[(uint16)AllocTag::Core]
+		);
+		return buffer;
+
+#else
+		return nullptr;
+#endif
+	}
+
+}

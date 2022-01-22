@@ -2,11 +2,10 @@
 
 #pragma once
 
-#include "Engine.h"
-#include "Memory.h"
+#include "Base.h"
 #include "Platform.h"
-#include "Log.h"
-#include "Profiler.h"
+#include "Memory.h"
+#include "Engine.h"
 
 #ifdef AE_PLATFORM_WINDOWS
 
@@ -14,19 +13,44 @@
 
 int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
-	// Platform initialization.
+	// Init foundational systems.
 	Apricot::Platform::Init();
+	Apricot::Memory_Init();
 
-	// Engine instantiation.
-	uint64 engineSize;
-	Apricot::Engine* engine = Apricot::CreateEngine(engineSize);
-	uint32 returnCode = engine->Run(lpCmdLine);
-	Apricot::Memory::Delete(engine, engineSize, Apricot::Memory::AllocTag::CoreSystems);
+	// Instantiate the engine.
+	Apricot::Engine* engine = Apricot::CreateEngine();
 
-	// Platform destruction.
+	// Run the engine.
+	int32 returnCode = engine->Run(lpCmdLine);
+
+	// TODO: Dump debug information (to files?).
+	switch (returnCode)
+	{
+		case AE_EXIT_SUCCESS:
+		{
+			break;
+		}
+		case AE_EXIT_UNKNOWN:
+		{
+			break;
+		}
+		case AE_EXIT_FAILED_INIT:
+		{
+			break;
+		}
+		case AE_EXIT_FAILED_DESTROY:
+		{
+			break;
+		}
+	}
+
+	// Delete the engine.
+	Apricot::DeleteEngine(engine);
+
+	// Destroy foundational systems.
+	Apricot::Memory_Destroy();
 	Apricot::Platform::Destroy();
 
-	// Application exit.
 	return (int)returnCode;
 }
 

@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "Config.h"
-
 /*
 * Platform detection
 */
@@ -74,6 +72,8 @@
 	#error "Unknown configuration macro!"
 #endif
 
+
+
 /*
 * Debug settings
 */
@@ -98,16 +98,7 @@
 	#define AE_ENABLE_FILESYSTEM_ERROR_CHECK
 #endif
 
-/*
-* 
-*/
-#ifdef AE_SHIPPING
-	#ifdef AE_SERVER
-		#define AE_ENABLE_CONSOLE
-	#endif
-#else
-	#define AE_ENABLE_CONSOLE
-#endif
+
 
 /*
 * Compiler detection
@@ -200,6 +191,17 @@ AE_STATIC_ASSERT(sizeof(bool32)	    == 4, "sizeof(bool32) expected to be 32 bits
 
 AE_STATIC_ASSERT(sizeof(char8)		== 1, "sizeof(char8) expected to be 8 bits!"	);
 AE_STATIC_ASSERT(sizeof(char16)	    == 2, "sizeof(char16) expected to be 16 bits!"	);
+
+#define AE_EXIT_UNKNOWN        -1
+#define AE_EXIT_FAILED_INIT    -2
+#define AE_EXIT_FAILED_DESTROY -3
+#define AE_EXIT_SUCCESS         0
+
+
+
+#define AE_ARRAY_LENGTH(Array) (sizeof(Array) / sizeof(Array[0]))
+
+
 
 /* Disables dll-interface compiler warning. It is usually generated around templates. */
 #pragma warning (disable: 4251)
