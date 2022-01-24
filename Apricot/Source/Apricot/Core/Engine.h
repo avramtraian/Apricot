@@ -1,3 +1,5 @@
+// Part of Apricot Engine. 2022-2022.
+
 #pragma once
 
 #include "Base.h"
@@ -33,6 +35,6 @@ namespace Apricot {
 	extern Engine* CreateEngine();
 	extern void DeleteEngine(Engine* engine);
 
-	extern Engine* GEngine;
+	APRICOT_API extern Engine* GEngine;
 
 }

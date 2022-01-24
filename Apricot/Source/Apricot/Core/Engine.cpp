@@ -1,3 +1,5 @@
+// Part of Apricot Engine. 2022-2022.
+
 #include "aepch.h"
 #include "Engine.h"
 
@@ -8,6 +10,8 @@
 #include "Apricot/Events/WindowEvents.h"
 #include "Apricot/Events/KeyboardEvents.h"
 #include "Apricot/Events/MouseEvents.h"
+
+#include "Apricot/Containers/Vector.h"
 
 namespace Apricot {
 
@@ -26,9 +30,10 @@ namespace Apricot {
 			return AE_EXIT_FAILED_INIT;
 		}
 
-		AE_CORE_DEBUG("Heelo {} times engine {} sads {}", 49237598432344.840395, -123, (const char8*)"bonjour");
-
 		AE_CORE_DEBUG("{}", MemoryDebugger::GetUsageString());
+
+		TVector<uint32> buffer;
+		buffer.SetAllocator(GAllocator);
 
 		while (true)
 		{

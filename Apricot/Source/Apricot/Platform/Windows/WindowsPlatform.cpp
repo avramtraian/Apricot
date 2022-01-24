@@ -1,3 +1,5 @@
+// Part of Apricot Engine. 2022-2022.
+
 #include "aepch.h"
 
 #ifdef AE_PLATFORM_WINDOWS
@@ -28,6 +30,10 @@ namespace Apricot {
 
 	void* Platform::Memory_Allocate(uint64 size, bool8 alligned)
 	{
+		if (size == 0)
+		{
+			return nullptr;
+		}
 		return ::operator new(size);
 	}
 

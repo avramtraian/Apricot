@@ -1,3 +1,5 @@
+// Part of Apricot Engine. 2022-2022.
+
 #pragma once
 
 #include "Base.h"
@@ -5,17 +7,30 @@
 #include <new>
 
 #define Memory_ZeroStruct(Variable) ::Apricot::Memory_Zero(&Variable, sizeof(Variable))
-#define Memory_ZeroArray(Variable) ::Apricot::Memory_Zero(Variable, sizeof(Variable))
+#define Memory_ZeroArray(Array) ::Apricot::Memory_Zero(Array, sizeof(Array))
 
 namespace Apricot {
 
 	enum class AllocTag : uint16
 	{
+		// Invalid allocation tag. Do not use it intentionally!
 		None = 0,
 
+		// Generic allocation
 		Unknown,
-		Core,
 
+		// Core engine allocations
+		Core,
+		Array,
+		Vector,
+		String,
+
+		// Allocators
+		LinearAllocator,
+		StackAllocator,
+		DynamicAllocator,
+
+		// Used internally
 		MaxEnumValue
 	};
 

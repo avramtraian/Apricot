@@ -1,9 +1,11 @@
+// Part of Apricot Engine. 2022-2022.
+
 #include "aepch.h"
 #include "Log.h"
 #include "Assert.h"
 
 #include "Memory.h"
-#include "Apricot/STL/String.h"
+#include "Apricot/Containers/String.h"
 #include "Platform.h"
 
 namespace Apricot {
