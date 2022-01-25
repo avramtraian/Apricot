@@ -101,17 +101,17 @@ namespace Apricot {
 
 		static const char8* format =
 			"Tagged Memory Usage:\n"
-			"    - {}: {}B\n"
-			"    - {}: {}B\n"
-			"    - {}: {}B\n"
-			"    - {}: {}B\n"
-			"    - {}: {}B\n"
-			"    - {}: {}B\n"
-			"    - {}: {}B\n"
-			"    - {}: {}B\n"
-			"    - {}: {}B\n";
+			"             - {}: {}B\n"
+			"             - {}: {}B\n"
+			"             - {}: {}B\n"
+			"             - {}: {}B\n"
+			"             - {}: {}B\n"
+			"             - {}: {}B\n"
+			"             - {}: {}B\n"
+			"             - {}: {}B\n"
+			"             - {}: {}B\n";
 
-		Format(format, buffer, AE_ARRAY_LENGTH(buffer), 
+		Format(buffer, AE_ARRAY_LENGTH(buffer), format,
 			allocTagStrs[(uint16)AllocTag::None],             AllocatedTagged[(uint16)AllocTag::None]             - FreedTagged[(uint16)AllocTag::None],
 			allocTagStrs[(uint16)AllocTag::Unknown],          AllocatedTagged[(uint16)AllocTag::Unknown]          - FreedTagged[(uint16)AllocTag::Unknown],
 			allocTagStrs[(uint16)AllocTag::Core],             AllocatedTagged[(uint16)AllocTag::Core]             - FreedTagged[(uint16)AllocTag::Core],

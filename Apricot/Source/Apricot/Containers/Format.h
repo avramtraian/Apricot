@@ -56,7 +56,7 @@ namespace Apricot {
 	}
 
 	template<typename... Args>
-	void Format(const char8* string, char8* buffer, uint64 bufferSize, Args&&... args)
+	void Format(char8* buffer, uint64 bufferSize, const char8* string, Args&&... args)
 	{
 		Internal_Format(string, Str_Length(string) + 1, buffer, bufferSize, std::forward<Args>(args)...);
 	}

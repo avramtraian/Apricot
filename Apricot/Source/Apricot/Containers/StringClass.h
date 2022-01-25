@@ -27,7 +27,7 @@ namespace Apricot {
 				}
 				else
 				{
-					AE_BASE_VERIFY(false, "A non-default allocator must always be provided!");
+					AE_CHECK(false);
 					m_Allocator = nullptr;
 				}
 			}
@@ -40,13 +40,13 @@ namespace Apricot {
 	public:
 		T& operator[](uint64 index)
 		{
-			AE_BASE_ASSERT(index < m_Capacity, "String data index out of range!");
+			AE_DEBUG_CHECK(index < m_Capacity);
 			return m_Data[index];
 		}
 
 		const T& operator[](uint64 index) const
 		{
-			AE_BASE_ASSERT(index < m_Capacity, "String data index out of range!");
+			AE_DEBUG_CHECK(index < m_Capacity);
 			return m_Data[index];
 		}
 

@@ -15,9 +15,9 @@
 
 namespace Apricot {
 
-	Engine* GEngine = nullptr;
+	AEngine* GEngine = nullptr;
 
-	int32 Engine::Run(const char8* commandLine)
+	int32 AEngine::Run(const char8* commandLine)
 	{
 		if (GEngine)
 		{
@@ -48,7 +48,7 @@ namespace Apricot {
 		return AE_EXIT_SUCCESS;
 	}
 
-	void Engine::OnEvent(Event* e)
+	void AEngine::OnEvent(Event* e)
 	{
 		static EventDispatchMap map;
 		map.OnWindowClosed = [](const WindowClosedEvent* e) -> bool8 { return GEngine->OnWindowClosed(e); };
@@ -67,61 +67,61 @@ namespace Apricot {
 		dispatcher.Dispatch();
 	}
 
-	bool8 Engine::OnEngineInitialize(const char8* commandLine)
+	bool8 AEngine::OnEngineInitialize(const char8* commandLine)
 	{
-		Logger::Init();
+		ALogger::Init();
 
 		return true;
 	}
 
-	bool8 Engine::OnEngineDestroy()
+	bool8 AEngine::OnEngineDestroy()
 	{
-		Logger::Destroy();
+		ALogger::Destroy();
 
 		return true;
 	}
 
-	bool8 Engine::OnWindowClosed(const WindowClosedEvent* e)
+	bool8 AEngine::OnWindowClosed(const WindowClosedEvent* e)
 	{
 		return false;
 	}
 
-	bool8 Engine::OnWindowResized(const WindowResizedEvent* e)
+	bool8 AEngine::OnWindowResized(const WindowResizedEvent* e)
 	{
 		return false;
 	}
 
-	bool8 Engine::OnWindowMoved(const WindowMovedEvent* e)
+	bool8 AEngine::OnWindowMoved(const WindowMovedEvent* e)
 	{
 		return false;
 	}
 
-	bool8 Engine::OnKeyPressed(const KeyPressedEvent* e)
+	bool8 AEngine::OnKeyPressed(const KeyPressedEvent* e)
 	{
 		return false;
 	}
 
-	bool8 Engine::OnKeyReleased(const KeyReleasedEvent* e)
+	bool8 AEngine::OnKeyReleased(const KeyReleasedEvent* e)
 	{
 		return false;
 	}
 
-	bool8 Engine::OnMouseMoved(const MouseMovedEvent* e)
+	bool8 AEngine::OnMouseMoved(const MouseMovedEvent* e)
 	{
 		return false;
 	}
 
-	bool8 Engine::OnMouseButtonPressed(const MouseButtonPressedEvent* e)
+	bool8 AEngine::OnMouseButtonPressed(const MouseButtonPressedEvent* e)
 	{
 		return false;
 	}
 
-	bool8 Engine::OnMouseButtonReleased(const MouseButtonReleasedEvent* e)
+	bool8 AEngine::OnMouseButtonReleased(const MouseButtonReleasedEvent* e)
 	{
 		return false;
 	}
 
-	bool8 Engine::OnMouseWheelScrolled(const MouseWheelScrolledEvent* e)
+	bool8 AEngine::OnMouseWheelScrolled(const MouseWheelScrolledEvent* e)
 	{
 		return false;
 	}

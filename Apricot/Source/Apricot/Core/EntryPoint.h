@@ -5,6 +5,7 @@
 #include "Base.h"
 #include "Platform.h"
 #include "Memory.h"
+#include "CrashReporter.h"
 #include "Engine.h"
 
 #ifdef AE_PLATFORM_WINDOWS
@@ -16,9 +17,10 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPS
 	// Init foundational systems.
 	Apricot::Platform::Init();
 	Apricot::Memory_Init();
+	Apricot::ACrashReporter::Init();
 
 	// Instantiate the engine.
-	Apricot::Engine* engine = Apricot::CreateEngine();
+	Apricot::AEngine* engine = Apricot::CreateEngine();
 
 	// Run the engine.
 	int32 returnCode = engine->Run(lpCmdLine);
@@ -48,6 +50,7 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPS
 	Apricot::DeleteEngine(engine);
 
 	// Destroy foundational systems.
+	Apricot::ACrashReporter::Destroy();
 	Apricot::Memory_Destroy();
 	Apricot::Platform::Destroy();
 

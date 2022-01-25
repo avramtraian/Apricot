@@ -34,7 +34,7 @@ namespace Apricot {
 				}
 				else
 				{
-					AE_BASE_VERIFY(false, "A non-default allocator must always be provided!");
+					AE_CHECK(false);
 					m_Allocator = nullptr;
 				}
 			}
@@ -54,7 +54,7 @@ namespace Apricot {
 				}
 				else
 				{
-					AE_BASE_VERIFY(false, "A non-default allocator must always be provided!");
+					AE_CHECK(false);
 					m_Allocator = nullptr;
 				}
 			}
@@ -162,7 +162,7 @@ namespace Apricot {
 		*/
 		void PopBack()
 		{
-			AE_BASE_ASSERT(m_Size > 0, "Attempting to pop from an empty vector!");
+			AE_DEBUG_CHECK(m_Size > 0);
 			m_Size--;
 			m_Data[m_Size].~T();
 		}
@@ -242,7 +242,7 @@ namespace Apricot {
 		*/
 		T& At(uint64 index)
 		{
-			AE_BASE_ASSERT(index < m_Size, "Vector index out of range!");
+			AE_DEBUG_CHECK(index < m_Size);
 			return m_Data[index];
 		}
 
@@ -251,7 +251,7 @@ namespace Apricot {
 		*/
 		const T& At(uint64 index) const
 		{
-			AE_BASE_ASSERT(index < m_Size, "Vector index out of range!");
+			AE_DEBUG_CHECK(index < m_Size);
 			return m_Data[index];
 		}
 
@@ -260,7 +260,7 @@ namespace Apricot {
 		*/
 		T& Front()
 		{
-			AE_BASE_ASSERT(m_Size > 0, "Attempting to get an element from an empty vector!");
+			AE_DEBUG_CHECK(m_Size > 0);
 			return m_Data[0];
 		}
 
@@ -269,7 +269,7 @@ namespace Apricot {
 		*/
 		const T& Front() const
 		{
-			AE_BASE_ASSERT(m_Size > 0, "Attempting to get an element from an empty vector!");
+			AE_DEBUG_CHECK(m_Size > 0);
 			return m_Data[0];
 		}
 
@@ -278,7 +278,7 @@ namespace Apricot {
 		*/
 		T& Back()
 		{
-			AE_BASE_ASSERT(m_Size > 0, "Attempting to get an element from an empty vector!");
+			AE_DEBUG_CHECK(m_Size > 0);
 			return m_Data[m_Size - 1];
 		}
 
@@ -287,7 +287,7 @@ namespace Apricot {
 		*/
 		const T& Back() const
 		{
-			AE_BASE_ASSERT(m_Size > 0, "Attempting to get an element from an empty vector!");
+			AE_DEBUG_CHECK(m_Size > 0);
 			return m_Data[m_Size - 1];
 		}
 
@@ -304,7 +304,7 @@ namespace Apricot {
 		*/
 		void SetAllocator(Alloc* newAllocator)
 		{
-			AE_BASE_ASSERT(newAllocator != nullptr, "Provided allocator was null!");
+			AE_CHECK(newAllocator != nullptr);
 
 			if ((void*)m_Allocator == (void*)newAllocator)
 			{
@@ -383,13 +383,13 @@ namespace Apricot {
 	public:
 		T& operator[](uint64 index)
 		{
-			AE_BASE_ASSERT(index < m_Size, "Vector index out of range!");
+			AE_DEBUG_CHECK(index < m_Size);
 			return m_Data[index];
 		}
 
 		const T& operator[](uint64 index) const
 		{
-			AE_BASE_ASSERT(index < m_Size, "Vector index out of range!");
+			AE_DEBUG_CHECK(index < m_Size);
 			return m_Data[index];
 		}
 

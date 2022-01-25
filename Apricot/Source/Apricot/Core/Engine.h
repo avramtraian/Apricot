@@ -8,7 +8,7 @@
 
 namespace Apricot {
 
-	class APRICOT_API Engine
+	class APRICOT_API AEngine
 	{
 	public:
 		int32 Run(const char8* commandLine);
@@ -32,9 +32,9 @@ namespace Apricot {
 		bool8 OnMouseWheelScrolled(const MouseWheelScrolledEvent* e);
 	};
 
-	extern Engine* CreateEngine();
-	extern void DeleteEngine(Engine* engine);
+	extern AEngine* CreateEngine();
+	extern void DeleteEngine(AEngine* engine);
 
-	APRICOT_API extern Engine* GEngine;
+	APRICOT_API extern AEngine* GEngine;
 
 }
