@@ -9,19 +9,19 @@
 
 namespace Apricot {
 
-	template<typename T, typename Alloc = GlobalAllocator>
+	template<typename T, typename Alloc = AGlobalAllocator>
 	class TString
 	{
 	public:
-		TString(Alloc* allocator = nullptr)
+		TString(Alloc* Allocator = nullptr)
 		{
 			m_Data = nullptr;
 			m_Capacity = 0;
 			m_Size = 0;
 
-			if (allocator == nullptr)
+			if (Allocator == nullptr)
 			{
-				if (Alloc::GetStaticType() == AllocatorType::Global)
+				if (Alloc::GetStaticType() == EAllocatorType::Global)
 				{
 					m_Allocator = (Alloc*)GAllocator;
 				}
@@ -33,21 +33,21 @@ namespace Apricot {
 			}
 			else
 			{
-				m_Allocator = allocator;
+				m_Allocator = Allocator;
 			}
 		}
 
 	public:
-		T& operator[](uint64 index)
+		T& operator[](uint64 Index)
 		{
-			AE_DEBUG_CHECK(index < m_Capacity);
-			return m_Data[index];
+			AE_DEBUG_CHECK(Index < m_Capacity);
+			return m_Data[Index];
 		}
 
-		const T& operator[](uint64 index) const
+		const T& operator[](uint64 Index) const
 		{
-			AE_DEBUG_CHECK(index < m_Capacity);
-			return m_Data[index];
+			AE_DEBUG_CHECK(Index < m_Capacity);
+			return m_Data[Index];
 		}
 
 	public:
@@ -78,7 +78,7 @@ namespace Apricot {
 		Alloc* m_Allocator;
 	};
 
-	using String = TString<char8>;
-	using WString = TString<char16>;
+	using AString = TString<char8>;
+	using AWString = TString<char16>;
 
 }

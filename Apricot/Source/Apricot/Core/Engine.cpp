@@ -17,7 +17,7 @@ namespace Apricot {
 
 	AEngine* GEngine = nullptr;
 
-	int32 AEngine::Run(const char8* commandLine)
+	int32 AEngine::Run(const char8* CommandLine)
 	{
 		if (GEngine)
 		{
@@ -25,15 +25,12 @@ namespace Apricot {
 		}
 		GEngine = this;
 
-		if (!OnEngineInitialize(commandLine))
+		if (!OnEngineInitialize(CommandLine))
 		{
 			return AE_EXIT_FAILED_INIT;
 		}
 
-		AE_CORE_DEBUG("{}", MemoryDebugger::GetUsageString());
-
-		TVector<uint32> buffer;
-		buffer.SetAllocator(GAllocator);
+		AE_CORE_DEBUG("{}", AMemoryDebugger::GetUsageString());
 
 		while (true)
 		{
@@ -48,28 +45,34 @@ namespace Apricot {
 		return AE_EXIT_SUCCESS;
 	}
 
-	void AEngine::OnEvent(Event* e)
+	void AEngine::OnEvent(AEvent* Event)
 	{
-		static EventDispatchMap map;
-		map.OnWindowClosed = [](const WindowClosedEvent* e) -> bool8 { return GEngine->OnWindowClosed(e); };
-		map.OnWindowResized = [](const WindowResizedEvent* e) -> bool8 { return GEngine->OnWindowResized(e); };
-		map.OnWindowMoved = [](const WindowMovedEvent* e) -> bool8 { return GEngine->OnWindowMoved(e); };
+		static AEventDispatchMap Map;
+		Map.OnWindowClosed = [](const AWindowClosedEvent* Ev) -> bool8 { return GEngine->OnWindowClosed(Ev); };
+		Map.OnWindowResized = [](const AWindowResizedEvent* Ev) -> bool8 { return GEngine->OnWindowResized(Ev); };
+		Map.OnWindowMoved = [](const AWindowMovedEvent* Ev) -> bool8 { return GEngine->OnWindowMoved(Ev); };
 
-		map.OnKeyPressed = [](const KeyPressedEvent* e) -> bool8 { return GEngine->OnKeyPressed(e); };
-		map.OnKeyReleased = [](const KeyReleasedEvent* e) -> bool8 { return GEngine->OnKeyReleased(e); };
+		Map.OnKeyPressed = [](const AKeyPressedEvent* Ev) -> bool8 { return GEngine->OnKeyPressed(Ev); };
+		Map.OnKeyReleased = [](const AKeyReleasedEvent* Ev) -> bool8 { return GEngine->OnKeyReleased(Ev); };
 
-		map.OnMouseMoved = [](const MouseMovedEvent* e) -> bool8 { return GEngine->OnMouseMoved(e); };
-		map.OnMouseButtonPressed = [](const MouseButtonPressedEvent* e) -> bool8 { return GEngine->OnMouseButtonPressed(e); };
-		map.OnMouseButtonReleased = [](const MouseButtonReleasedEvent* e) -> bool8 { return GEngine->OnMouseButtonReleased(e); };
-		map.OnMouseWheelScrolled = [](const MouseWheelScrolledEvent* e) -> bool8 { return GEngine->OnMouseWheelScrolled(e); };
+		Map.OnMouseMoved = [](const AMouseMovedEvent* Ev) -> bool8 { return GEngine->OnMouseMoved(Ev); };
+		Map.OnMouseButtonPressed = [](const AMouseButtonPressedEvent* Ev) -> bool8 { return GEngine->OnMouseButtonPressed(Ev); };
+		Map.OnMouseButtonReleased = [](const AMouseButtonReleasedEvent* Ev) -> bool8 { return GEngine->OnMouseButtonReleased(Ev); };
+		Map.OnMouseWheelScrolled = [](const AMouseWheelScrolledEvent* Ev) -> bool8 { return GEngine->OnMouseWheelScrolled(Ev); };
 
-		EventDispatcher dispatcher(e, &map);
-		dispatcher.Dispatch();
+		AEventDispatcher Dispatcher(Event, &Map);
+		Dispatcher.Dispatch();
 	}
 
-	bool8 AEngine::OnEngineInitialize(const char8* commandLine)
+	bool8 AEngine::OnEngineInitialize(const char8* CommandLine)
 	{
 		ALogger::Init();
+
+		AE_CORE_INFO("Engine initialization succeded!");
+		AE_CORE_INFO("Instance Info:");
+		AE_CORE_INFO("    Platform:      {}", AE_PLATFORM);
+		AE_CORE_INFO("    Configuration: {}", AE_CONFIGURATION);
+		AE_CORE_INFO("    Instance Type: {}", AE_ENGINE_TYPE);
 
 		return true;
 	}
@@ -81,47 +84,47 @@ namespace Apricot {
 		return true;
 	}
 
-	bool8 AEngine::OnWindowClosed(const WindowClosedEvent* e)
+	bool8 AEngine::OnWindowClosed(const AWindowClosedEvent* Event)
 	{
 		return false;
 	}
 
-	bool8 AEngine::OnWindowResized(const WindowResizedEvent* e)
+	bool8 AEngine::OnWindowResized(const AWindowResizedEvent* Event)
 	{
 		return false;
 	}
 
-	bool8 AEngine::OnWindowMoved(const WindowMovedEvent* e)
+	bool8 AEngine::OnWindowMoved(const AWindowMovedEvent* Event)
 	{
 		return false;
 	}
 
-	bool8 AEngine::OnKeyPressed(const KeyPressedEvent* e)
+	bool8 AEngine::OnKeyPressed(const AKeyPressedEvent* Event)
 	{
 		return false;
 	}
 
-	bool8 AEngine::OnKeyReleased(const KeyReleasedEvent* e)
+	bool8 AEngine::OnKeyReleased(const AKeyReleasedEvent* Event)
 	{
 		return false;
 	}
 
-	bool8 AEngine::OnMouseMoved(const MouseMovedEvent* e)
+	bool8 AEngine::OnMouseMoved(const AMouseMovedEvent* Event)
 	{
 		return false;
 	}
 
-	bool8 AEngine::OnMouseButtonPressed(const MouseButtonPressedEvent* e)
+	bool8 AEngine::OnMouseButtonPressed(const AMouseButtonPressedEvent* Event)
 	{
 		return false;
 	}
 
-	bool8 AEngine::OnMouseButtonReleased(const MouseButtonReleasedEvent* e)
+	bool8 AEngine::OnMouseButtonReleased(const AMouseButtonReleasedEvent* Event)
 	{
 		return false;
 	}
 
-	bool8 AEngine::OnMouseWheelScrolled(const MouseWheelScrolledEvent* e)
+	bool8 AEngine::OnMouseWheelScrolled(const AMouseWheelScrolledEvent* Event)
 	{
 		return false;
 	}

@@ -6,10 +6,10 @@
 
 namespace Apricot {
 
-	class APRICOT_API Platform
+	class APRICOT_API APlatform
 	{
 	public:
-		enum class ConsoleTextColor : uint32
+		enum class EConsoleTextColor : uint32
 		{
 			None = 0,
 
@@ -25,17 +25,17 @@ namespace Apricot {
 		static void Init();
 		static void Destroy();
 
-		static void* Memory_Allocate(uint64 size, bool8 alligned);
-		static void Memory_Free(void* address, uint64 size);
+		static void* Memory_Allocate(uint64 Size, bool8 Alligned);
+		static void Memory_Free(void* Address, uint64 Size);
 
-		static void Memory_Copy(void* destination, const void* source, uint64 size);
-		static void Memory_Set(void* destination, int32 value, uint64 size);
-		static void Memory_Zero(void* destination, uint64 size);
+		static void Memory_Copy(void* Destination, const void* Source, uint64 Size);
+		static void Memory_Set(void* Destination, int32 Value, uint64 Size);
+		static void Memory_Zero(void* Destination, uint64 Size);
 
 		static void Console_Attach();
 		static void Console_Free();
-		static void Console_Write(const char8* message, uint64 messageSize, ConsoleTextColor color);
-		static void Console_WriteError(const char8* message, uint64 messageSize, ConsoleTextColor color);
+		static void Console_Write(const char8* Message, uint64 MessageSize, EConsoleTextColor Color);
+		static void Console_WriteError(const char8* Message, uint64 MessageSize, EConsoleTextColor Color);
 	};
 
 }

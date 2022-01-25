@@ -7,7 +7,7 @@
 
 namespace Apricot {
 
-	enum class AllocatorType : uint8
+	enum class EAllocatorType : uint8
 	{
 		None = 0,
 
@@ -17,22 +17,22 @@ namespace Apricot {
 		Dynamic,
 	};
 
-	class APRICOT_API Allocator
+	class APRICOT_API AAllocator
 	{
 	public:
-		virtual void* Allocate(uint64 size, AllocTag reservedTag = AllocTag::Unknown) = 0;
-		virtual void Free(void* memory, uint64 size, AllocTag reservedTag = AllocTag::Unknown) = 0;
+		virtual void* Allocate(uint64 Size, EAllocTag ReservedTag = EAllocTag::Unknown) = 0;
+		virtual void Free(void* Memory, uint64 Size, EAllocTag ReservedTag = EAllocTag::Unknown) = 0;
 	};
 
-	class APRICOT_API GlobalAllocator : public Allocator
+	class APRICOT_API AGlobalAllocator : public AAllocator
 	{
 	public:
-		virtual void* Allocate(uint64 size, AllocTag reservedTag = AllocTag::Unknown) override;
-		virtual void Free(void* memory, uint64 size, AllocTag reservedTag = AllocTag::Unknown) override;
+		virtual void* Allocate(uint64 Size, EAllocTag ReservedTag = EAllocTag::Unknown) override;
+		virtual void Free(void* Memory, uint64 Size, EAllocTag ReservedTag = EAllocTag::Unknown) override;
 
-		static AllocatorType GetStaticType() { return AllocatorType::Global; }
+		static EAllocatorType GetStaticType() { return EAllocatorType::Global; }
 	};
 
-	APRICOT_API extern GlobalAllocator* GAllocator;
+	APRICOT_API extern AGlobalAllocator* GAllocator;
 
 }

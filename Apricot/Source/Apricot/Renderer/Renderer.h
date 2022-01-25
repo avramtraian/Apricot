@@ -3,10 +3,11 @@
 #pragma once
 
 #include "Apricot/Core/Base.h"
+#include "Apricot/Core/Assert.h"
 
 namespace Apricot {
 	
-	enum class RenderingAPI : uint8
+	enum class ERenderingAPI : uint8
 	{
 		None   = 0,
 		Vulkan = 1,
@@ -16,37 +17,37 @@ namespace Apricot {
 		OpenGL = 5
 	};
 
-	inline bool IsRenderingAPISupported(RenderingAPI api)
+	inline bool IsRenderingAPISupported(ERenderingAPI Api)
 	{
-		switch (api)
+		switch (Api)
 		{
-			case RenderingAPI::None:
+			case ERenderingAPI::None:
 				return true;
-			case RenderingAPI::Vulkan:
+			case ERenderingAPI::Vulkan:
 #ifdef AE_VULKAN
 				return true;
 #else
 				return false;
 #endif
-			case RenderingAPI::D3D12:
+			case ERenderingAPI::D3D12:
 #ifdef AE_D3D12
 				return true;
 #else
 				return false;
 #endif
-			case RenderingAPI::Metal:
+			case ERenderingAPI::Metal:
 #ifdef AE_METAL
 				return true;
 #else
 				return false;
 #endif
-			case RenderingAPI::D3D11:
+			case ERenderingAPI::D3D11:
 #ifdef AE_D3D11
 				return true;
 #else
 				return false;
 #endif
-			case RenderingAPI::OpenGL:
+			case ERenderingAPI::OpenGL:
 #ifdef AE_OPENGL
 				return true;
 #else
@@ -54,7 +55,7 @@ namespace Apricot {
 #endif
 		}
 
-		AE_CORE_ASSERT_RETURN(false, false, "Invalid RenderingAPI!");
+		AE_DEBUG_CHECK_NO_ENTRY(); // Invalid RenderingAPI!
 		return false;
 	}
 

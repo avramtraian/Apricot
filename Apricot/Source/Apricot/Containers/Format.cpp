@@ -8,247 +8,239 @@
 namespace Apricot {
 	
 	template<typename T>
-	APRICOT_API uint64 FormatType(const T& value, char8* buffer, uint64 bufferSize)
+	APRICOT_API uint64 FormatType(const T& Value, char8* Buffer, uint64 BufferSize)
 	{
 		AE_STATIC_ASSERT(false, "Specialize FormatType<T> in order to format this type!");
 		return 0;
 	}
 
-
-
 	template<>
-	APRICOT_API uint64 FormatType(const uint64& value, char8* buffer, uint64 bufferSize)
+	APRICOT_API uint64 FormatType(const uint64& Value, char8* Buffer, uint64 BufferSize)
 	{
-		if (value == 0)
+		if (Value == 0)
 		{
-			if (bufferSize >= 1)
+			if (BufferSize >= 1)
 			{
-				buffer[0] = '0';
+				Buffer[0] = '0';
 				return 1;
 			}
 			return 0;
 		}
 
-		auto temp = value;
-		uint8 digits[255] = { 0 };
-		uint8 digitsCount = 0;
-		while (temp != 0)
+		auto Temp = Value;
+		uint8 Digits[255] = { 0 };
+		uint8 DigitsCount = 0;
+		while (Temp != 0)
 		{
-			digits[digitsCount] = (uint8)(temp % 10);
-			digitsCount++;
-			temp /= 10;
+			Digits[DigitsCount] = (uint8)(Temp % 10);
+			DigitsCount++;
+			Temp /= 10;
 		}
 
-		for (int64 index = digitsCount - 1; index >= 0; index--)
+		for (int64 Index = DigitsCount - 1; Index >= 0; Index--)
 		{
-			if ((uint64)(digitsCount - index - 1) > bufferSize)
+			if ((uint64)(DigitsCount - Index - 1) > BufferSize)
 			{
-				return bufferSize;
+				return BufferSize;
 			}
-			buffer[digitsCount - index - 1] = '0' + digits[index];
+			Buffer[DigitsCount - Index - 1] = '0' + Digits[Index];
 		}
 
-		return digitsCount;
+		return DigitsCount;
 	}
 
 	template<>
-	APRICOT_API uint64 FormatType(const uint8& value, char8* buffer, uint64 bufferSize)
+	APRICOT_API uint64 FormatType(const uint8& Value, char8* Buffer, uint64 BufferSize)
 	{
-		return FormatType<uint64>((uint64)value, buffer, bufferSize);
-	}
-	
-	template<>
-	APRICOT_API uint64 FormatType(const uint16& value, char8* buffer, uint64 bufferSize)
-	{
-		return FormatType<uint64>((uint64)value, buffer, bufferSize);
+		return FormatType<uint64>((uint64)Value, Buffer, BufferSize);
 	}
 	
 	template<>
-	APRICOT_API uint64 FormatType(const uint32& value, char8* buffer, uint64 bufferSize)
+	APRICOT_API uint64 FormatType(const uint16& Value, char8* Buffer, uint64 BufferSize)
 	{
-		return FormatType<uint64>((uint64)value, buffer, bufferSize);
+		return FormatType<uint64>((uint64)Value, Buffer, BufferSize);
+	}
+	
+	template<>
+	APRICOT_API uint64 FormatType(const uint32& Value, char8* Buffer, uint64 BufferSize)
+	{
+		return FormatType<uint64>((uint64)Value, Buffer, BufferSize);
 	}
 
-
-
 	template<>
-	APRICOT_API uint64 FormatType(const int64& value, char8* buffer, uint64 bufferSize)
+	APRICOT_API uint64 FormatType(const int64& Value, char8* Buffer, uint64 BufferSize)
 	{
-		if (value == 0)
+		if (Value == 0)
 		{
-			if (bufferSize >= 1)
+			if (BufferSize >= 1)
 			{
-				buffer[0] = '0';
+				Buffer[0] = '0';
 				return 1;
 			}
 			return 0;
 		}
 
-		auto temp = value;
-		uint8 bIsNegative = value < 0 ? 1 : 0;
+		auto Temp = Value;
+		uint8 bIsNegative = Value < 0 ? 1 : 0;
 		if (bIsNegative)
 		{
-			temp *= -1;
-			buffer[0] = '-';
+			Temp *= -1;
+			Buffer[0] = '-';
 		}
 
-		uint8 digits[255] = { 0 };
-		uint8 digitsCount = 0;
-		while (temp != 0)
+		uint8 Digits[255] = { 0 };
+		uint8 DigitsCount = 0;
+		while (Temp != 0)
 		{
-			digits[digitsCount] = (uint8)(temp % 10);
-			digitsCount++;
-			temp /= 10;
+			Digits[DigitsCount] = (uint8)(Temp % 10);
+			DigitsCount++;
+			Temp /= 10;
 		}
 
-		for (int64 index = digitsCount - 1; index >= 0; index--)
+		for (int64 Index = DigitsCount - 1; Index >= 0; Index--)
 		{
-			if ((uint64)(digitsCount - index - 1 + bIsNegative) > bufferSize)
+			if ((uint64)(DigitsCount - Index - 1 + bIsNegative) > BufferSize)
 			{
-				return bufferSize;
+				return BufferSize;
 			}
-			buffer[digitsCount - index - 1 + bIsNegative] = '0' + digits[index];
+			Buffer[DigitsCount - Index - 1 + bIsNegative] = '0' + Digits[Index];
 		}
 
-		return digitsCount + bIsNegative;
+		return DigitsCount + bIsNegative;
 	}
 
 	template<>
-	APRICOT_API uint64 FormatType(const int8& value, char8* buffer, uint64 bufferSize)
+	APRICOT_API uint64 FormatType(const int8& Value, char8* Buffer, uint64 BufferSize)
 	{
-		return FormatType<int64>((int64)value, buffer, bufferSize);
-	}
-	
-	template<>
-	APRICOT_API uint64 FormatType(const int16& value, char8* buffer, uint64 bufferSize)
-	{
-		return FormatType<int64>((int64)value, buffer, bufferSize);
+		return FormatType<int64>((int64)Value, Buffer, BufferSize);
 	}
 	
 	template<>
-	APRICOT_API uint64 FormatType(const int32& value, char8* buffer, uint64 bufferSize)
+	APRICOT_API uint64 FormatType(const int16& Value, char8* Buffer, uint64 BufferSize)
 	{
-		return FormatType<int64>((int64)value, buffer, bufferSize);
+		return FormatType<int64>((int64)Value, Buffer, BufferSize);
+	}
+	
+	template<>
+	APRICOT_API uint64 FormatType(const int32& Value, char8* Buffer, uint64 BufferSize)
+	{
+		return FormatType<int64>((int64)Value, Buffer, BufferSize);
 	}
 
-
-
 	template<>
-	APRICOT_API uint64 FormatType(const float64& value, char8* buffer, uint64 bufferSize)
+	APRICOT_API uint64 FormatType(const float64& Value, char8* Buffer, uint64 BufferSize)
 	{
-		uint8 integralDigits[32] = { 0 };
-		uint8 integralDigitsCount = 0;
+		uint8 IntegralDigits[32] = { 0 };
+		uint8 IntegralDigitsCount = 0;
 
-		uint8 fractionalDigits[32] = { 0 };
-		uint8 fractionalDigitsCount = 0;
+		uint8 FractionalDigits[32] = { 0 };
+		uint8 FractionalDigitsCount = 0;
 
 		uint8 bIsNegative = 0;
 
 		{
-			int64 temp = (int64)value;
-			if (-1 < value && value < 1)
+			int64 Temp = (int64)Value;
+			if (-1 < Value && Value < 1)
 			{
-				integralDigits[0] = 0;
-				integralDigitsCount = 1;
+				IntegralDigits[0] = 0;
+				IntegralDigitsCount = 1;
 			}
-			if (value < 0)
+			if (Value < 0)
 			{
-				temp *= -1;
+				Temp *= -1;
 				bIsNegative = 1;
 			}
 
-			while (temp != 0)
+			while (Temp != 0)
 			{
-				integralDigits[integralDigitsCount] = temp % 10;
-				integralDigitsCount++;
-				temp /= 10;
+				IntegralDigits[IntegralDigitsCount] = Temp % 10;
+				IntegralDigitsCount++;
+				Temp /= 10;
 			}
 		}
 
 		{
-			uint64 offset = 10;
-			float64 positiveValue = bIsNegative ? -value : value;
-			for (uint64 index = 0; index < AEC_FLOAT_LOG_PRECISION; index++)
+			uint64 Offset = 10;
+			float64 PositiveValue = bIsNegative ? -Value : Value;
+			for (uint64 Index = 0; Index < AEC_FLOAT_LOG_PRECISION; Index++)
 			{
-				int64 temp = (int64)(positiveValue * (float64)offset);
-				fractionalDigits[fractionalDigitsCount] = temp % 10;
-				fractionalDigitsCount++;
-				offset *= 10;
+				int64 Temp = (int64)(PositiveValue * (float64)Offset);
+				FractionalDigits[FractionalDigitsCount] = Temp % 10;
+				FractionalDigitsCount++;
+				Offset *= 10;
 			}
 		}
 
-		uint64 bufferOffset = 0;
+		uint64 BufferOffset = 0;
 		if (bIsNegative)
 		{
-			if (bufferOffset > bufferSize)
+			if (BufferOffset > BufferSize)
 			{
-				return bufferSize;
+				return BufferSize;
 			}
-			buffer[bufferOffset] = '-';
-			bufferOffset++;
+			Buffer[BufferOffset] = '-';
+			BufferOffset++;
 		}
 
-		for (int64 index = integralDigitsCount - 1; index >= 0; index--)
+		for (int64 Index = IntegralDigitsCount - 1; Index >= 0; Index--)
 		{
-			if (bufferOffset > bufferSize)
+			if (BufferOffset > BufferSize)
 			{
-				return bufferSize;
+				return BufferSize;
 			}
-			buffer[bufferOffset] = '0' + integralDigits[index];
-			bufferOffset++;
+			Buffer[BufferOffset] = '0' + IntegralDigits[Index];
+			BufferOffset++;
 		}
 
-		if (bufferOffset > bufferSize)
+		if (BufferOffset > BufferSize)
 		{
-			return bufferSize;
+			return BufferSize;
 		}
-		buffer[bufferOffset] = '.';
-		bufferOffset++;
+		Buffer[BufferOffset] = '.';
+		BufferOffset++;
 
-		for (uint64 index = 0; index < fractionalDigitsCount; index++)
+		for (uint64 Index = 0; Index < FractionalDigitsCount; Index++)
 		{
-			if (bufferOffset > bufferSize)
+			if (BufferOffset > BufferSize)
 			{
-				return bufferSize;
+				return BufferSize;
 			}
-			buffer[bufferOffset] = '0' + fractionalDigits[index];
-			bufferOffset++;
+			Buffer[BufferOffset] = '0' + FractionalDigits[Index];
+			BufferOffset++;
 		}
 
-		return bufferOffset;
+		return BufferOffset;
 	}
 
 	template<>
-	APRICOT_API uint64 FormatType(const float32& value, char8* buffer, uint64 bufferSize)
+	APRICOT_API uint64 FormatType(const float32& Value, char8* Buffer, uint64 BufferSize)
 	{
-		return FormatType<float64>((float64)value, buffer, bufferSize);
+		return FormatType<float64>((float64)Value, Buffer, BufferSize);
 	}
 
-
-
 	template<>
-	APRICOT_API uint64 FormatType(const char8* value, char8* buffer, uint64 bufferSize)
+	APRICOT_API uint64 FormatType(const char8* Value, char8* Buffer, uint64 BufferSize)
 	{
-		uint64 stringSize = Str_Length(value);
-		if (bufferSize < stringSize)
+		uint64 StringSize = Str_Length(Value);
+		if (BufferSize < StringSize)
 		{
-			stringSize = bufferSize;
+			StringSize = BufferSize;
 		}
 
-		Memory_Copy(buffer, value, stringSize * sizeof(char8));
-		return stringSize;
+		Memory_Copy(Buffer, Value, StringSize * sizeof(char8));
+		return StringSize;
 	}
 
 	template<>
-	APRICOT_API uint64 FormatType(char8* value, char8* buffer, uint64 bufferSize)
+	APRICOT_API uint64 FormatType(char8* Value, char8* Buffer, uint64 BufferSize)
 	{
-		return FormatType<const char8>(value, buffer, bufferSize);
+		return FormatType<const char8>(Value, Buffer, BufferSize);
 	}
 
 	template<>
-	APRICOT_API uint64 FormatType(const void* value, char8* buffer, uint64 bufferSize)
+	APRICOT_API uint64 FormatType(const void* Value, char8* Buffer, uint64 BufferSize)
 	{
-		return FormatType<uint64>((uint64)value, buffer, bufferSize);
+		return FormatType<uint64>((uint64)Value, Buffer, BufferSize);
 	}
 
 }

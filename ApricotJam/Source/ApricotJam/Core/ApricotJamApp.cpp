@@ -7,7 +7,7 @@
 
 namespace Apricot {
 	
-	class ApricotJamEngine : public AEngine
+	class AApricotJamEngine : public AEngine
 	{
 	public:
 		
@@ -15,15 +15,15 @@ namespace Apricot {
 
 	AEngine* CreateEngine()
 	{
-		ApricotJamEngine* engine = (ApricotJamEngine*)Memory_Alloc(sizeof(ApricotJamEngine), AllocTag::Core);
-		Memory_Placement<ApricotJamEngine>(engine);
-		return engine;
+		AApricotJamEngine* Engine = (AApricotJamEngine*)Memory_Alloc(sizeof(AApricotJamEngine), EAllocTag::Core);
+		Memory_Placement<AApricotJamEngine>(Engine);
+		return Engine;
 	}
 
-	void DeleteEngine(AEngine* engine)
+	void DeleteEngine(AEngine* Engine)
 	{
-		((ApricotJamEngine*)engine)->~ApricotJamEngine();
-		Memory_Free(engine, sizeof(ApricotJamEngine), AllocTag::Core);
+		((AApricotJamEngine*)Engine)->~AApricotJamEngine();
+		Memory_Free(Engine, sizeof(AApricotJamEngine), EAllocTag::Core);
 	}
 
 }

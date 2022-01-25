@@ -11,7 +11,7 @@
 
 namespace Apricot {
 
-	enum class AllocTag : uint16
+	enum class EAllocTag : uint16
 	{
 		// Invalid allocation tag. Do not use it intentionally!
 		None = 0,
@@ -37,23 +37,23 @@ namespace Apricot {
 	APRICOT_API void Memory_Init();
 	APRICOT_API void Memory_Destroy();
 
-	APRICOT_API void* Memory_Alloc(uint64 size, AllocTag tag);
+	APRICOT_API void* Memory_Alloc(uint64 Size, EAllocTag Tag);
 
-	APRICOT_API void Memory_Free(void* address, uint64 size, AllocTag tag);
+	APRICOT_API void Memory_Free(void* Address, uint64 Size, EAllocTag Tag);
 
-	APRICOT_API void Memory_Copy(void* destination, const void* source, uint64 size);
+	APRICOT_API void Memory_Copy(void* Destination, const void* Source, uint64 Size);
 
-	APRICOT_API void Memory_Set(void* destination, int32 value, uint64 size);
+	APRICOT_API void Memory_Set(void* Destination, int32 Value, uint64 Size);
 
-	APRICOT_API void Memory_Zero(void* destination, uint64 size);
+	APRICOT_API void Memory_Zero(void* Destination, uint64 Size);
 
 	template<typename T, typename... Args>
-	T* Memory_Placement(void* address, Args&&... args)
+	T* Memory_Placement(void* Address, Args&&... args)
 	{
-		return (T*)(new (address) T(std::forward<Args>(args)...));
+		return (T*)(new (Address) T(std::forward<Args>(args)...));
 	}
 
-	class APRICOT_API MemoryDebugger
+	class APRICOT_API AMemoryDebugger
 	{
 	public:
 		static void Init();
@@ -62,11 +62,11 @@ namespace Apricot {
 		static char8* GetUsageString();
 
 	public:
-		static uint64 AllocatedTagged[(uint16)AllocTag::MaxEnumValue];
-		static uint64 FreedTagged[(uint16)AllocTag::MaxEnumValue];
+		static uint64 AllocatedTagged[(uint16)EAllocTag::MaxEnumValue];
+		static uint64 FreedTagged[(uint16)EAllocTag::MaxEnumValue];
 
-		static uint64 AllocationsCountTagged[(uint64)AllocTag::MaxEnumValue];
-		static uint64 DeallocationsCountTagged[(uint64)AllocTag::MaxEnumValue];
+		static uint64 AllocationsCountTagged[(uint64)EAllocTag::MaxEnumValue];
+		static uint64 DeallocationsCountTagged[(uint64)EAllocTag::MaxEnumValue];
 	};
 	
 }

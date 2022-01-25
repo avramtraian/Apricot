@@ -12,33 +12,33 @@
 
 namespace Apricot { namespace Testbed { 
 
-	class CustomAllocator : public Allocator
+	class CustomAllocator : public AAllocator
 	{
 	public:
-		virtual void* Allocate(uint64 size, AllocTag reservedTag) override
+		virtual void* Allocate(uint64 Size, EAllocTag ReservedTag) override
 		{
-			return Memory_Alloc(size, reservedTag);
+			return Memory_Alloc(Size, ReservedTag);
 		}
 
-		virtual void Free(void* memory, uint64 size, AllocTag reservedTag) override
+		virtual void Free(void* Memory, uint64 Size, EAllocTag ReservedTag) override
 		{
-			Memory_Free(memory, size, reservedTag);
+			Memory_Free(Memory, Size, ReservedTag);
 		}
 
-		static AllocatorType GetStaticType() { return AllocatorType::None; }
+		static EAllocatorType GetStaticType() { return EAllocatorType::None; }
 	};
-	static CustomAllocator s_Allocator;
+	static CustomAllocator SAllocator;
 
 	struct Vector_Test_Data
 	{
 	public:
 		Vector_Test_Data(uint64)
 		{
-			Data = Memory_Alloc(512, AllocTag::Unknown);
+			Data = Memory_Alloc(512, EAllocTag::Unknown);
 		}
 		~Vector_Test_Data()
 		{
-			Memory_Free(Data, 512, AllocTag::Unknown);
+			Memory_Free(Data, 512, EAllocTag::Unknown);
 		}
 
 		void* Data;
@@ -46,22 +46,22 @@ namespace Apricot { namespace Testbed {
 
 	bool8 Vector_Create_Destroy()
 	{
-		uint64 startMemory = MemoryDebugger::AllocatedTagged[(uint16)AllocTag::Vector] - MemoryDebugger::FreedTagged[(uint16)AllocTag::Vector];
-		uint64 startAllocs = MemoryDebugger::AllocationsCountTagged[(uint16)AllocTag::Vector] - MemoryDebugger::DeallocationsCountTagged[(uint16)AllocTag::Vector];
+		uint64 StartMemory = AMemoryDebugger::AllocatedTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::FreedTagged[(uint16)EAllocTag::Vector];
+		uint64 StartAllocs = AMemoryDebugger::AllocationsCountTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::DeallocationsCountTagged[(uint16)EAllocTag::Vector];
 
-		for (uint64 index = 0; index < CREATE_DESTROY_RUNS; index++)
+		for (uint64 Index = 0; Index < CREATE_DESTROY_RUNS; Index++)
 		{
-			TVector<uint64> vector;
+			TVector<uint64> Vector;
 		}
 
-		uint64 endMemory = MemoryDebugger::AllocatedTagged[(uint16)AllocTag::Vector] - MemoryDebugger::FreedTagged[(uint16)AllocTag::Vector];
-		uint64 endAllocs = MemoryDebugger::AllocationsCountTagged[(uint16)AllocTag::Vector] - MemoryDebugger::DeallocationsCountTagged[(uint16)AllocTag::Vector];
+		uint64 EndMemory = AMemoryDebugger::AllocatedTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::FreedTagged[(uint16)EAllocTag::Vector];
+		uint64 EndAllocs = AMemoryDebugger::AllocationsCountTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::DeallocationsCountTagged[(uint16)EAllocTag::Vector];
 
-		if (startMemory != endMemory)
+		if (StartMemory != EndMemory)
 		{
 			return false;
 		}
-		if (startAllocs != endAllocs)
+		if (StartAllocs != EndAllocs)
 		{
 			return false;
 		}
@@ -71,22 +71,22 @@ namespace Apricot { namespace Testbed {
 
 	bool8 Vector_Create_Destroy_Custom_Allocators()
 	{
-		uint64 startMemory = MemoryDebugger::AllocatedTagged[(uint16)AllocTag::Vector] - MemoryDebugger::FreedTagged[(uint16)AllocTag::Vector];
-		uint64 startAllocs = MemoryDebugger::AllocationsCountTagged[(uint16)AllocTag::Vector] - MemoryDebugger::DeallocationsCountTagged[(uint16)AllocTag::Vector];
+		uint64 StartMemory = AMemoryDebugger::AllocatedTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::FreedTagged[(uint16)EAllocTag::Vector];
+		uint64 StartAllocs = AMemoryDebugger::AllocationsCountTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::DeallocationsCountTagged[(uint16)EAllocTag::Vector];
 
-		for (uint64 index = 0; index < CREATE_DESTROY_RUNS; index++)
+		for (uint64 Index = 0; Index < CREATE_DESTROY_RUNS; Index++)
 		{
-			TVector<uint64, CustomAllocator> vector(&s_Allocator);
+			TVector<uint64, CustomAllocator> Vector(&SAllocator);
 		}
 
-		uint64 endMemory = MemoryDebugger::AllocatedTagged[(uint16)AllocTag::Vector] - MemoryDebugger::FreedTagged[(uint16)AllocTag::Vector];
-		uint64 endAllocs = MemoryDebugger::AllocationsCountTagged[(uint16)AllocTag::Vector] - MemoryDebugger::DeallocationsCountTagged[(uint16)AllocTag::Vector];
+		uint64 EndMemory = AMemoryDebugger::AllocatedTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::FreedTagged[(uint16)EAllocTag::Vector];
+		uint64 EndAllocs = AMemoryDebugger::AllocationsCountTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::DeallocationsCountTagged[(uint16)EAllocTag::Vector];
 
-		if (startMemory != endMemory)
+		if (StartMemory != EndMemory)
 		{
 			return false;
 		}
-		if (startAllocs != endAllocs)
+		if (StartAllocs != EndAllocs)
 		{
 			return false;
 		}
@@ -96,51 +96,51 @@ namespace Apricot { namespace Testbed {
 
 	bool8 Vector_Push_Emplace_Pop_Back()
 	{
-		uint64 startMemory = MemoryDebugger::AllocatedTagged[(uint16)AllocTag::Vector] - MemoryDebugger::FreedTagged[(uint16)AllocTag::Vector];
-		uint64 startAllocs = MemoryDebugger::AllocationsCountTagged[(uint16)AllocTag::Vector] - MemoryDebugger::DeallocationsCountTagged[(uint16)AllocTag::Vector];
+		uint64 StartMemory = AMemoryDebugger::AllocatedTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::FreedTagged[(uint16)EAllocTag::Vector];
+		uint64 StartAllocs = AMemoryDebugger::AllocationsCountTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::DeallocationsCountTagged[(uint16)EAllocTag::Vector];
 
-		for (uint64 index = 0; index < PUSH_EMPLACE_POP_BACK_RUNS / 2; index++)
+		for (uint64 Index = 0; Index < PUSH_EMPLACE_POP_BACK_RUNS / 2; Index++)
 		{
-				TVector<uint64> vector;
+				TVector<uint64> Vector;
 
-				vector.PushBack(0);
-				vector.PushBack(0);
-				vector.EmplaceBack(1);
-				vector.EmplaceBack(1);
-				vector.PopBack();
-				vector.PushBack(0);
-				vector.EmplaceBack(1);
-				vector.PopBack();
-				vector.PopBack();
-				vector.EmplaceBack(1);
-				vector.PopBack();
-				vector.PushBack(0);
-				vector.PopBack();
+				Vector.PushBack(0);
+				Vector.PushBack(0);
+				Vector.EmplaceBack(1);
+				Vector.EmplaceBack(1);
+				Vector.PopBack();
+				Vector.PushBack(0);
+				Vector.EmplaceBack(1);
+				Vector.PopBack();
+				Vector.PopBack();
+				Vector.EmplaceBack(1);
+				Vector.PopBack();
+				Vector.PushBack(0);
+				Vector.PopBack();
 		}
 
-		for (uint64 index = 0; index < PUSH_EMPLACE_POP_BACK_RUNS / 2; index++)
+		for (uint64 Index = 0; Index < PUSH_EMPLACE_POP_BACK_RUNS / 2; Index++)
 		{
-			TVector<Vector_Test_Data> vector;
+			TVector<Vector_Test_Data> Vector;
 
-			vector.PushBack(0);
-			vector.PushBack(0);
-			vector.EmplaceBack(1);
-			vector.EmplaceBack(1);
-			vector.PopBack();
-			vector.PushBack(0);
-			vector.EmplaceBack(1);
-			vector.PopBack();
-			vector.PopBack();
-			vector.EmplaceBack(1);
-			vector.PopBack();
-			vector.PushBack(0);
-			vector.PopBack();
+			Vector.PushBack(0);
+			Vector.PushBack(0);
+			Vector.EmplaceBack(1);
+			Vector.EmplaceBack(1);
+			Vector.PopBack();
+			Vector.PushBack(0);
+			Vector.EmplaceBack(1);
+			Vector.PopBack();
+			Vector.PopBack();
+			Vector.EmplaceBack(1);
+			Vector.PopBack();
+			Vector.PushBack(0);
+			Vector.PopBack();
 		}
 
-		uint64 endMemory = MemoryDebugger::AllocatedTagged[(uint16)AllocTag::Vector] - MemoryDebugger::FreedTagged[(uint16)AllocTag::Vector];
-		uint64 endAllocs = MemoryDebugger::AllocationsCountTagged[(uint16)AllocTag::Vector] - MemoryDebugger::DeallocationsCountTagged[(uint16)AllocTag::Vector];
+		uint64 EndMemory = AMemoryDebugger::AllocatedTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::FreedTagged[(uint16)EAllocTag::Vector];
+		uint64 EndAllocs = AMemoryDebugger::AllocationsCountTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::DeallocationsCountTagged[(uint16)EAllocTag::Vector];
 
-		if (startMemory != endMemory)
+		if (StartMemory != EndMemory)
 		{
 			return false;
 		}
@@ -150,51 +150,51 @@ namespace Apricot { namespace Testbed {
 
 	bool8 Vector_Push_Emplace_Pop_Back_Custom_Allocators()
 	{
-		uint64 startMemory = MemoryDebugger::AllocatedTagged[(uint16)AllocTag::Unknown] - MemoryDebugger::FreedTagged[(uint16)AllocTag::Unknown];
-		uint64 startAllocs = MemoryDebugger::AllocationsCountTagged[(uint16)AllocTag::Unknown] - MemoryDebugger::DeallocationsCountTagged[(uint16)AllocTag::Unknown];
+		uint64 StartMemory = AMemoryDebugger::AllocatedTagged[(uint16)EAllocTag::Unknown] - AMemoryDebugger::FreedTagged[(uint16)EAllocTag::Unknown];
+		uint64 StartAllocs = AMemoryDebugger::AllocationsCountTagged[(uint16)EAllocTag::Unknown] - AMemoryDebugger::DeallocationsCountTagged[(uint16)EAllocTag::Unknown];
 
-		for (uint64 index = 0; index < PUSH_EMPLACE_POP_BACK_RUNS / 2; index++)
+		for (uint64 Index = 0; Index < PUSH_EMPLACE_POP_BACK_RUNS / 2; Index++)
 		{
-			TVector<uint64, CustomAllocator> vector(&s_Allocator);
+			TVector<uint64, CustomAllocator> Vector(&SAllocator);
 
-			vector.PushBack(0);
-			vector.PushBack(0);
-			vector.EmplaceBack(1);
-			vector.EmplaceBack(1);
-			vector.PopBack();
-			vector.PushBack(0);
-			vector.EmplaceBack(1);
-			vector.PopBack();
-			vector.PopBack();
-			vector.EmplaceBack(1);
-			vector.PopBack();
-			vector.PushBack(0);
-			vector.PopBack();
+			Vector.PushBack(0);
+			Vector.PushBack(0);
+			Vector.EmplaceBack(1);
+			Vector.EmplaceBack(1);
+			Vector.PopBack();
+			Vector.PushBack(0);
+			Vector.EmplaceBack(1);
+			Vector.PopBack();
+			Vector.PopBack();
+			Vector.EmplaceBack(1);
+			Vector.PopBack();
+			Vector.PushBack(0);
+			Vector.PopBack();
 		}
 
-		for (uint64 index = 0; index < PUSH_EMPLACE_POP_BACK_RUNS / 2; index++)
+		for (uint64 Index = 0; Index < PUSH_EMPLACE_POP_BACK_RUNS / 2; Index++)
 		{
-			TVector<Vector_Test_Data, CustomAllocator> vector(&s_Allocator);
+			TVector<Vector_Test_Data, CustomAllocator> Vector(&SAllocator);
 
-			vector.PushBack(0);
-			vector.PushBack(0);
-			vector.EmplaceBack(1);
-			vector.EmplaceBack(1);
-			vector.PopBack();
-			vector.PushBack(0);
-			vector.EmplaceBack(1);
-			vector.PopBack();
-			vector.PopBack();
-			vector.EmplaceBack(1);
-			vector.PopBack();
-			vector.PushBack(0);
-			vector.PopBack();
+			Vector.PushBack(0);
+			Vector.PushBack(0);
+			Vector.EmplaceBack(1);
+			Vector.EmplaceBack(1);
+			Vector.PopBack();
+			Vector.PushBack(0);
+			Vector.EmplaceBack(1);
+			Vector.PopBack();
+			Vector.PopBack();
+			Vector.EmplaceBack(1);
+			Vector.PopBack();
+			Vector.PushBack(0);
+			Vector.PopBack();
 		}
 
-		uint64 endMemory = MemoryDebugger::AllocatedTagged[(uint16)AllocTag::Unknown] - MemoryDebugger::FreedTagged[(uint16)AllocTag::Unknown];
-		uint64 endAllocs = MemoryDebugger::AllocationsCountTagged[(uint16)AllocTag::Unknown] - MemoryDebugger::DeallocationsCountTagged[(uint16)AllocTag::Unknown];
+		uint64 EndMemory = AMemoryDebugger::AllocatedTagged[(uint16)EAllocTag::Unknown] - AMemoryDebugger::FreedTagged[(uint16)EAllocTag::Unknown];
+		uint64 EndAllocs = AMemoryDebugger::AllocationsCountTagged[(uint16)EAllocTag::Unknown] - AMemoryDebugger::DeallocationsCountTagged[(uint16)EAllocTag::Unknown];
 
-		if (startMemory != endMemory)
+		if (StartMemory != EndMemory)
 		{
 			return false;
 		}
@@ -204,19 +204,19 @@ namespace Apricot { namespace Testbed {
 
 	bool8 Vector_Copy_Move()
 	{
-		uint64 startMemory = MemoryDebugger::AllocatedTagged[(uint16)AllocTag::Vector] - MemoryDebugger::FreedTagged[(uint16)AllocTag::Vector];
-		uint64 startAllocs = MemoryDebugger::AllocationsCountTagged[(uint16)AllocTag::Vector] - MemoryDebugger::DeallocationsCountTagged[(uint16)AllocTag::Vector];
+		uint64 StartMemory = AMemoryDebugger::AllocatedTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::FreedTagged[(uint16)EAllocTag::Vector];
+		uint64 StartAllocs = AMemoryDebugger::AllocationsCountTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::DeallocationsCountTagged[(uint16)EAllocTag::Vector];
 
 
 
-		uint64 endMemory = MemoryDebugger::AllocatedTagged[(uint16)AllocTag::Vector] - MemoryDebugger::FreedTagged[(uint16)AllocTag::Vector];
-		uint64 endAllocs = MemoryDebugger::AllocationsCountTagged[(uint16)AllocTag::Vector] - MemoryDebugger::DeallocationsCountTagged[(uint16)AllocTag::Vector];
+		uint64 EndMemory = AMemoryDebugger::AllocatedTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::FreedTagged[(uint16)EAllocTag::Vector];
+		uint64 EndAllocs = AMemoryDebugger::AllocationsCountTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::DeallocationsCountTagged[(uint16)EAllocTag::Vector];
 
-		if (startMemory != endMemory)
+		if (StartMemory != EndMemory)
 		{
 			return false;
 		}
-		if (startAllocs != endAllocs)
+		if (StartAllocs != EndAllocs)
 		{
 			return false;
 		}
@@ -226,19 +226,19 @@ namespace Apricot { namespace Testbed {
 
 	bool8 Vector_Copy_Move_Custom_Allocators()
 	{
-		uint64 startMemory = MemoryDebugger::AllocatedTagged[(uint16)AllocTag::Vector] - MemoryDebugger::FreedTagged[(uint16)AllocTag::Vector];
-		uint64 startAllocs = MemoryDebugger::AllocationsCountTagged[(uint16)AllocTag::Vector] - MemoryDebugger::DeallocationsCountTagged[(uint16)AllocTag::Vector];
+		uint64 StartMemory = AMemoryDebugger::AllocatedTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::FreedTagged[(uint16)EAllocTag::Vector];
+		uint64 StartAllocs = AMemoryDebugger::AllocationsCountTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::DeallocationsCountTagged[(uint16)EAllocTag::Vector];
 
 
 
-		uint64 endMemory = MemoryDebugger::AllocatedTagged[(uint16)AllocTag::Vector] - MemoryDebugger::FreedTagged[(uint16)AllocTag::Vector];
-		uint64 endAllocs = MemoryDebugger::AllocationsCountTagged[(uint16)AllocTag::Vector] - MemoryDebugger::DeallocationsCountTagged[(uint16)AllocTag::Vector];
+		uint64 EndMemory = AMemoryDebugger::AllocatedTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::FreedTagged[(uint16)EAllocTag::Vector];
+		uint64 EndAllocs = AMemoryDebugger::AllocationsCountTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::DeallocationsCountTagged[(uint16)EAllocTag::Vector];
 
-		if (startMemory != endMemory)
+		if (StartMemory != EndMemory)
 		{
 			return false;
 		}
-		if (startAllocs != endAllocs)
+		if (StartAllocs != EndAllocs)
 		{
 			return false;
 		}
@@ -248,19 +248,19 @@ namespace Apricot { namespace Testbed {
 
 	bool8 Vector_Clear_Tidy_Resize_Reserve()
 	{
-		uint64 startMemory = MemoryDebugger::AllocatedTagged[(uint16)AllocTag::Vector] - MemoryDebugger::FreedTagged[(uint16)AllocTag::Vector];
-		uint64 startAllocs = MemoryDebugger::AllocationsCountTagged[(uint16)AllocTag::Vector] - MemoryDebugger::DeallocationsCountTagged[(uint16)AllocTag::Vector];
+		uint64 StartMemory = AMemoryDebugger::AllocatedTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::FreedTagged[(uint16)EAllocTag::Vector];
+		uint64 StartAllocs = AMemoryDebugger::AllocationsCountTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::DeallocationsCountTagged[(uint16)EAllocTag::Vector];
 
 
 
-		uint64 endMemory = MemoryDebugger::AllocatedTagged[(uint16)AllocTag::Vector] - MemoryDebugger::FreedTagged[(uint16)AllocTag::Vector];
-		uint64 endAllocs = MemoryDebugger::AllocationsCountTagged[(uint16)AllocTag::Vector] - MemoryDebugger::DeallocationsCountTagged[(uint16)AllocTag::Vector];
+		uint64 EndMemory = AMemoryDebugger::AllocatedTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::FreedTagged[(uint16)EAllocTag::Vector];
+		uint64 EndAllocs = AMemoryDebugger::AllocationsCountTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::DeallocationsCountTagged[(uint16)EAllocTag::Vector];
 
-		if (startMemory != endMemory)
+		if (StartMemory != EndMemory)
 		{
 			return false;
 		}
-		if (startAllocs != endAllocs)
+		if (StartAllocs != EndAllocs)
 		{
 			return false;
 		}
@@ -270,19 +270,19 @@ namespace Apricot { namespace Testbed {
 
 	bool8 Vector_Clear_Tidy_Resize_Reserve_Custom_Allocators()
 	{
-		uint64 startMemory = MemoryDebugger::AllocatedTagged[(uint16)AllocTag::Vector] - MemoryDebugger::FreedTagged[(uint16)AllocTag::Vector];
-		uint64 startAllocs = MemoryDebugger::AllocationsCountTagged[(uint16)AllocTag::Vector] - MemoryDebugger::DeallocationsCountTagged[(uint16)AllocTag::Vector];
+		uint64 StartMemory = AMemoryDebugger::AllocatedTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::FreedTagged[(uint16)EAllocTag::Vector];
+		uint64 StartAllocs = AMemoryDebugger::AllocationsCountTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::DeallocationsCountTagged[(uint16)EAllocTag::Vector];
 
 
 
-		uint64 endMemory = MemoryDebugger::AllocatedTagged[(uint16)AllocTag::Vector] - MemoryDebugger::FreedTagged[(uint16)AllocTag::Vector];
-		uint64 endAllocs = MemoryDebugger::AllocationsCountTagged[(uint16)AllocTag::Vector] - MemoryDebugger::DeallocationsCountTagged[(uint16)AllocTag::Vector];
+		uint64 EndMemory = AMemoryDebugger::AllocatedTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::FreedTagged[(uint16)EAllocTag::Vector];
+		uint64 EndAllocs = AMemoryDebugger::AllocationsCountTagged[(uint16)EAllocTag::Vector] - AMemoryDebugger::DeallocationsCountTagged[(uint16)EAllocTag::Vector];
 
-		if (startMemory != endMemory)
+		if (StartMemory != EndMemory)
 		{
 			return false;
 		}
-		if (startAllocs != endAllocs)
+		if (StartAllocs != EndAllocs)
 		{
 			return false;
 		}

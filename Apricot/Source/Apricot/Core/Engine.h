@@ -11,29 +11,29 @@ namespace Apricot {
 	class APRICOT_API AEngine
 	{
 	public:
-		int32 Run(const char8* commandLine);
+		int32 Run(const char8* CommandLine);
 
-		void OnEvent(Event* e);
+		void OnEvent(AEvent* e);
 
 	private:
-		bool8 OnEngineInitialize(const char8* commandLine);
+		bool8 OnEngineInitialize(const char8* CommandLine);
 		bool8 OnEngineDestroy();
 
-		bool8 OnWindowClosed(const WindowClosedEvent* e);
-		bool8 OnWindowResized(const WindowResizedEvent* e);
-		bool8 OnWindowMoved(const WindowMovedEvent* e);
+		bool8 OnWindowClosed(const AWindowClosedEvent* Event);
+		bool8 OnWindowResized(const AWindowResizedEvent* Event);
+		bool8 OnWindowMoved(const AWindowMovedEvent* Event);
 
-		bool8 OnKeyPressed(const KeyPressedEvent* e);
-		bool8 OnKeyReleased(const KeyReleasedEvent* e);
+		bool8 OnKeyPressed(const AKeyPressedEvent* Event);
+		bool8 OnKeyReleased(const AKeyReleasedEvent* Event);
 
-		bool8 OnMouseMoved(const MouseMovedEvent* e);
-		bool8 OnMouseButtonPressed(const MouseButtonPressedEvent* e);
-		bool8 OnMouseButtonReleased(const MouseButtonReleasedEvent* e);
-		bool8 OnMouseWheelScrolled(const MouseWheelScrolledEvent* e);
+		bool8 OnMouseMoved(const AMouseMovedEvent* e);
+		bool8 OnMouseButtonPressed(const AMouseButtonPressedEvent* Event);
+		bool8 OnMouseButtonReleased(const AMouseButtonReleasedEvent* Event);
+		bool8 OnMouseWheelScrolled(const AMouseWheelScrolledEvent* Event);
 	};
 
 	extern AEngine* CreateEngine();
-	extern void DeleteEngine(AEngine* engine);
+	extern void DeleteEngine(AEngine* Engine);
 
 	APRICOT_API extern AEngine* GEngine;
 

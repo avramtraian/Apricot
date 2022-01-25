@@ -8,16 +8,16 @@
 
 namespace Apricot {
 	
-	void* GlobalAllocator::Allocate(uint64 size, AllocTag reservedTag /* = AllocTag::Unknown */)
+	void* AGlobalAllocator::Allocate(uint64 Size, EAllocTag ReservedTag /* = AllocTag::Unknown */)
 	{
-		return Memory_Alloc(size, reservedTag);
+		return Memory_Alloc(Size, ReservedTag);
 	}
-	void GlobalAllocator::Free(void* memory, uint64 size, AllocTag reservedTag /* = AllocTag::Unknown */)
+	void AGlobalAllocator::Free(void* Memory, uint64 Size, EAllocTag ReservedTag /* = AllocTag::Unknown */)
 	{
-		Memory_Free(memory, size, reservedTag);
+		Memory_Free(Memory, Size, ReservedTag);
 	}
-	static GlobalAllocator s_GlobalAllocator;
+	static AGlobalAllocator s_GlobalAllocator;
 
-	GlobalAllocator* GAllocator = &s_GlobalAllocator;
+	AGlobalAllocator* GAllocator = &s_GlobalAllocator;
 
 }

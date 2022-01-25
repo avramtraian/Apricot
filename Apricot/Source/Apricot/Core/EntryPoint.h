@@ -15,18 +15,18 @@
 int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
 	// Init foundational systems.
-	Apricot::Platform::Init();
+	Apricot::APlatform::Init();
 	Apricot::Memory_Init();
 	Apricot::ACrashReporter::Init();
 
 	// Instantiate the engine.
-	Apricot::AEngine* engine = Apricot::CreateEngine();
+	Apricot::AEngine* Engine = Apricot::CreateEngine();
 
 	// Run the engine.
-	int32 returnCode = engine->Run(lpCmdLine);
+	int32 ReturnCode = Engine->Run(lpCmdLine);
 
 	// TODO: Dump debug information (to files?).
-	switch (returnCode)
+	switch (ReturnCode)
 	{
 		case AE_EXIT_SUCCESS:
 		{
@@ -47,14 +47,14 @@ int WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPS
 	}
 
 	// Delete the engine.
-	Apricot::DeleteEngine(engine);
+	Apricot::DeleteEngine(Engine);
 
 	// Destroy foundational systems.
 	Apricot::ACrashReporter::Destroy();
 	Apricot::Memory_Destroy();
-	Apricot::Platform::Destroy();
+	Apricot::APlatform::Destroy();
 
-	return (int)returnCode;
+	return (int)ReturnCode;
 }
 
 #endif

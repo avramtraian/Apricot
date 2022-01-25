@@ -8,14 +8,14 @@
 
 namespace Apricot {
 
-	APRICOT_API uint64 Str_Length(const char8* string)
+	APRICOT_API uint64 Str_Length(const char8* String)
 	{
-		return strlen(string);
+		return strlen(String);
 	}
 
-	APRICOT_API uint64 Str_Length(const char16* string)
+	APRICOT_API uint64 Str_Length(const char16* String)
 	{
-		return wcslen(string);
+		return wcslen(String);
 	}
 	
 }

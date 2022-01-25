@@ -12,10 +12,10 @@ namespace Apricot {
 	
 
 	// TODO: Don't do these!
-	char8 ALogger::s_Buffer[32000] = { 0 };
-	static char8 s_LogBuffer[32000] = {0};
+	char8 ALogger::SBuffer[32000] = { 0 };
+	static char8 SLogBuffer[32000] = {0};
 
-	static const char8* s_LogTypes[] =
+	static const char8* SLogTypes[] =
 	{
 		"[FATAL]: ",
 		"[ERROR]: ",
@@ -25,52 +25,52 @@ namespace Apricot {
 		"[TRACE]: ",
 	};
 
-	static const uint64 s_LogTypeSize = sizeof("[FATAL]: ") - 1;
+	static const uint64 SLogTypeSize = sizeof("[FATAL]: ") - 1;
 
-	static Platform::ConsoleTextColor s_LogTypesColors[] =
+	static APlatform::EConsoleTextColor SLogTypesColors[] =
 	{
-		Platform::ConsoleTextColor::Black_RedBg,
-		Platform::ConsoleTextColor::BrightRed,
-		Platform::ConsoleTextColor::PaleYellow,
-		Platform::ConsoleTextColor::Green,
-		Platform::ConsoleTextColor::DarkPurple,
-		Platform::ConsoleTextColor::Gray
+		APlatform::EConsoleTextColor::Black_RedBg,
+		APlatform::EConsoleTextColor::BrightRed,
+		APlatform::EConsoleTextColor::PaleYellow,
+		APlatform::EConsoleTextColor::Green,
+		APlatform::EConsoleTextColor::DarkPurple,
+		APlatform::EConsoleTextColor::Gray
 	};
 
 	void ALogger::Init()
 	{
-		Platform::Console_Attach();
+		APlatform::Console_Attach();
 
 		AE_CORE_TRACE("Logger initialized succesfully!");
 	}
 
 	void ALogger::Destroy()
 	{
-		Platform::Console_Free();
+		APlatform::Console_Free();
 	}
 
-	void ALogger::Write(Log type, const char8* message)
+	void ALogger::Write(ELog Type, const char8* Message)
 	{
-		uint64 messageSize = Str_Length(message);
-		AE_CHECK(s_LogTypeSize + messageSize + 1 <= sizeof(s_Buffer) / sizeof(char8));
+		uint64 MessageSize = Str_Length(Message);
+		AE_CHECK(SLogTypeSize + MessageSize + 1 <= sizeof(SBuffer) / sizeof(char8));
 
-		Memory_Copy(s_LogBuffer, s_LogTypes[(uint8)type], s_LogTypeSize);
-		Memory_Copy(s_LogBuffer + s_LogTypeSize, message, messageSize);
-		s_LogBuffer[s_LogTypeSize + messageSize] = '\n';
+		Memory_Copy(SLogBuffer, SLogTypes[(uint8)Type], SLogTypeSize);
+		Memory_Copy(SLogBuffer + SLogTypeSize, Message, MessageSize);
+		SLogBuffer[SLogTypeSize + MessageSize] = '\n';
 
-		Platform::Console_Write(s_LogBuffer, s_LogTypeSize + messageSize + 1, s_LogTypesColors[(uint8)type]);
+		APlatform::Console_Write(SLogBuffer, SLogTypeSize + MessageSize + 1, SLogTypesColors[(uint8)Type]);
 	}
 
-	void ALogger::WriteError(Log type, const char8* message)
+	void ALogger::WriteError(ELog Type, const char8* Message)
 	{
-		uint64 messageSize = Str_Length(message);
-		AE_CHECK(s_LogTypeSize + messageSize + 1 <= sizeof(s_Buffer) / sizeof(char8));
+		uint64 MessageSize = Str_Length(Message);
+		AE_CHECK(SLogTypeSize + MessageSize + 1 <= sizeof(SBuffer) / sizeof(char8));
 
-		Memory_Copy(s_LogBuffer, s_LogTypes[(uint8)type], s_LogTypeSize);
-		Memory_Copy(s_LogBuffer + s_LogTypeSize, message, messageSize);
-		s_LogBuffer[s_LogTypeSize + messageSize] = '\n';
+		Memory_Copy(SLogBuffer, SLogTypes[(uint8)Type], SLogTypeSize);
+		Memory_Copy(SLogBuffer + SLogTypeSize, Message, MessageSize);
+		SLogBuffer[SLogTypeSize + MessageSize] = '\n';
 
-		Platform::Console_WriteError(s_LogBuffer, s_LogTypeSize + messageSize + 1, s_LogTypesColors[(uint8)type]);
+		APlatform::Console_WriteError(SLogBuffer, SLogTypeSize + MessageSize + 1, SLogTypesColors[(uint8)Type]);
 	}
 
 }

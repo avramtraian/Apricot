@@ -7,58 +7,58 @@
 
 namespace Apricot {
 	
-	class MouseMovedEvent : public Event
+	class AMouseMovedEvent : public AEvent
 	{
 	public:
-		MouseMovedEvent(int32 mouseX, int32 mouseY)
-			: Event(EventCategory::Mouse, EventType::MouseMoved), m_MouseX(mouseX), m_MouseY(mouseY) {}
+		AMouseMovedEvent(int32 MouseX, int32 MouseY)
+			: AEvent(EEventCategory::Mouse, EEventType::MouseMoved), m_MouseX(MouseX), m_MouseY(MouseY) {}
 
 		int32 GetMouseX() const { return m_MouseX; }
 		int32 GetMouseY() const { return m_MouseY; }
 
-		static EventType GetStaticType() { return EventType::MouseMoved; }
+		static EEventType GetStaticType() { return EEventType::MouseMoved; }
 
 	private:
 		int32 m_MouseX, m_MouseY;
 	};
 
-	class MouseButtonPressedEvent : public Event
+	class AMouseButtonPressedEvent : public AEvent
 	{
 	public:
-		MouseButtonPressedEvent(Button button)
-			: Event(EventCategory::Mouse, EventType::MouseButtonPressed), m_Button(button) {}
+		AMouseButtonPressedEvent(EButton Button)
+			: AEvent(EEventCategory::Mouse, EEventType::MouseButtonPressed), m_Button(Button) {}
 
-		Button GetButton() const { return m_Button; }
+		EButton GetButton() const { return m_Button; }
 
-		static EventType GetStaticType() { return EventType::MouseButtonPressed; }
+		static EEventType GetStaticType() { return EEventType::MouseButtonPressed; }
 
 	private:
-		Button m_Button = Button::None;
+		EButton m_Button = EButton::None;
 	};
 
-	class MouseButtonReleasedEvent : public Event
+	class AMouseButtonReleasedEvent : public AEvent
 	{
 	public:
-		MouseButtonReleasedEvent(Button button)
-			: Event(EventCategory::Mouse, EventType::MouseButtonReleased), m_Button(button) {}
+		AMouseButtonReleasedEvent(EButton Button)
+			: AEvent(EEventCategory::Mouse, EEventType::MouseButtonReleased), m_Button(Button) {}
 
-		Button GetButton() const { return m_Button; }
+		EButton GetButton() const { return m_Button; }
 
-		static EventType GetStaticType() { return EventType::MouseButtonReleased; }
+		static EEventType GetStaticType() { return EEventType::MouseButtonReleased; }
 
 	private:
-		Button m_Button = Button::None;
+		EButton m_Button = EButton::None;
 	};
 
-	class MouseWheelScrolledEvent : public Event
+	class AMouseWheelScrolledEvent : public AEvent
 	{
 	public:
-		MouseWheelScrolledEvent(int32 offset)
-			: Event(EventCategory::Mouse, EventType::MouseWheelScrolled), m_Offset(offset) {}
+		AMouseWheelScrolledEvent(int32 Offset)
+			: AEvent(EEventCategory::Mouse, EEventType::MouseWheelScrolled), m_Offset(Offset) {}
 
 		int32 GetOffset() const { return m_Offset; }
 
-		static EventType GetStaticType() { return EventType::MouseWheelScrolled; }
+		static EEventType GetStaticType() { return EEventType::MouseWheelScrolled; }
 
 	private:
 		int32 m_Offset;

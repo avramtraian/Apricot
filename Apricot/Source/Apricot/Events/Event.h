@@ -6,15 +6,15 @@
 #include "Apricot/Core/Log.h"
 
 #define AE_EVENT_CASE(Type) \
-	case EventType::Type: \
+	case EEventType::Type: \
 	{ \
-		m_Event->m_bIsHandled = m_Map->On##Type((const Type##Event*)m_Event);\
+		m_Event->m_bIsHandled = m_Map->On##Type((const A##Type##Event*)m_Event);\
 		break;\
 	}
 
 namespace Apricot {
 	
-	enum class EventCategory : uint8
+	enum class EEventCategory : uint8
 	{
 		None = 0,
 		Unknown = 1,
@@ -25,76 +25,76 @@ namespace Apricot {
 		Mouse       = 1 << 4
 	};
 
-	enum class EventType : uint16
+	enum class EEventType : uint16
 	{
 		None = 0,
 		Unknown = 1,
 
-		WindowClosed        = (uint16)EventCategory::Window | (1 << 5),
-		WindowResized       = (uint16)EventCategory::Window | (1 << 6),
-		WindowMoved         = (uint16)EventCategory::Window | (1 << 7),
+		WindowClosed        = (uint16)EEventCategory::Window | (1 << 5),
+		WindowResized       = (uint16)EEventCategory::Window | (1 << 6),
+		WindowMoved         = (uint16)EEventCategory::Window | (1 << 7),
 					        
-		KeyPressed          = (uint16)EventCategory::Keyboard | (1 << 5),
-		KeyReleased         = (uint16)EventCategory::Keyboard | (1 << 6),
+		KeyPressed          = (uint16)EEventCategory::Keyboard | (1 << 5),
+		KeyReleased         = (uint16)EEventCategory::Keyboard | (1 << 6),
 
-		MouseMoved          = (uint16)EventCategory::Mouse | (1 << 5),
-		MouseButtonPressed  = (uint16)EventCategory::Mouse | (1 << 6),
-		MouseButtonReleased = (uint16)EventCategory::Mouse | (1 << 7),
-		MouseWheelScrolled  = (uint16)EventCategory::Mouse | (1 << 8)
+		MouseMoved          = (uint16)EEventCategory::Mouse | (1 << 5),
+		MouseButtonPressed  = (uint16)EEventCategory::Mouse | (1 << 6),
+		MouseButtonReleased = (uint16)EEventCategory::Mouse | (1 << 7),
+		MouseWheelScrolled  = (uint16)EEventCategory::Mouse | (1 << 8)
 	};
 
-	class Event
+	class AEvent
 	{
 	public:
-		Event(EventCategory category, EventType type)
-			: m_Category(category), m_Type(type) {}
+		AEvent(EEventCategory Category, EEventType Type)
+			: m_Category(Category), m_Type(Type) {}
 
-		EventCategory GetCategory() const { return m_Category; }
-		EventType GetType() const { return m_Type; }
+		EEventCategory GetCategory() const { return m_Category; }
+		EEventType GetType() const { return m_Type; }
 
-		static EventType GetStaticType() { return EventType::None; }
+		static EEventType GetStaticType() { return EEventType::None; }
 
 	private:
-		EventCategory m_Category = EventCategory::None;
-		EventType m_Type = EventType::None;
+		EEventCategory m_Category = EEventCategory::None;
+		EEventType m_Type = EEventType::None;
 		bool8 m_bIsHandled = false;
 
-		friend class EventDispatcher;
+		friend class AEventDispatcher;
 	};
 
 	// Forward declare all event classes.
-	class WindowClosedEvent;
-	class WindowResizedEvent;
-	class WindowMovedEvent;
-	class KeyPressedEvent;
-	class KeyReleasedEvent;
-	class MouseMovedEvent;
-	class MouseButtonPressedEvent;
-	class MouseButtonReleasedEvent;
-	class MouseWheelScrolledEvent;
+	class AWindowClosedEvent;
+	class AWindowResizedEvent;
+	class AWindowMovedEvent;
+	class AKeyPressedEvent;
+	class AKeyReleasedEvent;
+	class AMouseMovedEvent;
+	class AMouseButtonPressedEvent;
+	class AMouseButtonReleasedEvent;
+	class AMouseWheelScrolledEvent;
 
-	struct EventDispatchMap
+	struct AEventDispatchMap
 	{
 		template<typename T>
-		using PFN_Dispatch = bool8(*)(const T* e);
+		using PFN_Dispatch = bool8(*)(const T* Ev);
 
-		PFN_Dispatch<Event> OnUnknown                                = [](const Event* e) -> bool8 { return false; };
-		PFN_Dispatch<WindowClosedEvent> OnWindowClosed               = [](const WindowClosedEvent* e) -> bool8 { return false; };
-		PFN_Dispatch<WindowResizedEvent> OnWindowResized             = [](const WindowResizedEvent* e) -> bool8 { return false; };
-		PFN_Dispatch<WindowMovedEvent> OnWindowMoved                 = [](const WindowMovedEvent* e) -> bool8 { return false; };
-		PFN_Dispatch<KeyPressedEvent> OnKeyPressed                   = [](const KeyPressedEvent* e) -> bool8 { return false; };
-		PFN_Dispatch<KeyReleasedEvent> OnKeyReleased                 = [](const KeyReleasedEvent* e) -> bool8 { return false; };
-		PFN_Dispatch<MouseMovedEvent> OnMouseMoved                   = [](const MouseMovedEvent* e) -> bool8 { return false; };
-		PFN_Dispatch<MouseButtonPressedEvent> OnMouseButtonPressed   = [](const MouseButtonPressedEvent* e) -> bool8 { return false; };
-		PFN_Dispatch<MouseButtonReleasedEvent> OnMouseButtonReleased = [](const MouseButtonReleasedEvent* e) -> bool8 { return false; };
-		PFN_Dispatch<MouseWheelScrolledEvent> OnMouseWheelScrolled   = [](const MouseWheelScrolledEvent* e) -> bool8 { return false; };
+		PFN_Dispatch<AEvent> OnUnknown                                = [](const AEvent* e) -> bool8 { return false; };
+		PFN_Dispatch<AWindowClosedEvent> OnWindowClosed               = [](const AWindowClosedEvent* e) -> bool8 { return false; };
+		PFN_Dispatch<AWindowResizedEvent> OnWindowResized             = [](const AWindowResizedEvent* e) -> bool8 { return false; };
+		PFN_Dispatch<AWindowMovedEvent> OnWindowMoved                 = [](const AWindowMovedEvent* e) -> bool8 { return false; };
+		PFN_Dispatch<AKeyPressedEvent> OnKeyPressed                   = [](const AKeyPressedEvent* e) -> bool8 { return false; };
+		PFN_Dispatch<AKeyReleasedEvent> OnKeyReleased                 = [](const AKeyReleasedEvent* e) -> bool8 { return false; };
+		PFN_Dispatch<AMouseMovedEvent> OnMouseMoved                   = [](const AMouseMovedEvent* e) -> bool8 { return false; };
+		PFN_Dispatch<AMouseButtonPressedEvent> OnMouseButtonPressed   = [](const AMouseButtonPressedEvent* e) -> bool8 { return false; };
+		PFN_Dispatch<AMouseButtonReleasedEvent> OnMouseButtonReleased = [](const AMouseButtonReleasedEvent* e) -> bool8 { return false; };
+		PFN_Dispatch<AMouseWheelScrolledEvent> OnMouseWheelScrolled   = [](const AMouseWheelScrolledEvent* e) -> bool8 { return false; };
 	};
 
-	class EventDispatcher
+	class AEventDispatcher
 	{
 	public:
-		EventDispatcher(Event* e, EventDispatchMap* map)
-			: m_Event(e), m_Map(map) {}
+		AEventDispatcher(AEvent* Event, AEventDispatchMap* Map)
+			: m_Event(Event), m_Map(Map) {}
 
 		void Dispatch() const
 		{
@@ -115,12 +115,12 @@ namespace Apricot {
 				AE_EVENT_CASE(MouseButtonReleased)
 				AE_EVENT_CASE(MouseWheelScrolled)
 
-				case EventType::Unknown:
+				case EEventType::Unknown:
 				{
 					m_Event->m_bIsHandled = m_Map->OnUnknown(m_Event);
 					break;
 				}
-				case EventType::None:
+				case EEventType::None:
 				{
 					AE_CORE_ERROR("Invalid '{}' EventType!", (uint16)m_Event->GetType());
 					break;
@@ -134,17 +134,17 @@ namespace Apricot {
 		}
 
 		template<typename T, typename Func>
-		void Dispatch(Func callback) const
+		void Dispatch(Func Callback) const
 		{
 			if (!m_Event->m_bIsHandled && m_Event->GetType() == T::GetStaticType())
 			{
-				m_Event->m_bIsHandled = callback((const T*)m_Event);
+				m_Event->m_bIsHandled = Callback((const T*)m_Event);
 			}
 		}
 
 	private:
-		Event* m_Event = nullptr;
-		EventDispatchMap* m_Map = nullptr;
+		AEvent* m_Event = nullptr;
+		AEventDispatchMap* m_Map = nullptr;
 	};
 
 }

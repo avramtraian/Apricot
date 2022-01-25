@@ -16,16 +16,16 @@ namespace Apricot {
 		}
 
 	public:
-		T& operator[](uint64 index)
+		T& operator[](uint64 Index)
 		{
-			AE_BASE_ASSERT(index < S, "Array index out of range!");
-			return m_Data[index];
+			AE_DEBUG_CHECK(Index < S); // Array index out of range!
+			return m_Data[Index];
 		}
 
-		const T& operator[](uint64 index) const
+		const T& operator[](uint64 Index) const
 		{
-			AE_BASE_ASSERT(index < S, "Array index out of range!");
-			return m_Data[index];
+			AE_DEBUG_CHECK(Index < S); // Array index out of range!
+			return m_Data[Index];
 		}
 
 	public:

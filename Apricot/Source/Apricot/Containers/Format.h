@@ -8,57 +8,57 @@
 namespace Apricot {
 
 	template<typename T>
-	APRICOT_API uint64 FormatType(const T& value, char8* buffer, uint64 bufferSize);
+	APRICOT_API uint64 FormatType(const T& Value, char8* Buffer, uint64 BufferSize);
 
 	template<typename T>
-	APRICOT_API uint64 FormatType(T* value, char8* buffer, uint64 bufferSize);
+	APRICOT_API uint64 FormatType(T* Value, char8* Buffer, uint64 BufferSize);
 
-	inline void Internal_Format(const char8* string, uint64 stringSize, char8* buffer, uint64 bufferSize)
+	inline void Internal_Format(const char8* String, uint64 StringSize, char8* Buffer, uint64 BufferSize)
 	{
-		uint64 offset = 0;
+		uint64 Offset = 0;
 
-		while (offset < stringSize && offset < bufferSize)
+		while (Offset < StringSize && Offset < BufferSize)
 		{
-			buffer[offset] = string[offset];
-			offset++;
+			Buffer[Offset] = String[Offset];
+			Offset++;
 		}
 
-		buffer[bufferSize - 1] = 0;
+		Buffer[BufferSize - 1] = 0;
 	}
 
 	template<typename T, typename... Args>
-	void Internal_Format(const char8* string, uint64 stringSize, char8* buffer, uint64 bufferSize, const T& value, Args&&... args)
+	void Internal_Format(const char8* String, uint64 StringSize, char8* Buffer, uint64 BufferSize, const T& Value, Args&&... args)
 	{
-		uint64 stringOffset = 0;
-		uint64 bufferOffset = 0;
+		uint64 StringOffset = 0;
+		uint64 BufferOffset = 0;
 
 		bool8 bIsInsideCurlies = false;
 
-		while (stringOffset < stringSize && bufferOffset < bufferSize)
+		while (StringOffset < StringSize && BufferOffset < BufferSize)
 		{
-			if (string[stringOffset] == '{')
+			if (String[StringOffset] == '{')
 			{
 				bIsInsideCurlies = true;
 			}
-			if (string[stringOffset] == '}')
+			if (String[StringOffset] == '}')
 			{
-				bufferOffset += FormatType(value, buffer + bufferOffset, bufferSize - bufferOffset);
-				Internal_Format(string + stringOffset + 1, stringSize - stringOffset, buffer + bufferOffset, bufferSize - bufferOffset, std::forward<Args>(args)...);
+				BufferOffset += FormatType(Value, Buffer + BufferOffset, BufferSize - BufferOffset);
+				Internal_Format(String + StringOffset + 1, StringSize - StringOffset, Buffer + BufferOffset, BufferSize - BufferOffset, std::forward<Args>(args)...);
 				break;
 			}
 			else if (!bIsInsideCurlies)
 			{
-				buffer[bufferOffset] = string[stringOffset];
-				bufferOffset++;
+				Buffer[BufferOffset] = String[StringOffset];
+				BufferOffset++;
 			}
-			stringOffset++;
+			StringOffset++;
 		}
 	}
 
 	template<typename... Args>
-	void Format(char8* buffer, uint64 bufferSize, const char8* string, Args&&... args)
+	void Format(char8* Buffer, uint64 BufferSize, const char8* String, Args&&... args)
 	{
-		Internal_Format(string, Str_Length(string) + 1, buffer, bufferSize, std::forward<Args>(args)...);
+		Internal_Format(String, Str_Length(String) + 1, Buffer, BufferSize, std::forward<Args>(args)...);
 	}
 
 }

@@ -16,50 +16,50 @@ namespace Apricot {
 		HANDLE Console_ErrorHandle = INVALID_HANDLE_VALUE;
 		bool8 bIsConsoleAttached = false;
 	};
-	static WindowsPlatformData s_WindowsPlatformData;
+	static WindowsPlatformData SWindowsPlatformData;
 
-	void Platform::Init()
+	void APlatform::Init()
 	{
 		
 	}
 
-	void Platform::Destroy()
+	void APlatform::Destroy()
 	{
 		
 	}
 
-	void* Platform::Memory_Allocate(uint64 size, bool8 alligned)
+	void* APlatform::Memory_Allocate(uint64 Size, bool8 Alligned)
 	{
-		if (size == 0)
+		if (Size == 0)
 		{
 			return nullptr;
 		}
-		return ::operator new(size);
+		return ::operator new(Size);
 	}
 
-	void Platform::Memory_Free(void* address, uint64 size)
+	void APlatform::Memory_Free(void* Address, uint64 Size)
 	{
-		::operator delete(address, size);
+		::operator delete(Address, Size);
 	}
 
-	void Platform::Memory_Copy(void* destination, const void* source, uint64 size)
+	void APlatform::Memory_Copy(void* Destination, const void* Source, uint64 Size)
 	{
-		memcpy(destination, source, size);
+		memcpy(Destination, Source, Size);
 	}
 
-	void Platform::Memory_Set(void* destination, int32 value, uint64 size)
+	void APlatform::Memory_Set(void* Destination, int32 Value, uint64 Size)
 	{
-		memset(destination, value, size);
+		memset(Destination, Value, Size);
 	}
 
-	void Platform::Memory_Zero(void* destination, uint64 size)
+	void APlatform::Memory_Zero(void* Destination, uint64 Size)
 	{
-		ZeroMemory(destination, size);
+		ZeroMemory(Destination, Size);
 	}
 
-	void Platform::Console_Attach()
+	void APlatform::Console_Attach()
 	{
-		if (s_WindowsPlatformData.bIsConsoleAttached)
+		if (SWindowsPlatformData.bIsConsoleAttached)
 		{
 			return;
 		}
@@ -67,45 +67,45 @@ namespace Apricot {
 		AllocConsole();
 		AttachConsole(ATTACH_PARENT_PROCESS);
 
-		s_WindowsPlatformData.Console_OutputHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-		s_WindowsPlatformData.Console_ErrorHandle = GetStdHandle(STD_ERROR_HANDLE);
-		s_WindowsPlatformData.bIsConsoleAttached = true;
+		SWindowsPlatformData.Console_OutputHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+		SWindowsPlatformData.Console_ErrorHandle = GetStdHandle(STD_ERROR_HANDLE);
+		SWindowsPlatformData.bIsConsoleAttached = true;
 	}
 
 
-	void Platform::Console_Free()
+	void APlatform::Console_Free()
 	{
-		if (!s_WindowsPlatformData.bIsConsoleAttached)
+		if (!SWindowsPlatformData.bIsConsoleAttached)
 		{
 			return;
 		}
 
 		FreeConsole();
 
-		s_WindowsPlatformData.Console_OutputHandle = INVALID_HANDLE_VALUE;
-		s_WindowsPlatformData.Console_ErrorHandle = INVALID_HANDLE_VALUE;
-		s_WindowsPlatformData.bIsConsoleAttached = false;
+		SWindowsPlatformData.Console_OutputHandle = INVALID_HANDLE_VALUE;
+		SWindowsPlatformData.Console_ErrorHandle = INVALID_HANDLE_VALUE;
+		SWindowsPlatformData.bIsConsoleAttached = false;
 	}
 
-	void Platform::Console_Write(const char8* message, uint64 messageSize, ConsoleTextColor color)
+	void APlatform::Console_Write(const char8* Message, uint64 MessageSize, EConsoleTextColor Color)
 	{
-		if (s_WindowsPlatformData.bIsConsoleAttached)
+		if (SWindowsPlatformData.bIsConsoleAttached)
 		{
-			SetConsoleTextAttribute(s_WindowsPlatformData.Console_OutputHandle, (WORD)color);
+			SetConsoleTextAttribute(SWindowsPlatformData.Console_OutputHandle, (WORD)Color);
 
-			DWORD numberOfCharsWritten = 0;
-			WriteConsoleA(s_WindowsPlatformData.Console_OutputHandle, message, (DWORD)messageSize, &numberOfCharsWritten, NULL);
+			DWORD NumberOfCharsWritten = 0;
+			WriteConsoleA(SWindowsPlatformData.Console_OutputHandle, Message, (DWORD)MessageSize, &NumberOfCharsWritten, NULL);
 		}
 	}
 
-	void Platform::Console_WriteError(const char8* message, uint64 messageSize, ConsoleTextColor color)
+	void APlatform::Console_WriteError(const char8* Message, uint64 MessageSize, EConsoleTextColor Color)
 	{
-		if (s_WindowsPlatformData.bIsConsoleAttached)
+		if (SWindowsPlatformData.bIsConsoleAttached)
 		{
-			SetConsoleTextAttribute(s_WindowsPlatformData.Console_ErrorHandle, (WORD)color);
+			SetConsoleTextAttribute(SWindowsPlatformData.Console_ErrorHandle, (WORD)Color);
 
-			DWORD numberOfCharsWritten = 0;
-			WriteConsoleA(s_WindowsPlatformData.Console_ErrorHandle, message, (DWORD)messageSize, &numberOfCharsWritten, NULL);
+			DWORD NumberOfCharsWritten = 0;
+			WriteConsoleA(SWindowsPlatformData.Console_ErrorHandle, Message, (DWORD)MessageSize, &NumberOfCharsWritten, NULL);
 		}
 	}
 
