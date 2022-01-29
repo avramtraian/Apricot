@@ -219,6 +219,31 @@ namespace Apricot {
 	}
 
 	template<>
+	APRICOT_API uint64 FormatType(const bool8& Value, char8* Buffer, uint64 BufferSize)
+	{
+		if (Value)
+		{
+			uint64 Size = sizeof("true") - 1;
+			if (Size > BufferSize)
+			{
+				Size = BufferSize;
+			}
+			Memory_Copy(Buffer, "true", Size);
+			return Size;
+		}
+		else
+		{
+			uint64 Size = sizeof("false") - 1;
+			if (Size > BufferSize)
+			{
+				Size = BufferSize;
+			}
+			Memory_Copy(Buffer, "false", Size);
+			return Size;
+		}
+	}
+
+	template<>
 	APRICOT_API uint64 FormatType(const char8* Value, char8* Buffer, uint64 BufferSize)
 	{
 		uint64 StringSize = Str_Length(Value);

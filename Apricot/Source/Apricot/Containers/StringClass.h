@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Apricot/Core/Base.h"
+#include "Apricot/Core/Types.h"
 #include "Apricot/Core/Assert.h"
 #include "Apricot/Core/Memory.h"
 #include "Apricot/Memory/Allocator.h"

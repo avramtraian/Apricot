@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Apricot/Core/Base.h"
+#include "Apricot/Core/Types.h"
 #include "Apricot/Core/Assert.h"
 
 namespace Apricot {

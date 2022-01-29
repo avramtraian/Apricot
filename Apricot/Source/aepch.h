@@ -11,6 +11,7 @@
 #include <type_traits>
 
 #include "Apricot/Core/Base.h"
+#include "Apricot/Core/Types.h"
 #include "Apricot/Core/Assert.h"
 
 #include "Apricot/Containers/Array.h"

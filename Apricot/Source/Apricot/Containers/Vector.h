@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Apricot/Core/Base.h"
+#include "Apricot/Core/Types.h"
 #include "Apricot/Core/Assert.h"
 #include "Apricot/Core/Memory.h"
 
@@ -440,6 +441,18 @@ namespace Apricot {
 			Other.m_Size = 0;
 
 			return *this;
+		}
+
+	// Raw Memory Accesses
+	public:
+		void Raw_SetSize(uint64 NewSize)
+		{
+			m_Size = NewSize;
+		}
+
+		void Raw_SetCapacity(uint64 NewCapacity)
+		{
+			m_Capacity = NewCapacity;
 		}
 
 	private:
