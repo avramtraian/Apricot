@@ -4,7 +4,7 @@
 #include "Log.h"
 #include "Assert.h"
 
-#include "Memory.h"
+#include "Memory/Memory.h"
 #include "Apricot/Containers/String.h"
 #include "Platform.h"
 

@@ -4,9 +4,9 @@
 
 #include "Base.h"
 #include "Platform.h"
-#include "Memory.h"
 #include "CrashReporter.h"
 #include "Engine.h"
+#include "Memory/Memory.h"
 
 #ifdef AE_PLATFORM_WINDOWS
 

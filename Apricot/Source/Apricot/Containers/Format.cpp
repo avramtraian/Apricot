@@ -3,7 +3,7 @@
 #include "aepch.h"
 #include "Format.h"
 
-#include "Apricot/Core/Memory.h"
+#include "Apricot/Core/Memory/Memory.h"
 
 namespace Apricot {
 	

@@ -3,7 +3,7 @@
 #include "aepch.h"
 #include "Memory.h"
 
-#include "Platform.h"
+#include "Apricot/Core/Platform.h"
 
 namespace Apricot {
 
@@ -97,10 +97,14 @@ namespace Apricot {
 			"LINEAR_ALLOC ",
 			"STACK_ALLOC  ",
 			"DYNAMIC_ALLOC",
+			"SHARED_PTR   ",
+			"UNIQUE_PTR   ",
 		};
 
 		static const char8* Fmt =
 			"Tagged Memory Usage:\n"
+			"             - {}: {}B\n"
+			"             - {}: {}B\n"
 			"             - {}: {}B\n"
 			"             - {}: {}B\n"
 			"             - {}: {}B\n"
@@ -120,7 +124,9 @@ namespace Apricot {
 			AllocTagStrs[(uint16)EAllocTag::String],           AllocatedTagged[(uint16)EAllocTag::String]           - FreedTagged[(uint16)EAllocTag::String],
 			AllocTagStrs[(uint16)EAllocTag::LinearAllocator],  AllocatedTagged[(uint16)EAllocTag::LinearAllocator]  - FreedTagged[(uint16)EAllocTag::LinearAllocator],
 			AllocTagStrs[(uint16)EAllocTag::StackAllocator],   AllocatedTagged[(uint16)EAllocTag::StackAllocator]   - FreedTagged[(uint16)EAllocTag::StackAllocator],
-			AllocTagStrs[(uint16)EAllocTag::DynamicAllocator], AllocatedTagged[(uint16)EAllocTag::DynamicAllocator] - FreedTagged[(uint16)EAllocTag::DynamicAllocator]
+			AllocTagStrs[(uint16)EAllocTag::DynamicAllocator], AllocatedTagged[(uint16)EAllocTag::DynamicAllocator] - FreedTagged[(uint16)EAllocTag::DynamicAllocator],
+			AllocTagStrs[(uint16)EAllocTag::SharedPtr],        AllocatedTagged[(uint16)EAllocTag::SharedPtr]        - FreedTagged[(uint16)EAllocTag::SharedPtr],
+			AllocTagStrs[(uint16)EAllocTag::UniquePtr],        AllocatedTagged[(uint16)EAllocTag::UniquePtr]        - FreedTagged[(uint16)EAllocTag::UniquePtr]
 		);
 		return Buffer;
 

@@ -2,6 +2,8 @@
 
 #include "Base.h"
 
+#include <type_traits>
+
 #ifdef AE_COMPILER_MSVC
 
 	using uint8 = unsigned char;
@@ -67,18 +69,18 @@ AE_STATIC_ASSERT(sizeof(bool32)  == 4, "sizeof(bool32) expected to be 32 bits!")
 AE_STATIC_ASSERT(sizeof(char8)   == 1, "sizeof(char8) expected to be 8 bits!");
 AE_STATIC_ASSERT(sizeof(char16)  == 2, "sizeof(char16) expected to be 16 bits!");
 
-#define AE_INT8_MIN         (-127i8 - 1)
-#define AE_INT16_MIN        (-32767i16 - 1)
-#define AE_INT32_MIN        (-2147483647i32 - 1)
-#define AE_INT64_MIN        (-9223372036854775807i64 - 1)
-#define AE_INT8_MAX         127i8
-#define AE_INT16_MAX        32767i16
-#define AE_INT32_MAX        2147483647i32
-#define AE_INT64_MAX        9223372036854775807i64
-#define AE_UINT8_MAX        0xffui8
-#define AE_UINT16_MAX       0xffffui16
-#define AE_UINT32_MAX       0xffffffffui32
-#define AE_UINT64_MAX       0xffffffffffffffffui64
+#define AE_INT8_MIN   (-127i8 - 1)
+#define AE_INT16_MIN  (-32767i16 - 1)
+#define AE_INT32_MIN  (-2147483647i32 - 1)
+#define AE_INT64_MIN  (-9223372036854775807i64 - 1)
+#define AE_INT8_MAX   127i8
+#define AE_INT16_MAX  32767i16
+#define AE_INT32_MAX  2147483647i32
+#define AE_INT64_MAX  9223372036854775807i64
+#define AE_UINT8_MAX  0xffui8
+#define AE_UINT16_MAX 0xffffui16
+#define AE_UINT32_MAX 0xffffffffui32
+#define AE_UINT64_MAX 0xffffffffffffffffui64
 
 namespace Apricot {
 
@@ -104,7 +106,22 @@ namespace Apricot {
 	using TRemoveReference_Type = TRemoveReference<T>::Type;
 
 	template<typename T>
-	NODISCARD FORCEINLINE T&& Forward(TRemoveReference_Type<T>& Argument) noexcept
+	struct TRemoveConst
+	{
+		using Type = T;
+	};
+
+	template<typename T>
+	struct TRemoveConst<const T>
+	{
+		using Type = T;
+	};
+
+	template<typename T>
+	using TRemoveConst_Type = TRemoveConst<T>::Type;
+
+	template<typename T>
+	NODISCARD FORCEINLINE constexpr T&& Forward(TRemoveReference_Type<T>& Argument) noexcept
 	{
 		return static_cast<T&&>(Argument);
 	}
@@ -113,6 +130,18 @@ namespace Apricot {
 	NODISCARD FORCEINLINE constexpr TRemoveReference_Type<T>&& Move(T&& Argument) noexcept
 	{
 		return static_cast<TRemoveReference_Type<T>&&>(Argument);
+	}
+
+	template<typename ClassType, typename BaseType>
+	NODISCARD FORCEINLINE constexpr bool8 IsDerivedFrom() noexcept
+	{
+		return std::is_base_of<BaseType, ClassType>::value;
+	}
+
+	template<typename A, typename B>
+	NODISCARD FORCEINLINE constexpr bool8 AreSameType() noexcept
+	{
+		return std::is_same<A, B>::value;
 	}
 	
 }

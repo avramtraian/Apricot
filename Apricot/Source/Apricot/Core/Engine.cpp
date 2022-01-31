@@ -3,15 +3,13 @@
 #include "aepch.h"
 #include "Engine.h"
 
-#include "Memory.h"
 #include "Platform.h"
+#include "Memory/Memory.h"
 
 #include "Apricot/Events/ApplicationEvents.h"
 #include "Apricot/Events/WindowEvents.h"
 #include "Apricot/Events/KeyboardEvents.h"
 #include "Apricot/Events/MouseEvents.h"
-
-#include "Apricot/Containers/Vector.h"
 
 namespace Apricot {
 

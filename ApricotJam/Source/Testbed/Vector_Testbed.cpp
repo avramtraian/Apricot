@@ -5,14 +5,14 @@
 
 #include "Apricot/Containers/Vector.h"
 
-#include "Apricot/Core/Memory.h"
+#include "Apricot/Core/Memory/Memory.h"
 
 #define CREATE_DESTROY_RUNS 100
 #define PUSH_EMPLACE_POP_BACK_RUNS 512
 
 namespace Apricot { namespace Testbed { 
 
-	class CustomAllocator : public AAllocator
+	class CustomAllocator : public AAllocatorBase
 	{
 	public:
 		virtual void* Allocate(uint64 Size, EAllocTag ReservedTag) override

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Base.h"
+#include "Apricot/Core/Base.h"
 
 #include <new>
 
@@ -10,6 +10,32 @@
 #define Memory_ZeroArray(Array) ::Apricot::Memory_Zero(Array, sizeof(Array))
 
 namespace Apricot {
+
+	enum class EAllocRegion
+	{
+		// Invalid allocation regions.
+		None = 0,
+		Unknown,
+
+		// Valid allocation regions.
+		Stack,
+		Heap,
+	};
+
+	enum class EAllocSubregion
+	{
+		// Invalid allocation subregion.
+		None = 0,
+		
+		// Default allocation subregion.
+		Unknown,
+
+		// Memory subregion managed by the allocators.
+		HeapAllocator,
+		LinearAllocator,
+		StackAllocator,
+		DynamicAllocator
+	};
 
 	enum class EAllocTag : uint16
 	{
@@ -29,6 +55,9 @@ namespace Apricot {
 		LinearAllocator,
 		StackAllocator,
 		DynamicAllocator,
+
+		SharedPtr,
+		UniquePtr,
 
 		// Used internally
 		MaxEnumValue
