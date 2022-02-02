@@ -28,7 +28,9 @@ namespace Apricot {
 			return AE_EXIT_FAILED_INIT;
 		}
 
-		AE_CORE_DEBUG("{}", AMemoryDebugger::GetUsageString());
+		AE_CORE_DEBUG("{}", AMemoryDebugger::GetRegionsUsageString());
+		AE_CORE_DEBUG("{}", AMemoryDebugger::GetSubregionsUsageString());
+		AE_CORE_DEBUG("{}", AMemoryDebugger::GetTaggedUsageString());
 
 		while (true)
 		{

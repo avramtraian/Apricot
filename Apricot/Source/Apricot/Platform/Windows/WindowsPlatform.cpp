@@ -4,6 +4,10 @@
 
 #ifdef AE_PLATFORM_WINDOWS
 
+#ifdef TEXT
+	#undef TEXT
+#endif
+
 #include "Apricot/Core/Platform.h"
 
 #include <Windows.h>

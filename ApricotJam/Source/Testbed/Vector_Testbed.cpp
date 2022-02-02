@@ -17,12 +17,12 @@ namespace Apricot { namespace Testbed {
 	public:
 		virtual void* Allocate(uint64 Size, EAllocTag ReservedTag) override
 		{
-			return Memory_Alloc(Size, ReservedTag);
+			return GHeapAllocator->Allocate(Size, ReservedTag);
 		}
 
 		virtual void Free(void* Memory, uint64 Size, EAllocTag ReservedTag) override
 		{
-			Memory_Free(Memory, Size, ReservedTag);
+			GHeapAllocator->Free(Memory, Size, ReservedTag);
 		}
 
 		static EAllocatorType GetStaticType() { return EAllocatorType::None; }
@@ -34,11 +34,11 @@ namespace Apricot { namespace Testbed {
 	public:
 		Vector_Test_Data(uint64)
 		{
-			Data = Memory_Alloc(512, EAllocTag::Unknown);
+			Data = GHeapAllocator->Allocate(512, EAllocTag::Debug);
 		}
 		~Vector_Test_Data()
 		{
-			Memory_Free(Data, 512, EAllocTag::Unknown);
+			GHeapAllocator->Free(Data, 512, EAllocTag::Debug);
 		}
 
 		void* Data;

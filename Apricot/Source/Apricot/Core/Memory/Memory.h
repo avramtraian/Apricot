@@ -7,22 +7,24 @@
 #include <new>
 
 #define Memory_ZeroStruct(Variable) ::Apricot::Memory_Zero(&Variable, sizeof(Variable))
-#define Memory_ZeroArray(Array) ::Apricot::Memory_Zero(Array, sizeof(Array))
+#define Memory_ZeroArray(Array)     ::Apricot::Memory_Zero( Array,    sizeof(Array))
 
 namespace Apricot {
 
-	enum class EAllocRegion
+	enum class EAllocRegion : uint8
 	{
 		// Invalid allocation regions.
 		None = 0,
 		Unknown,
 
 		// Valid allocation regions.
-		Stack,
 		Heap,
+		Stack,
+
+		MaxEnumValue
 	};
 
-	enum class EAllocSubregion
+	enum class EAllocSubregion : uint8
 	{
 		// Invalid allocation subregion.
 		None = 0,
@@ -34,7 +36,9 @@ namespace Apricot {
 		HeapAllocator,
 		LinearAllocator,
 		StackAllocator,
-		DynamicAllocator
+		DynamicAllocator,
+
+		MaxEnumValue
 	};
 
 	enum class EAllocTag : uint16
@@ -47,6 +51,7 @@ namespace Apricot {
 
 		// Core engine allocations
 		Core,
+		Debug,
 		Array,
 		Vector,
 		String,
@@ -66,9 +71,9 @@ namespace Apricot {
 	APRICOT_API void Memory_Init();
 	APRICOT_API void Memory_Destroy();
 
-	APRICOT_API void* Memory_Alloc(uint64 Size, EAllocTag Tag);
+	APRICOT_API void* Memory_Alloc(uint64 Size, EAllocSubregion Subregion);
 
-	APRICOT_API void Memory_Free(void* Address, uint64 Size, EAllocTag Tag);
+	APRICOT_API void Memory_Free(void* Address, uint64 Size, EAllocSubregion Subregion);
 
 	APRICOT_API void Memory_Copy(void* Destination, const void* Source, uint64 Size);
 
@@ -88,14 +93,32 @@ namespace Apricot {
 		static void Init();
 		static void Destroy();
 
-		static char8* GetUsageString();
+		static char8* GetRegionsUsageString();
+		static char8* GetSubregionsUsageString();
+		static char8* GetTaggedUsageString();
 
 	public:
-		static uint64 AllocatedTagged[(uint16)EAllocTag::MaxEnumValue];
-		static uint64 FreedTagged[(uint16)EAllocTag::MaxEnumValue];
+		/* REGIONS */
+		static uint64 AllocatedRegions             [(uint8)EAllocRegion::MaxEnumValue];
+		static uint64 FreedRegions                 [(uint8)EAllocRegion::MaxEnumValue];
+											       
+		static uint64 AllocationsCountRegions      [(uint8)EAllocRegion::MaxEnumValue];
+		static uint64 DeallocationsCountRegions    [(uint8)EAllocRegion::MaxEnumValue];
 
-		static uint64 AllocationsCountTagged[(uint64)EAllocTag::MaxEnumValue];
-		static uint64 DeallocationsCountTagged[(uint64)EAllocTag::MaxEnumValue];
+		/* SUBREGIONS */
+
+		static uint64 AllocatedSubregions          [(uint8)EAllocSubregion::MaxEnumValue];
+		static uint64 FreedSubregions              [(uint8)EAllocSubregion::MaxEnumValue];
+												   
+		static uint64 AllocationsCountSubregions   [(uint8)EAllocSubregion::MaxEnumValue];
+		static uint64 DeallocationsCountSubregions [(uint8)EAllocSubregion::MaxEnumValue];
+												   
+		/* TAGGED */							   
+		static uint64 AllocatedTagged              [(uint16)EAllocTag::MaxEnumValue];
+		static uint64 FreedTagged                  [(uint16)EAllocTag::MaxEnumValue];
+											       
+		static uint64 AllocationsCountTagged       [(uint64)EAllocTag::MaxEnumValue];
+		static uint64 DeallocationsCountTagged     [(uint64)EAllocTag::MaxEnumValue];
 	};
 	
 }

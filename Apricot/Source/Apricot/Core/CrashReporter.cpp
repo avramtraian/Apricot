@@ -26,7 +26,7 @@ namespace Apricot {
 			return;
 		}
 
-		GCrashReporter = (ACrashReporter*)Memory_Alloc(sizeof(ACrashReporter), EAllocTag::Core);
+		GCrashReporter = (ACrashReporter*)GHeapAllocator->Allocate(sizeof(ACrashReporter), EAllocTag::Core);
 
 		GCrashReporter->AssertionBuffer = SAssertionBuffer;
 		GCrashReporter->AssertionBufferSize = AE_ARRAY_LENGTH(SAssertionBuffer);
@@ -42,7 +42,7 @@ namespace Apricot {
 			return;
 		}
 
-		Memory_Free(GCrashReporter, sizeof(ACrashReporter), EAllocTag::Core);
+		GHeapAllocator->Free(GCrashReporter, sizeof(ACrashReporter), EAllocTag::Core);
 		GCrashReporter = nullptr;
 	}
 

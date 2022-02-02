@@ -7,7 +7,7 @@
 #include "Apricot/Core/Assert.h"
 #include "Apricot/Core/Memory/Memory.h"
 
-#include "Apricot/Core/Memory/Allocator.h"
+#include "Apricot/Core/Memory/HeapAllocator.h"
 
 namespace Apricot {
 
@@ -17,7 +17,7 @@ namespace Apricot {
 	* @tparam T The type that the vector stores.
 	* @tparam Alloc The allocator class used for managing the internal memory. Default value = it allocates directly from the global heap.
 	*/
-	template<typename T, typename Alloc = AGlobalAllocator>
+	template<typename T, typename Alloc = AHeapAllocator>
 	class TVector
 	{
 	public:
@@ -31,7 +31,7 @@ namespace Apricot {
 			{
 				if (Alloc::GetStaticType() == EAllocatorType::Global)
 				{
-					m_Allocator = (Alloc*)GAllocator;
+					m_Allocator = (Alloc*)GHeapAllocator;
 				}
 				else
 				{
@@ -51,7 +51,7 @@ namespace Apricot {
 			{
 				if (Alloc::GetStaticType() == EAllocatorType::Global)
 				{
-					m_Allocator = (Alloc*)GAllocator;
+					m_Allocator = (Alloc*)GHeapAllocator;
 				}
 				else
 				{

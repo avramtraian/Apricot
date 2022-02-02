@@ -22,19 +22,10 @@ namespace Apricot {
 	class APRICOT_API AAllocatorBase
 	{
 	public:
-		virtual void* Allocate(uint64 Size, EAllocTag ReservedTag = EAllocTag::Unknown) = 0;
-		virtual void Free(void* Memory, uint64 Size, EAllocTag ReservedTag = EAllocTag::Unknown) = 0;
+		virtual ~AAllocatorBase() = default;
+
+		virtual void* Allocate(uint64 Size, EAllocTag Tag = EAllocTag::Unknown) = 0;
+		virtual void Free(void* Memory, uint64 Size, EAllocTag Tag = EAllocTag::Unknown) = 0;
 	};
-
-	class APRICOT_API AGlobalAllocator : public AAllocatorBase
-	{
-	public:
-		virtual void* Allocate(uint64 Size, EAllocTag ReservedTag = EAllocTag::Unknown) override;
-		virtual void Free(void* Memory, uint64 Size, EAllocTag ReservedTag = EAllocTag::Unknown) override;
-
-		static EAllocatorType GetStaticType() { return EAllocatorType::Global; }
-	};
-
-	APRICOT_API extern AGlobalAllocator* GAllocator;
 
 }
