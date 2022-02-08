@@ -7,9 +7,9 @@ namespace Apricot {
 	
 	ACrashReporter* GCrashReporter = nullptr;
 
-	static char8 SAssertionBuffer[32000] = { 0 };
+	static TChar SAssertionBuffer[32000] = { 0 };
 
-	static char8 SInternalBuffer[32000] = { 0 };
+	static TChar SInternalBuffer[32000] = { 0 };
 
 	ACrashReporter::ACrashReporter()
 	{
@@ -46,85 +46,85 @@ namespace Apricot {
 		GCrashReporter = nullptr;
 	}
 
-	void ACrashReporter::PreCheckFailed(const char8* File, const char8* Function, uint64 Line, const char8* Expression, const char8* Message)
+	void ACrashReporter::PreCheckFailed(const TChar* File, const TChar* Function, uint64 Line, const TChar* Expression, const TChar* Message)
 	{
 		if (Message)
 		{
-			AE_CORE_ERROR(
+			AE_CORE_ERROR(TEXT(
 				"CHECK FAILED:\n"
 				"            [EXPR]: {}\n"
 				"            [FILE]: {}\n"
 				"            [FUNC]: {}\n"
 				"            [LINE]: {}\n"
 				"----------------------------\n"
-				"            {}",
+				"            {}"),
 			Expression, File, Function, Line, Message);
 		}
 	}
 
-	void ACrashReporter::PostCheckFailed(const char8* File, const char8* Function, uint64 Line, const char8* Expression, const char8* Message)
+	void ACrashReporter::PostCheckFailed(const TChar* File, const TChar* Function, uint64 Line, const TChar* Expression, const TChar* Message)
 	{
 		
 	}
 
-	void ACrashReporter::PreCheckNoEntryFailed(const char8* File, const char8* Function, uint64 Line)
+	void ACrashReporter::PreCheckNoEntryFailed(const TChar* File, const TChar* Function, uint64 Line)
 	{
 		
 	}
 
-	void ACrashReporter::PostCheckNoEntryFailed(const char8* File, const char8* Function, uint64 Line)
+	void ACrashReporter::PostCheckNoEntryFailed(const TChar* File, const TChar* Function, uint64 Line)
 	{
 		
 	}
 
-	void ACrashReporter::PreCheckUnimplementedFailed(const char8* File, const char8* Function, uint64 Line)
+	void ACrashReporter::PreCheckUnimplementedFailed(const TChar* File, const TChar* Function, uint64 Line)
 	{
 		
 	}
 
-	void ACrashReporter::PostCheckUnimplementedFailed(const char8* File, const char8* Function, uint64 Line)
+	void ACrashReporter::PostCheckUnimplementedFailed(const TChar* File, const TChar* Function, uint64 Line)
 	{
 		
 	}
 
-	void ACrashReporter::PreVerifyFailed(const char8* File, const char8* Function, uint64 Line, const char8* Expression, const char8* Message)
+	void ACrashReporter::PreVerifyFailed(const TChar* File, const TChar* Function, uint64 Line, const TChar* Expression, const TChar* Message)
 	{
 		if (Message)
 		{
-			AE_CORE_ERROR(
+			AE_CORE_ERROR(TEXT(
 				"VERIFY FAILED:\n"
 				"            [EXPR]: {}\n"
 				"            [FILE]: {}\n"
 				"            [FUNC]: {}\n"
 				"            [LINE]: {}\n"
 				"----------------------------\n"
-				"            {}",
+				"            {}"),
 				Expression, File, Function, Line, Message);
 		}
 	}
 
-	void ACrashReporter::PostVerifyFailed(const char8* File, const char8* Function, uint64 Line, const char8* Expression, const char8* Message)
+	void ACrashReporter::PostVerifyFailed(const TChar* File, const TChar* Function, uint64 Line, const TChar* Expression, const TChar* Message)
 	{
 		
 	}
 
-	void ACrashReporter::EnsureFailed(const char8* File, const char8* Function, uint64 Line, const char8* Expression, const char8* Message)
+	void ACrashReporter::EnsureFailed(const TChar* File, const TChar* Function, uint64 Line, const TChar* Expression, const TChar* Message)
 	{
 		
 	}
 
-	void ACrashReporter::EnsureAlwaysFailed(const char8* File, const char8* Function, uint64 Line, const char8* Expression, const char8* Message)
+	void ACrashReporter::EnsureAlwaysFailed(const TChar* File, const TChar* Function, uint64 Line, const TChar* Expression, const TChar* Message)
 	{
 		if (Message)
 		{
-			AE_CORE_ERROR(
+			AE_CORE_ERROR(TEXT(
 				"ENSURE FAILED:\n"
 				"            [EXPR]: {}\n"
 				"            [FILE]: {}\n"
 				"            [FUNC]: {}\n"
 				"            [LINE]: {}\n"
 				"----------------------------\n"
-				"            {}",
+				"            {}"),
 				Expression, File, Function, Line, Message);
 		}
 	}

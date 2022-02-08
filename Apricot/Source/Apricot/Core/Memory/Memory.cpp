@@ -107,26 +107,26 @@ namespace Apricot {
 #endif
 	}
 
-	char8* AMemoryDebugger::GetRegionsUsageString()
+	TChar* AMemoryDebugger::GetRegionsUsageString()
 	{
 #ifdef AE_ENABLE_MEMORY_TRACE
 
-		static char8 Buffer[2048] = { 0 };
+		static TChar Buffer[2048] = { 0 };
 
-		static const char8* AllocRegionStrs[] =
+		static const TChar* AllocRegionStrs[] =
 		{
-			"NONE         ",
-			"UNKNOWN      ",
-			"HEAP         ",
-			"STACK        ",
+			TEXT("NONE         "),
+			TEXT("UNKNOWN      "),
+			TEXT("HEAP         "),
+			TEXT("STACK        "),
 		};
 
-		static const char8* Fmt =
+		static const TChar* Fmt = TEXT(
 			"Regions Memory Usage:\n"
 			"             - {}: {}B\n"
 			"             - {}: {}B\n"
 			"             - {}: {}B\n"
-			"             - {}: {}B\n";
+			"             - {}: {}B\n");
 
 		Format(Buffer, AE_ARRAY_LENGTH(Buffer), Fmt,
 			AllocRegionStrs[(uint8)EAllocRegion::None],    AllocatedRegions[(uint8)EAllocRegion::None]    - FreedRegions[(uint8)EAllocRegion::None],
@@ -141,30 +141,30 @@ namespace Apricot {
 #endif
 	}
 
-	char8* AMemoryDebugger::GetSubregionsUsageString()
+	TChar* AMemoryDebugger::GetSubregionsUsageString()
 	{
 #ifdef AE_ENABLE_MEMORY_TRACE
 
-		static char8 Buffer[2048] = { 0 };
+		static TChar Buffer[2048] = { 0 };
 
-		static const char8* AllocTagStrs[] =
+		static const TChar* AllocTagStrs[] =
 		{
-			"NONE         ",
-			"UNKNOWN      ",
-			"HEAP_ALLOC   ",
-			"LINEAR_ALLOC ",
-			"STACK_ALLOC  ",
-			"DYNAMIC_ALLOC",
+			TEXT("NONE         "),
+			TEXT("UNKNOWN      "),
+			TEXT("HEAP_ALLOC   "),
+			TEXT("LINEAR_ALLOC "),
+			TEXT("STACK_ALLOC  "),
+			TEXT("DYNAMIC_ALLOC"),
 		};
 
-		static const char8* Fmt =
+		static const TChar* Fmt = TEXT(
 			"Subregions Memory Usage:\n"
 			"             - {}: {}B\n"
 			"             - {}: {}B\n"
 			"             - {}: {}B\n"
 			"             - {}: {}B\n"
 			"             - {}: {}B\n"
-			"             - {}: {}B\n";
+			"             - {}: {}B\n");
 
 		Format(Buffer, AE_ARRAY_LENGTH(Buffer), Fmt,
 			AllocTagStrs[(uint16)EAllocSubregion::None],             AllocatedSubregions[(uint16)EAllocSubregion::None]             - FreedSubregions[(uint16)EAllocSubregion::None],
@@ -181,29 +181,29 @@ namespace Apricot {
 #endif
 	}
 
-	char8* AMemoryDebugger::GetTaggedUsageString()
+	TChar* AMemoryDebugger::GetTaggedUsageString()
 	{
 #ifdef AE_ENABLE_MEMORY_TRACE
 
-		static char8 Buffer[2048] = { 0 };
+		static TChar Buffer[2048] = { 0 };
 
-		static const char8* AllocTagStrs[] =
+		static const TChar* AllocTagStrs[] =
 		{
-			"NONE         ",
-			"UNKNOWN      ",
-			"CORE         ",
-			"DEBUG        ",
-			"ARRAY        ",
-			"VECTOR       ",
-			"STRING       ",
-			"LINEAR_ALLOC ",
-			"STACK_ALLOC  ",
-			"DYNAMIC_ALLOC",
-			"SHARED_PTR   ",
-			"UNIQUE_PTR   ",
+			TEXT("NONE         "),
+			TEXT("UNKNOWN      "),
+			TEXT("CORE         "),
+			TEXT("DEBUG        "),
+			TEXT("ARRAY        "),
+			TEXT("VECTOR       "),
+			TEXT("STRING       "),
+			TEXT("LINEAR_ALLOC "),
+			TEXT("STACK_ALLOC  "),
+			TEXT("DYNAMIC_ALLOC"),
+			TEXT("SHARED_PTR   "),
+			TEXT("UNIQUE_PTR   "),
 		};
 
-		static const char8* Fmt =
+		static const TChar* Fmt = TEXT(
 			"Tagged Memory Usage:\n"
 			"             - {}: {}B\n"
 			"             - {}: {}B\n"
@@ -216,7 +216,7 @@ namespace Apricot {
 			"             - {}: {}B\n"
 			"             - {}: {}B\n"
 			"             - {}: {}B\n"
-			"             - {}: {}B\n";
+			"             - {}: {}B\n");
 
 		Format(Buffer, AE_ARRAY_LENGTH(Buffer), Fmt,
 			AllocTagStrs[(uint16)EAllocTag::None],             AllocatedTagged[(uint16)EAllocTag::None]             - FreedTagged[(uint16)EAllocTag::None],

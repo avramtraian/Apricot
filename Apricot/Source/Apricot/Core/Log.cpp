@@ -5,27 +5,26 @@
 #include "Assert.h"
 
 #include "Memory/Memory.h"
-#include "Apricot/Containers/String.h"
+#include "Apricot/Containers/Strings/String.h"
 #include "Platform.h"
 
 namespace Apricot {
-	
 
 	// TODO: Don't do these!
-	char8 ALogger::SBuffer[32000] = { 0 };
-	static char8 SLogBuffer[32000] = {0};
+	TChar ALogger::SBuffer[32000] = { 0 };
+	static TChar SLogBuffer[32000] = { 0 };
 
-	static const char8* SLogTypes[] =
+	static const TChar* SLogTypes[] =
 	{
-		"[FATAL]: ",
-		"[ERROR]: ",
-		"[WARN]:  ",
-		"[INFO]:  ",
-		"[DEBUG]: ",
-		"[TRACE]: ",
+		TEXT("[FATAL]: "),
+		TEXT("[ERROR]: "),
+		TEXT("[WARN]:  "),
+		TEXT("[INFO]:  "),
+		TEXT("[DEBUG]: "),
+		TEXT("[TRACE]: "),
 	};
 
-	static const uint64 SLogTypeSize = sizeof("[FATAL]: ") - 1;
+	static const uint64 SLogTypeSize = 9; /* Size in characters of the log type */
 
 	static APlatform::EConsoleTextColor SLogTypesColors[] =
 	{
@@ -41,7 +40,7 @@ namespace Apricot {
 	{
 		APlatform::Console_Attach();
 
-		AE_CORE_TRACE("Logger initialized succesfully!");
+		AE_CORE_TRACE(TEXT("Logger initialized succesfully!"));
 	}
 
 	void ALogger::Destroy()
@@ -49,25 +48,25 @@ namespace Apricot {
 		APlatform::Console_Free();
 	}
 
-	void ALogger::Write(ELog Type, const char8* Message)
+	void ALogger::Write(ELog Type, const TChar* Message)
 	{
 		uint64 MessageSize = Str_Length(Message);
-		AE_CHECK(SLogTypeSize + MessageSize + 1 <= sizeof(SBuffer) / sizeof(char8));
+		AE_CHECK(SLogTypeSize + MessageSize + 1 <= sizeof(SBuffer) / sizeof(TChar));
 
-		Memory_Copy(SLogBuffer, SLogTypes[(uint8)Type], SLogTypeSize);
-		Memory_Copy(SLogBuffer + SLogTypeSize, Message, MessageSize);
+		Memory_Copy(SLogBuffer, SLogTypes[(uint8)Type], SLogTypeSize * sizeof(TChar));
+		Memory_Copy(SLogBuffer + SLogTypeSize, Message, MessageSize * sizeof(TChar));
 		SLogBuffer[SLogTypeSize + MessageSize] = '\n';
 
 		APlatform::Console_Write(SLogBuffer, SLogTypeSize + MessageSize + 1, SLogTypesColors[(uint8)Type]);
 	}
 
-	void ALogger::WriteError(ELog Type, const char8* Message)
+	void ALogger::WriteError(ELog Type, const TChar* Message)
 	{
 		uint64 MessageSize = Str_Length(Message);
-		AE_CHECK(SLogTypeSize + MessageSize + 1 <= sizeof(SBuffer) / sizeof(char8));
+		AE_CHECK(SLogTypeSize + MessageSize + 1 <= sizeof(SBuffer) / sizeof(TChar));
 
-		Memory_Copy(SLogBuffer, SLogTypes[(uint8)Type], SLogTypeSize);
-		Memory_Copy(SLogBuffer + SLogTypeSize, Message, MessageSize);
+		Memory_Copy(SLogBuffer, SLogTypes[(uint8)Type], SLogTypeSize * sizeof(TChar));
+		Memory_Copy(SLogBuffer + SLogTypeSize, Message, MessageSize * sizeof(TChar));
 		SLogBuffer[SLogTypeSize + MessageSize] = '\n';
 
 		APlatform::Console_WriteError(SLogBuffer, SLogTypeSize + MessageSize + 1, SLogTypesColors[(uint8)Type]);

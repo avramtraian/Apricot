@@ -3,17 +3,17 @@
 #pragma once
 
 #include "Apricot/Core/Base.h"
-#include "String.h"
+#include "Strings/String.h"
 
 namespace Apricot {
 
 	template<typename T>
-	APRICOT_API uint64 FormatType(const T& Value, char8* Buffer, uint64 BufferSize);
+	APRICOT_API uint64 FormatType(const T& Value, TChar* Buffer, uint64 BufferSize);
 
 	template<typename T>
-	APRICOT_API uint64 FormatType(T* Value, char8* Buffer, uint64 BufferSize);
+	APRICOT_API uint64 FormatType(T* Value, TChar* Buffer, uint64 BufferSize);
 
-	inline void Internal_Format(const char8* String, uint64 StringSize, char8* Buffer, uint64 BufferSize)
+	inline void Internal_Format(const TChar* String, uint64 StringSize, TChar* Buffer, uint64 BufferSize)
 	{
 		uint64 Offset = 0;
 
@@ -27,7 +27,7 @@ namespace Apricot {
 	}
 
 	template<typename T, typename... Args>
-	void Internal_Format(const char8* String, uint64 StringSize, char8* Buffer, uint64 BufferSize, const T& Value, Args&&... args)
+	void Internal_Format(const TChar* String, uint64 StringSize, TChar* Buffer, uint64 BufferSize, const T& Value, Args&&... args)
 	{
 		uint64 StringOffset = 0;
 		uint64 BufferOffset = 0;
@@ -56,7 +56,7 @@ namespace Apricot {
 	}
 
 	template<typename... Args>
-	void Format(char8* Buffer, uint64 BufferSize, const char8* String, Args&&... args)
+	void Format(TChar* Buffer, uint64 BufferSize, const TChar* String, Args&&... args)
 	{
 		Internal_Format(String, Str_Length(String) + 1, Buffer, BufferSize, std::forward<Args>(args)...);
 	}

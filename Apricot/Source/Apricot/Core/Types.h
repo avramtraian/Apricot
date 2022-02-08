@@ -66,7 +66,7 @@ AE_STATIC_ASSERT(sizeof(float64) == 8, "sizeof(float64) expected to be 64 bits!"
 AE_STATIC_ASSERT(sizeof(bool8)   == 1, "sizeof(bool8) expected to be 8 bits!");
 AE_STATIC_ASSERT(sizeof(bool32)  == 4, "sizeof(bool32) expected to be 32 bits!");
 								 
-AE_STATIC_ASSERT(sizeof(char8)   == 1, "sizeof(char8) expected to be 8 bits!");
+AE_STATIC_ASSERT(sizeof(char8)   == 1, "sizeof(TChar) expected to be 8 bits!");
 AE_STATIC_ASSERT(sizeof(char16)  == 2, "sizeof(char16) expected to be 16 bits!");
 
 #define AE_INT8_MIN   (-127i8 - 1)
@@ -145,3 +145,37 @@ namespace Apricot {
 	}
 	
 }
+
+#include "Char.h"
+
+
+#ifdef AE_PLATFORM_WINDOWS
+	#define AE_PLATFORM TEXT("Windows")
+#endif
+
+#ifdef AE_CONFIG_DEBUG_GAME
+
+	#define AE_CONFIGURATION TEXT("Debug")
+	#define AE_ENGINE_TYPE TEXT("Game")
+
+#elif AE_CONFIG_RELEASE_GAME
+
+	#define AE_CONFIGURATION TEXT("Release")
+	#define AE_ENGINE_TYPE TEXT("Game")
+
+#elif AE_CONFIG_SHIPPING_GAME
+
+	#define AE_CONFIGURATION TEXT("Shipping")
+	#define AE_ENGINE_TYPE TEXT("Game")
+
+#elif AE_CONFIG_DEBUG_EDITOR
+
+	#define AE_CONFIGURATION TEXT("Debug")
+	#define AE_ENGINE_TYPE TEXT("Editor")
+
+#elif AE_CONFIG_RELEASE_EDITOR
+
+	#define AE_CONFIGURATION TEXT("Release")
+	#define AE_ENGINE_TYPE TEXT("Editor")
+
+#endif

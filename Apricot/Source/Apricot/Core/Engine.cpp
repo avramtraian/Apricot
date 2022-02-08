@@ -11,6 +11,8 @@
 #include "Apricot/Events/KeyboardEvents.h"
 #include "Apricot/Events/MouseEvents.h"
 
+#include "Apricot/Containers/Hash.h"
+
 namespace Apricot {
 
 	AEngine* GEngine = nullptr;
@@ -28,9 +30,9 @@ namespace Apricot {
 			return AE_EXIT_FAILED_INIT;
 		}
 
-		AE_CORE_DEBUG("{}", AMemoryDebugger::GetRegionsUsageString());
-		AE_CORE_DEBUG("{}", AMemoryDebugger::GetSubregionsUsageString());
-		AE_CORE_DEBUG("{}", AMemoryDebugger::GetTaggedUsageString());
+		AE_CORE_DEBUG(TEXT("{}"), AMemoryDebugger::GetRegionsUsageString());
+		AE_CORE_DEBUG(TEXT("{}"), AMemoryDebugger::GetSubregionsUsageString());
+		AE_CORE_DEBUG(TEXT("{}"), AMemoryDebugger::GetTaggedUsageString());
 
 		while (true)
 		{
@@ -68,11 +70,11 @@ namespace Apricot {
 	{
 		ALogger::Init();
 
-		AE_CORE_INFO("Engine initialization succeded!");
-		AE_CORE_INFO("Instance Info:");
-		AE_CORE_INFO("    Platform:      {}", AE_PLATFORM);
-		AE_CORE_INFO("    Configuration: {}", AE_CONFIGURATION);
-		AE_CORE_INFO("    Instance Type: {}", AE_ENGINE_TYPE);
+		AE_CORE_INFO(TEXT("Engine initialization succeded!"));
+		AE_CORE_INFO(TEXT("Instance Info:"));
+		AE_CORE_INFO(TEXT("    Platform:      {}"), AE_PLATFORM);
+		AE_CORE_INFO(TEXT("    Configuration: {}"), AE_CONFIGURATION);
+		AE_CORE_INFO(TEXT("    Instance Type: {}"), AE_ENGINE_TYPE);
 
 		return true;
 	}

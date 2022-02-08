@@ -34,8 +34,8 @@ namespace Apricot {
 
 		static void Console_Attach();
 		static void Console_Free();
-		static void Console_Write(const char8* Message, uint64 MessageSize, EConsoleTextColor Color);
-		static void Console_WriteError(const char8* Message, uint64 MessageSize, EConsoleTextColor Color);
+		static void Console_Write(const TChar* Message, uint64 MessageSize, EConsoleTextColor Color);
+		static void Console_WriteError(const TChar* Message, uint64 MessageSize, EConsoleTextColor Color);
 	};
 
 }

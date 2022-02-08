@@ -294,51 +294,51 @@ namespace Apricot { namespace Testbed {
 	{
 		if (Vector_Create_Destroy())
 		{
-			AE_CORE_INFO("Vector_Create_Destroy test passed.");
+			AE_CORE_INFO(TEXT("Vector_Create_Destroy test passed."));
 		}
 		else
 		{
-			AE_CORE_ERROR("Vector_Create_Destroy test failed.");
+			AE_CORE_ERROR(TEXT("Vector_Create_Destroy test failed."));
 		}
 		if (Vector_Create_Destroy_Custom_Allocators())
 		{
-			AE_CORE_INFO("Vector_Create_Destroy_Custom_Allocators test passed.");
+			AE_CORE_INFO(TEXT("Vector_Create_Destroy_Custom_Allocators test passed."));
 		}
 		else
 		{
-			AE_CORE_ERROR("Vector_Create_Destroy_Custom_Allocators test failed.");
+			AE_CORE_ERROR(TEXT("Vector_Create_Destroy_Custom_Allocators test failed."));
 		}
 		if (Vector_Push_Emplace_Pop_Back())
 		{
-			AE_CORE_INFO("Vector_Push_Emplace_Pop_Back test passed.");
+			AE_CORE_INFO(TEXT("Vector_Push_Emplace_Pop_Back test passed."));
 		}
 		else
 		{
-			AE_CORE_ERROR("Vector_Push_Emplace_Pop_Back test failed.");
+			AE_CORE_ERROR(TEXT("Vector_Push_Emplace_Pop_Back test failed."));
 		}
 		if (Vector_Push_Emplace_Pop_Back_Custom_Allocators())
 		{
-			AE_CORE_INFO("Vector_Push_Emplace_Pop_Back_Custom_Allocators test passed.");
+			AE_CORE_INFO(TEXT("Vector_Push_Emplace_Pop_Back_Custom_Allocators test passed."));
 		}
 		else
 		{
-			AE_CORE_ERROR("Vector_Push_Emplace_Pop_Back_Custom_Allocators test failed.");
+			AE_CORE_ERROR(TEXT("Vector_Push_Emplace_Pop_Back_Custom_Allocators test failed."));
 		}
 		if (Vector_Copy_Move())
 		{
-			AE_CORE_INFO("Vector_Copy_Move test passed.");
+			AE_CORE_INFO(TEXT("Vector_Copy_Move test passed."));
 		}
 		else
 		{
-			AE_CORE_ERROR("Vector_Copy_Move test failed.");
+			AE_CORE_ERROR(TEXT("Vector_Copy_Move test failed."));
 		}
 		if (Vector_Copy_Move_Custom_Allocators())
 		{
-			AE_CORE_INFO("Vector_Copy_Move_Custom_Allocators test passed.");
+			AE_CORE_INFO(TEXT("Vector_Copy_Move_Custom_Allocators test passed."));
 		}
 		else
 		{
-			AE_CORE_ERROR("Vector_Copy_Move_Custom_Allocators test failed.");
+			AE_CORE_ERROR(TEXT("Vector_Copy_Move_Custom_Allocators test failed."));
 		}
 	}
 

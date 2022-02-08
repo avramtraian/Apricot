@@ -10,18 +10,18 @@
 	#define AE_DEBUG_CHECK(Expression)                                                                \
 		if (!(Expression))                                                                            \
 		{                                                                                             \
-			GCrashReporter->PreCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, #Expression, nullptr);  \
+			GCrashReporter->PreCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), nullptr);  \
 			AE_DEBUGBREAK();                                                                          \
-			GCrashReporter->PostCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, #Expression, nullptr); \
+			GCrashReporter->PostCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), nullptr); \
 		}
 
 	#define AE_DEBUG_CHECK_M(Expression, ...)                                                                                 \
 		if (!(Expression))                                                                                                    \
 		{                                                                                                                     \
-			Format(GCrashReporter->AssertionBuffer, GCrashReporter->AssertionBufferSize, ""##__VA_ARGS__);                    \
-			GCrashReporter->PreCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, #Expression, GCrashReporter->AssertionBuffer);  \
+			Format(GCrashReporter->AssertionBuffer, GCrashReporter->AssertionBufferSize, TEXT("")##__VA_ARGS__);                    \
+			GCrashReporter->PreCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), GCrashReporter->AssertionBuffer);  \
 			AE_DEBUGBREAK();                                                                                                  \
-			GCrashReporter->PostCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, #Expression, GCrashReporter->AssertionBuffer); \
+			GCrashReporter->PostCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), GCrashReporter->AssertionBuffer); \
 		}
 
 	#define AE_DEBUG_CHECK_NO_ENTRY()                                                  \
@@ -56,18 +56,18 @@
 	#define AE_CHECK(Expression) \
 		if (!(Expression))                                                                            \
 		{                                                                                             \
-			GCrashReporter->PreCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, #Expression, nullptr);  \
+			GCrashReporter->PreCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), nullptr);  \
 			AE_DEBUGBREAK();                                                                          \
-			GCrashReporter->PostCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, #Expression, nullptr); \
+			GCrashReporter->PostCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), nullptr); \
 		}
 	
 	#define AE_CHECK_M(Expression, ...) \
 		if (!(Expression))                                                                                                    \
 		{                                                                                                                     \
-			Format(GCrashReporter->AssertionBuffer, GCrashReporter->AssertionBufferSize, ""##__VA_ARGS__);                    \
-			GCrashReporter->PreCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, #Expression, GCrashReporter->AssertionBuffer);  \
+			Format(GCrashReporter->AssertionBuffer, GCrashReporter->AssertionBufferSize, TEXT("")##__VA_ARGS__);                    \
+			GCrashReporter->PreCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), GCrashReporter->AssertionBuffer);  \
 			AE_DEBUGBREAK();                                                                                                  \
-			GCrashReporter->PostCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, #Expression, GCrashReporter->AssertionBuffer); \
+			GCrashReporter->PostCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), GCrashReporter->AssertionBuffer); \
 		}
 
 	#define AE_CHECK_NO_ENTRY()                                                        \
@@ -102,18 +102,18 @@
 #define AE_VERIFY(Expression)                                                                          \
 		if (!(Expression))                                                                             \
 		{                                                                                              \
-			GCrashReporter->PreVerifyFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, #Expression, nullptr);  \
+			GCrashReporter->PreVerifyFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), nullptr);  \
 			AE_DEBUGBREAK();                                                                           \
-			GCrashReporter->PostVerifyFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, #Expression, nullptr); \
+			GCrashReporter->PostVerifyFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), nullptr); \
 		}
 
 	#define AE_VERIFY_M(Expression, ...)                                                                                       \
 		if (!(Expression))                                                                                                     \
 		{                                                                                                                      \
-			Format(GCrashReporter->AssertionBuffer, GCrashReporter->AssertionBufferSize, ""##__VA_ARGS__);                     \
-			GCrashReporter->PreVerifyFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, #Expression, GCrashReporter->AssertionBuffer);  \
+			Format(GCrashReporter->AssertionBuffer, GCrashReporter->AssertionBufferSize, TEXT("")##__VA_ARGS__);                     \
+			GCrashReporter->PreVerifyFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), GCrashReporter->AssertionBuffer);  \
 			AE_DEBUGBREAK();                                                                                                   \
-			GCrashReporter->PostVerifyFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, #Expression, GCrashReporter->AssertionBuffer); \
+			GCrashReporter->PostVerifyFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), GCrashReporter->AssertionBuffer); \
 		}
 
 #else
@@ -130,27 +130,27 @@
 	#define AE_ENSURE(Expression)                                                                  \
 		if (!(Expression))                                                                         \
 		{                                                                                          \
-			GCrashReporter->EnsureFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, #Expression, nullptr); \
+			GCrashReporter->EnsureFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), nullptr); \
 		}
 										        
 	#define AE_ENSURE_M(Expression, ...)                                                                                   \
 		if (!(Expression))                                                                                                 \
 		{                                                                                                                  \
-			Format(GCrashReporter->AssertionBuffer, GCrashReporter->AssertionBufferSize, ""##__VA_ARGS__);                 \
-			GCrashReporter->EnsureFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, #Expression, GCrashReporter->AssertionBuffer); \
+			Format(GCrashReporter->AssertionBuffer, GCrashReporter->AssertionBufferSize, TEXT("")##__VA_ARGS__);                 \
+			GCrashReporter->EnsureFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), GCrashReporter->AssertionBuffer); \
 		}
 										        
 	#define AE_ENSURE_ALWAYS(Expression)                                                                 \
 		if (!(Expression))                                                                               \
 		{                                                                                                \
-			GCrashReporter->EnsureAlwaysFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, #Expression, nullptr); \
+			GCrashReporter->EnsureAlwaysFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), nullptr); \
 		}
 
 	#define AE_ENSURE_ALWAYS_M(Expression, ...)                                                                                  \
 		if (!(Expression))                                                                                                       \
 		{                                                                                                                        \
-			Format(GCrashReporter->AssertionBuffer, GCrashReporter->AssertionBufferSize, ""##__VA_ARGS__);                       \
-			GCrashReporter->EnsureAlwaysFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, #Expression, GCrashReporter->AssertionBuffer); \
+			Format(GCrashReporter->AssertionBuffer, GCrashReporter->AssertionBufferSize,  TEXT("")##__VA_ARGS__);                       \
+			GCrashReporter->EnsureAlwaysFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), GCrashReporter->AssertionBuffer); \
 		}
 
 #else

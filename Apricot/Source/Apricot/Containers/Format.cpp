@@ -8,14 +8,14 @@
 namespace Apricot {
 	
 	template<typename T>
-	APRICOT_API uint64 FormatType(const T& Value, char8* Buffer, uint64 BufferSize)
+	APRICOT_API uint64 FormatType(const T& Value, TChar* Buffer, uint64 BufferSize)
 	{
 		AE_STATIC_ASSERT(false, "Specialize FormatType<T> in order to format this type!");
 		return 0;
 	}
 
 	template<>
-	APRICOT_API uint64 FormatType(const uint64& Value, char8* Buffer, uint64 BufferSize)
+	APRICOT_API uint64 FormatType(const uint64& Value, TChar* Buffer, uint64 BufferSize)
 	{
 		if (Value == 0)
 		{
@@ -50,25 +50,25 @@ namespace Apricot {
 	}
 
 	template<>
-	APRICOT_API uint64 FormatType(const uint8& Value, char8* Buffer, uint64 BufferSize)
+	APRICOT_API uint64 FormatType(const uint8& Value, TChar* Buffer, uint64 BufferSize)
 	{
 		return FormatType<uint64>((uint64)Value, Buffer, BufferSize);
 	}
 	
 	template<>
-	APRICOT_API uint64 FormatType(const uint16& Value, char8* Buffer, uint64 BufferSize)
+	APRICOT_API uint64 FormatType(const uint16& Value, TChar* Buffer, uint64 BufferSize)
 	{
 		return FormatType<uint64>((uint64)Value, Buffer, BufferSize);
 	}
 	
 	template<>
-	APRICOT_API uint64 FormatType(const uint32& Value, char8* Buffer, uint64 BufferSize)
+	APRICOT_API uint64 FormatType(const uint32& Value, TChar* Buffer, uint64 BufferSize)
 	{
 		return FormatType<uint64>((uint64)Value, Buffer, BufferSize);
 	}
 
 	template<>
-	APRICOT_API uint64 FormatType(const int64& Value, char8* Buffer, uint64 BufferSize)
+	APRICOT_API uint64 FormatType(const int64& Value, TChar* Buffer, uint64 BufferSize)
 	{
 		if (Value == 0)
 		{
@@ -110,25 +110,25 @@ namespace Apricot {
 	}
 
 	template<>
-	APRICOT_API uint64 FormatType(const int8& Value, char8* Buffer, uint64 BufferSize)
+	APRICOT_API uint64 FormatType(const int8& Value, TChar* Buffer, uint64 BufferSize)
 	{
 		return FormatType<int64>((int64)Value, Buffer, BufferSize);
 	}
 	
 	template<>
-	APRICOT_API uint64 FormatType(const int16& Value, char8* Buffer, uint64 BufferSize)
+	APRICOT_API uint64 FormatType(const int16& Value, TChar* Buffer, uint64 BufferSize)
 	{
 		return FormatType<int64>((int64)Value, Buffer, BufferSize);
 	}
 	
 	template<>
-	APRICOT_API uint64 FormatType(const int32& Value, char8* Buffer, uint64 BufferSize)
+	APRICOT_API uint64 FormatType(const int32& Value, TChar* Buffer, uint64 BufferSize)
 	{
 		return FormatType<int64>((int64)Value, Buffer, BufferSize);
 	}
 
 	template<>
-	APRICOT_API uint64 FormatType(const float64& Value, char8* Buffer, uint64 BufferSize)
+	APRICOT_API uint64 FormatType(const float64& Value, TChar* Buffer, uint64 BufferSize)
 	{
 		uint8 IntegralDigits[32] = { 0 };
 		uint8 IntegralDigitsCount = 0;
@@ -213,13 +213,13 @@ namespace Apricot {
 	}
 
 	template<>
-	APRICOT_API uint64 FormatType(const float32& Value, char8* Buffer, uint64 BufferSize)
+	APRICOT_API uint64 FormatType(const float32& Value, TChar* Buffer, uint64 BufferSize)
 	{
 		return FormatType<float64>((float64)Value, Buffer, BufferSize);
 	}
 
 	template<>
-	APRICOT_API uint64 FormatType(const bool8& Value, char8* Buffer, uint64 BufferSize)
+	APRICOT_API uint64 FormatType(const bool8& Value, TChar* Buffer, uint64 BufferSize)
 	{
 		if (Value)
 		{
@@ -244,7 +244,7 @@ namespace Apricot {
 	}
 
 	template<>
-	APRICOT_API uint64 FormatType(const char8* Value, char8* Buffer, uint64 BufferSize)
+	APRICOT_API uint64 FormatType(const TChar* Value, TChar* Buffer, uint64 BufferSize)
 	{
 		uint64 StringSize = Str_Length(Value);
 		if (BufferSize < StringSize)
@@ -252,18 +252,18 @@ namespace Apricot {
 			StringSize = BufferSize;
 		}
 
-		Memory_Copy(Buffer, Value, StringSize * sizeof(char8));
+		Memory_Copy(Buffer, Value, StringSize * sizeof(TChar));
 		return StringSize;
 	}
 
 	template<>
-	APRICOT_API uint64 FormatType(char8* Value, char8* Buffer, uint64 BufferSize)
+	APRICOT_API uint64 FormatType(TChar* Value, TChar* Buffer, uint64 BufferSize)
 	{
-		return FormatType<const char8>(Value, Buffer, BufferSize);
+		return FormatType<const TChar>(Value, Buffer, BufferSize);
 	}
 
 	template<>
-	APRICOT_API uint64 FormatType(const void* Value, char8* Buffer, uint64 BufferSize)
+	APRICOT_API uint64 FormatType(const void* Value, TChar* Buffer, uint64 BufferSize)
 	{
 		return FormatType<uint64>((uint64)Value, Buffer, BufferSize);
 	}

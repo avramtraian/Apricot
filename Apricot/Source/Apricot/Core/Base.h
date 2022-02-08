@@ -6,7 +6,6 @@
 * Platform detection
 */
 #ifdef AE_PLATFORM_WINDOWS
-	#define AE_PLATFORM "Windows"
 #else
 	#error "Apricot only supports Windows!"
 #endif
@@ -46,28 +45,18 @@
 #ifdef AE_CONFIG_DEBUG_GAME
 	#define AE_DEBUG
 	#define AE_GAME
-	#define AE_CONFIGURATION "Debug"
-	#define AE_ENGINE_TYPE "Game"
 #elif AE_CONFIG_RELEASE_GAME
 	#define AE_RELEASE
 	#define AE_GAME
-	#define AE_CONFIGURATION "Release"
-	#define AE_ENGINE_TYPE "Game"
 #elif AE_CONFIG_SHIPPING_GAME
 	#define AE_SHIPPING
 	#define AE_GAME
-	#define AE_CONFIGURATION "Shipping"
-	#define AE_ENGINE_TYPE "Game"
 #elif AE_CONFIG_DEBUG_EDITOR
 	#define AE_DEBUG
 	#define AE_EDITOR
-	#define AE_CONFIGURATION "Debug"
-	#define AE_ENGINE_TYPE "Editor"
 #elif AE_CONFIG_RELEASE_EDITOR
 	#define AE_RELEASE
 	#define AE_EDITOR
-	#define AE_CONFIGURATION "Release"
-	#define AE_ENGINE_TYPE "Editor"
 #else
 	#error "Unknown configuration macro!"
 #endif
@@ -119,9 +108,6 @@
 	#define AE_STATIC_ASSERT(...) static_assert(__VA_ARGS__)
 	#define AE_DEBUGBREAK() __debugbreak()
 	#define AE_LINE __LINE__
-	#define AE_FILE __FILE__
-	#define AE_FUNCTION __FUNCTION__
-	#define AE_FUNCTION_SIG __FUNCSIG__
 
 	#define NODISCARD [[nodiscard]]
 	#define FORCEINLINE __forceinline

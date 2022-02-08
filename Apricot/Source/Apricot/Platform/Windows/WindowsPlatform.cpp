@@ -91,25 +91,25 @@ namespace Apricot {
 		SWindowsPlatformData.bIsConsoleAttached = false;
 	}
 
-	void APlatform::Console_Write(const char8* Message, uint64 MessageSize, EConsoleTextColor Color)
+	void APlatform::Console_Write(const TChar* Message, uint64 MessageSize, EConsoleTextColor Color)
 	{
 		if (SWindowsPlatformData.bIsConsoleAttached)
 		{
 			SetConsoleTextAttribute(SWindowsPlatformData.Console_OutputHandle, (WORD)Color);
 
 			DWORD NumberOfCharsWritten = 0;
-			WriteConsoleA(SWindowsPlatformData.Console_OutputHandle, Message, (DWORD)MessageSize, &NumberOfCharsWritten, NULL);
+			WriteConsole(SWindowsPlatformData.Console_OutputHandle, Message, (DWORD)MessageSize, &NumberOfCharsWritten, NULL);
 		}
 	}
 
-	void APlatform::Console_WriteError(const char8* Message, uint64 MessageSize, EConsoleTextColor Color)
+	void APlatform::Console_WriteError(const TChar* Message, uint64 MessageSize, EConsoleTextColor Color)
 	{
 		if (SWindowsPlatformData.bIsConsoleAttached)
 		{
 			SetConsoleTextAttribute(SWindowsPlatformData.Console_ErrorHandle, (WORD)Color);
 
 			DWORD NumberOfCharsWritten = 0;
-			WriteConsoleA(SWindowsPlatformData.Console_ErrorHandle, Message, (DWORD)MessageSize, &NumberOfCharsWritten, NULL);
+			WriteConsole(SWindowsPlatformData.Console_ErrorHandle, Message, (DWORD)MessageSize, &NumberOfCharsWritten, NULL);
 		}
 	}
 

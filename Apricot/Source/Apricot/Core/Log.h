@@ -24,25 +24,25 @@ namespace Apricot {
 		static void Init();
 		static void Destroy();
 
-		static void Write(ELog Type, const char8* Message);
-		static void WriteError(ELog Type, const char8* Message);
+		static void Write(ELog Type, const TChar* Message);
+		static void WriteError(ELog Type, const TChar* Message);
 
 		template<typename... Args>
-		static void Write(ELog Type, const char8* Message, Args&&... args)
+		static void Write(ELog Type, const TChar* Message, Args&&... args)
 		{
 			Format(SBuffer, AE_ARRAY_LENGTH(SBuffer), Message, std::forward<Args>(args)...);
 			Write(Type, SBuffer);
 		}
 
 		template<typename... Args>
-		static void WriteError(ELog Type, const char8* Message, Args&&... args)
+		static void WriteError(ELog Type, const TChar* Message, Args&&... args)
 		{
 			Format(SBuffer, AE_ARRAY_LENGTH(SBuffer), Message, std::forward<Args>(args)...);
 			WriteError(Type, SBuffer);
 		}
 
 	private:
-		static char8 SBuffer[32000];
+		static TChar SBuffer[32000];
 	};
 
 }

@@ -36,7 +36,7 @@ namespace Apricot {
 	{
 		if (m_Memory && m_OwnsMemory)
 		{
-			AE_CORE_ERROR("Linear Allocator not destroyed! Always call ALinearAllocator::Destroy!");
+			AE_CORE_ERROR(TEXT("Linear Allocator not destroyed! Always call ALinearAllocator::Destroy!"));
 			AE_DEBUG_CHECK(false);
 		}
 	}
@@ -47,12 +47,12 @@ namespace Apricot {
 		{
 			if (Allocator->m_Memory)
 			{
-				AE_CORE_ERROR("Attempting to create an allocator which is already initialized!");
+				AE_CORE_ERROR(TEXT("Attempting to create an allocator which is already initialized!"));
 				return;
 			}
 			if (TotalSize != 0)
 			{
-				AE_CORE_WARN("Attempting to create an ALinearAllocator with 0 total size!");
+				AE_CORE_WARN(TEXT("Attempting to create an ALinearAllocator with 0 total size!"));
 				return;
 			}
 			
@@ -73,7 +73,7 @@ namespace Apricot {
 		}
 		else
 		{
-			AE_CORE_WARN("ALinearAllocator::Create -> Invalid Allocator parameter.");
+			AE_CORE_WARN(TEXT("ALinearAllocator::Create -> Invalid Allocator parameter."));
 		}
 	}
 
@@ -83,7 +83,7 @@ namespace Apricot {
 		{
 			if (Allocator->m_TotalSize == 0)
 			{
-				AE_CORE_WARN("Attempting to destroy an ALinearAllocator with valid memory pointer, but 0 total size. Corruption?");
+				AE_CORE_WARN(TEXT("Attempting to destroy an ALinearAllocator with valid memory pointer, but 0 total size. Corruption?"));
 				return;
 			}
 
@@ -98,7 +98,7 @@ namespace Apricot {
 		}
 		else
 		{
-			AE_CORE_WARN("ALinearAllocator::Destroy -> Invalid or already destroyed Allocator parameter.");
+			AE_CORE_WARN(TEXT("ALinearAllocator::Destroy -> Invalid or already destroyed Allocator parameter."));
 		}
 	}
 

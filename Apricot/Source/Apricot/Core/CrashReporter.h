@@ -13,20 +13,20 @@ namespace Apricot {
 		static void Destroy();
 
 	public:
-		void PreCheckFailed(const char8* File, const char8* Function, uint64 Line, const char8* Expression, const char8* Message);
-		void PostCheckFailed(const char8* File, const char8* Function, uint64 Line, const char8* Expression, const char8* Message);
+		void PreCheckFailed(const TChar* File, const TChar* Function, uint64 Line, const TChar* Expression, const TChar* Message);
+		void PostCheckFailed(const TChar* File, const TChar* Function, uint64 Line, const TChar* Expression, const TChar* Message);
 
-		void PreCheckNoEntryFailed(const char8* File, const char8* Function, uint64 Line);
-		void PostCheckNoEntryFailed(const char8* File, const char8* Function, uint64 Line);
+		void PreCheckNoEntryFailed(const TChar* File, const TChar* Function, uint64 Line);
+		void PostCheckNoEntryFailed(const TChar* File, const TChar* Function, uint64 Line);
 
-		void PreCheckUnimplementedFailed(const char8* File, const char8* Function, uint64 Line);
-		void PostCheckUnimplementedFailed(const char8* File, const char8* Function, uint64 Line);
+		void PreCheckUnimplementedFailed(const TChar* File, const TChar* Function, uint64 Line);
+		void PostCheckUnimplementedFailed(const TChar* File, const TChar* Function, uint64 Line);
 
-		void PreVerifyFailed(const char8* File, const char8* Function, uint64 Line, const char8* Expression, const char8* Message);
-		void PostVerifyFailed(const char8* File, const char8* Function, uint64 Line, const char8* Expression, const char8* Message);
+		void PreVerifyFailed(const TChar* File, const TChar* Function, uint64 Line, const TChar* Expression, const TChar* Message);
+		void PostVerifyFailed(const TChar* File, const TChar* Function, uint64 Line, const TChar* Expression, const TChar* Message);
 
-		void EnsureFailed(const char8* File, const char8* Function, uint64 Line, const char8* Expression, const char8* Message);
-		void EnsureAlwaysFailed(const char8* File, const char8* Function, uint64 Line, const char8* Expression, const char8* Message);
+		void EnsureFailed(const TChar* File, const TChar* Function, uint64 Line, const TChar* Expression, const TChar* Message);
+		void EnsureAlwaysFailed(const TChar* File, const TChar* Function, uint64 Line, const TChar* Expression, const TChar* Message);
 
 	private:
 		ACrashReporter();
@@ -35,11 +35,11 @@ namespace Apricot {
 		ACrashReporter& operator=(const ACrashReporter&) = delete;
 
 	public:
-		char8* AssertionBuffer = nullptr;
+		TChar* AssertionBuffer = nullptr;
 		uint64 AssertionBufferSize = 0;
 
 	private:
-		char8* m_InternalBuffer = nullptr;
+		TChar* m_InternalBuffer = nullptr;
 		uint64 m_InternalBufferSize = 0;
 	};
 

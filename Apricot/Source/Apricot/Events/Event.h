@@ -122,12 +122,12 @@ namespace Apricot {
 				}
 				case EEventType::None:
 				{
-					AE_CORE_ERROR("Invalid '{}' EventType!", (uint16)m_Event->GetType());
+					AE_CORE_ERROR(TEXT("Invalid '{}' EventType!"), (uint16)m_Event->GetType());
 					break;
 				}
 				default:
 				{
-					AE_CORE_ERROR("Corrupt '{}' EventType!", (uint16)m_Event->GetType());
+					AE_CORE_ERROR(TEXT("Corrupt '{}' EventType!"), (uint16)m_Event->GetType());
 					break;
 				}
 			}

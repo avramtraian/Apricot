@@ -93,9 +93,9 @@ namespace Apricot {
 		static void Init();
 		static void Destroy();
 
-		static char8* GetRegionsUsageString();
-		static char8* GetSubregionsUsageString();
-		static char8* GetTaggedUsageString();
+		static TChar* GetRegionsUsageString();
+		static TChar* GetSubregionsUsageString();
+		static TChar* GetTaggedUsageString();
 
 	public:
 		/* REGIONS */
