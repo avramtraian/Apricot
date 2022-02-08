@@ -48,7 +48,7 @@ namespace Apricot {
 	{
 	}
 
-	APRICOT_API void* AMalloc::Alloc(uint64 Size)
+	void* AMalloc::Alloc(uint64 Size, uint64 Alignment /*= AE_PTR_SIZE*/)
 	{
 		if (Size == 0)
 		{
@@ -58,7 +58,17 @@ namespace Apricot {
 		return APlatformMemory::Malloc(Size, 0);
 	}
 
-	APRICOT_API void AMalloc::Free(void* Allocation)
+	int32 AMalloc::TryAlloc(uint64 Size, void** OutPointer, uint64 Alignment /*= AE_PTR_SIZE*/)
+	{
+		*OutPointer = Alloc(Size);
+		if (OutPointer)
+		{
+			return 1;
+		}
+		return 0;
+	}
+
+	void AMalloc::Free(void* Allocation)
 	{
 		if (!Allocation)
 		{
@@ -68,22 +78,14 @@ namespace Apricot {
 		APlatformMemory::Free(Allocation, 0);
 	}
 
-	APRICOT_API void* AMalloc::Alloc(uint64 Size, const TChar* File, const TChar* Func, uint64 Line)
+	int32 AMalloc::TryFree(void* Allocation)
 	{
-		void* Allocation = Alloc(Size);
-	#ifdef AE_ENABLE_MEMORY_TRACE
-		GMemoryProfiler->SubmitLowLevelMalloc(Size, File, Func, Line);
-	#endif
-		return Allocation;
-	}
-
-	APRICOT_API void AMalloc::Free(void* Allocation, const TChar* File, const TChar* Func, uint64 Line)
-	{
-	#ifdef AE_ENABLE_MEMORY_TRACE
-		uint64 AllocationSize = APlatformMemory::GetAllocationSize(Allocation);
-		GMemoryProfiler->SubmitLowLevelFree(AllocationSize, File, Func, Line);
-	#endif
+		if (!Allocation)
+		{
+			return -1;
+		}
 		Free(Allocation);
+		return 1;
 	}
 
 	APRICOT_API void MemCpy(void* Destination, const void* Source, uint64 SizeBytes)

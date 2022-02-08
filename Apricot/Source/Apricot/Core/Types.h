@@ -82,6 +82,8 @@ AE_STATIC_ASSERT(sizeof(char16)  == 2, "sizeof(char16) expected to be 16 bits!")
 #define AE_UINT32_MAX 0xffffffffui32
 #define AE_UINT64_MAX 0xffffffffffffffffui64
 
+#define AE_PTR_SIZE (sizeof(void*))
+
 namespace Apricot {
 
 	template<typename T>

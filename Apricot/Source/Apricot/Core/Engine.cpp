@@ -5,6 +5,7 @@
 
 #include "Platform.h"
 #include "Memory/Memory.h"
+#include "Memory/ApricotMemory.h"
 
 #include "Apricot/Events/ApplicationEvents.h"
 #include "Apricot/Events/WindowEvents.h"

@@ -18,6 +18,29 @@
 
 namespace Apricot {
 
+	enum EAllocationReturn : int32
+	{
+		AE_ALLOC_NONE            =  0,
+							     
+		AE_ALLOC_SUCCESSFULLY    =  1,
+		AE_ALLOC_UNKNOWN_FAILURE = -1,
+		AE_ALLOC_OUT_OF_MEMORY   = -2,
+		AE_ALLOC_BAD_ARENA       = -3,
+		AE_ALLOC_INVALID_SIZE    = -4,
+	};
+
+	enum EFreeReturn : int32
+	{
+		AE_FREE_NONE                 =  0,
+							            
+		AE_FREE_SUCCESSFULLY         =  1,
+		AE_FREE_UNKNOWN_FAILURE      = -1,
+		AE_FREE_POINTER_OUT_OF_RANGE = -2,
+		AE_FREE_BAD_ARENA            = -3,
+		AE_FREE_BAD_POINTER          = -4,
+		AE_FREE_ALREADY_FREED        = -5,
+	};
+
 	/**
 	* 
 	*/
@@ -46,17 +69,17 @@ namespace Apricot {
 	/**
 	* 
 	*/
-	class AMalloc
+	class APRICOT_API AMalloc
 	{
 	public:
 		AMalloc();
 		virtual ~AMalloc();
 
-		APRICOT_API virtual void* Alloc(uint64 Size);
-		APRICOT_API virtual void Free(void* Allocation);
+		virtual void* Alloc(uint64 Size, uint64 Alignment = AE_PTR_SIZE);
+		virtual int32 TryAlloc(uint64 Size, void** OutPointer, uint64 Alignment = AE_PTR_SIZE);
 
-		APRICOT_API virtual void* Alloc(uint64 Size, const TChar* File, const TChar* Func, uint64 Line);
-		APRICOT_API virtual void Free(void* Allocation, const TChar* File, const TChar* Func, uint64 Line);
+		virtual void Free(void* Allocation);
+		virtual int32 TryFree(void* Allocation);
 	};
 
 	APRICOT_API extern AMalloc* GMalloc;
@@ -74,7 +97,7 @@ namespace Apricot {
 	/**
 	* 
 	*/
-	class AMemoryArena : public AMalloc
+	class APRICOT_API AMemoryArena : public AMalloc
 	{
 	public:
 		enum class EFailureMode : uint8
