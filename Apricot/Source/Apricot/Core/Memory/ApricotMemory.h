@@ -18,7 +18,7 @@
 
 namespace Apricot {
 
-	enum EAllocationReturn : int32
+	enum EAllocErrors : int32
 	{
 		AE_ALLOC_NONE            =  0,
 							     
@@ -27,9 +27,10 @@ namespace Apricot {
 		AE_ALLOC_OUT_OF_MEMORY   = -2,
 		AE_ALLOC_BAD_ARENA       = -3,
 		AE_ALLOC_INVALID_SIZE    = -4,
+		AE_ALLOC_INVALID_PARAM   = -5,
 	};
 
-	enum EFreeReturn : int32
+	enum EFreeErrors : int32
 	{
 		AE_FREE_NONE                 =  0,
 							            
@@ -75,11 +76,13 @@ namespace Apricot {
 		AMalloc();
 		virtual ~AMalloc();
 
-		virtual void* Alloc(uint64 Size, uint64 Alignment = AE_PTR_SIZE);
-		virtual int32 TryAlloc(uint64 Size, void** OutPointer, uint64 Alignment = AE_PTR_SIZE);
+		NODISCARD virtual void* Alloc(uint64 Size, uint64 Alignment = sizeof(void*));
+		NODISCARD virtual int32 TryAlloc(uint64 Size, void** OutPointer, uint64 Alignment = sizeof(void*));
+		NODISCARD virtual void* AllocUnsafe(uint64 Size, uint64 Alignment = sizeof(void*));
 
-		virtual void Free(void* Allocation);
-		virtual int32 TryFree(void* Allocation);
+		virtual void Free(void* Allocation, uint64 Size);
+		virtual int32 TryFree(void* Allocation, uint64 Size);
+		virtual void FreeUnsafe(void* Allocation, uint64 Size);
 	};
 
 	APRICOT_API extern AMalloc* GMalloc;
@@ -103,7 +106,7 @@ namespace Apricot {
 		enum class EFailureMode : uint8
 		{
 			None = 0,
-			Assert, Fatal, Ignore,
+			Assert, Error, Ignore,
 			Max
 		};
 

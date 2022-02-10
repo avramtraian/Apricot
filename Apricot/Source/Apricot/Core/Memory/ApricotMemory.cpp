@@ -48,44 +48,60 @@ namespace Apricot {
 	{
 	}
 
-	void* AMalloc::Alloc(uint64 Size, uint64 Alignment /*= AE_PTR_SIZE*/)
+	void* AMalloc::Alloc(uint64 Size, uint64 Alignment /*= sizeof(void*) */)
 	{
 		if (Size == 0)
 		{
 			return nullptr;
 		}
 
-		return APlatformMemory::Malloc(Size, 0);
+		return APlatformMemory::Malloc(Size, Alignment);
 	}
 
-	int32 AMalloc::TryAlloc(uint64 Size, void** OutPointer, uint64 Alignment /*= AE_PTR_SIZE*/)
+	int32 AMalloc::TryAlloc(uint64 Size, void** OutPointer, uint64 Alignment /*= sizeof(void*)*/)
 	{
-		*OutPointer = Alloc(Size);
-		if (OutPointer)
+		if (Size == 0)
 		{
-			return 1;
+			return AE_ALLOC_INVALID_SIZE;
 		}
-		return 0;
+		if (!OutPointer)
+		{
+			return AE_ALLOC_INVALID_PARAM;
+		}
+
+		*OutPointer = APlatformMemory::Malloc(Size, Alignment);
+		return AE_ALLOC_SUCCESSFULLY;
 	}
 
-	void AMalloc::Free(void* Allocation)
+	void* AMalloc::AllocUnsafe(uint64 Size, uint64 Alignment /*= sizeof(void*)*/)
+	{
+		return APlatformMemory::Malloc(Size, Alignment);;
+	}
+
+	void AMalloc::Free(void* Allocation, uint64 Size)
 	{
 		if (!Allocation)
 		{
 			return;
 		}
 
-		APlatformMemory::Free(Allocation, 0);
+		APlatformMemory::Free(Allocation, Size);
 	}
 
-	int32 AMalloc::TryFree(void* Allocation)
+	int32 AMalloc::TryFree(void* Allocation, uint64 Size)
 	{
 		if (!Allocation)
 		{
-			return -1;
+			return AE_FREE_BAD_POINTER;
 		}
-		Free(Allocation);
-		return 1;
+
+		APlatformMemory::Free(Allocation, Size);
+		return AE_FREE_SUCCESSFULLY;
+	}
+
+	void AMalloc::FreeUnsafe(void* Allocation, uint64 Size)
+	{
+		APlatformMemory::Free(Allocation, Size);
 	}
 
 	APRICOT_API void MemCpy(void* Destination, const void* Source, uint64 SizeBytes)

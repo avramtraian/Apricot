@@ -30,7 +30,7 @@ namespace Apricot {
 		}
 
 		GMemoryProfiler->~AMemoryProfiler();
-		GMalloc->Free(GMemoryProfiler);
+		GMalloc->Free(GMemoryProfiler, sizeof(AMemoryProfiler));
 		GMemoryProfiler = nullptr;
 	}
 

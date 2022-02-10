@@ -16,6 +16,11 @@
 	using int32 = signed int;
 	using int64 = signed long long;
 
+	/* Currently, Apricot engine runs ONLY on x64 computers. So we don't need to worry */
+/* #ifdef AE_ARCHITECTURE_X64 */
+	using uintptr = uint64;
+/* #endif */
+
 	using float32 = float;
 	using float64 = double;
 
@@ -39,6 +44,8 @@
 	using int32 = int32_t;
 	using int64 = int64_t;
 
+	using uintptr = uintptr_t;
+
 	using float32 = float;
 	using float64 = double;
 
@@ -59,6 +66,8 @@ AE_STATIC_ASSERT(sizeof(int8)    == 1, "sizeof(int8) expected to be 8 bits!");
 AE_STATIC_ASSERT(sizeof(int16)   == 2, "sizeof(int16) expected to be 16 bits!");
 AE_STATIC_ASSERT(sizeof(int32)   == 4, "sizeof(int32) expected to be 32 bits!");
 AE_STATIC_ASSERT(sizeof(int64)   == 8, "sizeof(int64) expected to be 64 bits!");
+
+AE_STATIC_ASSERT(sizeof(uintptr) == sizeof(void*), "sizeof(uintptr) expected to be sizeof(void*)!");
 
 AE_STATIC_ASSERT(sizeof(float32) == 4, "sizeof(float32) expected to be 32 bits!");
 AE_STATIC_ASSERT(sizeof(float64) == 8, "sizeof(float64) expected to be 64 bits!");
@@ -81,8 +90,6 @@ AE_STATIC_ASSERT(sizeof(char16)  == 2, "sizeof(char16) expected to be 16 bits!")
 #define AE_UINT16_MAX 0xffffui16
 #define AE_UINT32_MAX 0xffffffffui32
 #define AE_UINT64_MAX 0xffffffffffffffffui64
-
-#define AE_PTR_SIZE (sizeof(void*))
 
 namespace Apricot {
 

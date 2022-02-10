@@ -67,19 +67,48 @@
 * Debug settings
 */
 #ifdef AE_DEBUG
+	/*  */
 	#define AE_ENABLE_LOG_TRACE
+
+	/*  */
 	#define AE_ENABLE_LOG_DEBUG
+
+	/*  */
 	#define AE_ENABLE_LOG_INFO
+
+	/*  */
 	#define AE_ENABLE_LOG_WARN
+
+	/*  */
 	#define AE_ENABLE_LOG_ERROR
+
+	/*  */
 	#define AE_ENABLE_LOG_FATAL
+
+	/*  */
 	#define AE_ENABLE_DEBUG_CHECKS
+
+	/*  */
 	#define AE_ENABLE_CHECKS
+
+	/*  */
 	#define AE_ENABLE_VERIFIES
+
+	/*  */
 	#define AE_ENABLE_ENSURES
+
+	/*  */
 	#define AE_ENABLE_MEMORY_TRACE
+
+	/* Enables error checking before allocating from an arena */
+	#define AE_ENABLE_MEMORY_CHECK
+
+	/*  */
 	#define AE_ENABLE_PERFORMANCE_PROFILING
+
+	/*  */
 	#define AE_ENABLE_FILESYSTEM_ERROR_CHECK
+
 #elif defined(AE_RELEASE)
 	#define AE_ENABLE_LOG_INFO
 	#define AE_ENABLE_LOG_WARN
@@ -88,6 +117,7 @@
 	#define AE_ENABLE_CHECKS
 	#define AE_ENABLE_VERIFIES
 	#define AE_ENABLE_ENSURES
+	#define AE_ENABLE_MEMORY_CHECK
 	#define AE_ENABLE_FILESYSTEM_ERROR_CHECK
 #endif
 
