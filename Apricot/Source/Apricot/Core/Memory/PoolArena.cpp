@@ -17,7 +17,7 @@ namespace Apricot {
 
 	const TChar* APoolArena::GetDebugName() const
 	{
-		return TEXT("Base_PoolArena");
+		return TEXT("Base_POOLARENA");
 	}
 
 	uint64 APoolArena::GetFreeSize() const
@@ -194,6 +194,26 @@ namespace Apricot {
 	{
 		void* AllocationChunk = (uint8*)Allocation - ((uintptr)Allocation - (uintptr)m_MemoryBlock) % m_ChunkSizeBytes;
 		m_FreeChunks[m_FreeChunksCount++] = AllocationChunk;
+	}
+
+	void APoolArena::FreeAll()
+	{
+		
+	}
+
+	int32 APoolArena::TryFreeAll()
+	{
+		return AE_FREE_SUCCESSFULLY;
+	}
+
+	void APoolArena::FreeAllUnsafe()
+	{
+		
+	}
+
+	void APoolArena::GarbageCollect()
+	{
+		
 	}
 
 	APRICOT_API APoolArena* CreatePoolArena(uint64 ChunksCount, uint64 ChunkSizeBytes, void* Memory /*= nullptr*/, uint64* OutMemoryRequirement /*= nullptr*/)

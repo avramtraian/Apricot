@@ -128,6 +128,17 @@ namespace Apricot {
 		*/
 		virtual void FreeUnsafe(void* Allocation, uint64 Size) override;
 
+		virtual void FreeAll() override;
+
+		virtual int32 TryFreeAll() override;
+
+		virtual void FreeAllUnsafe() override;
+
+		/**
+		* 
+		*/
+		virtual void GarbageCollect() override;
+
 	private:
 		/**
 		* Pointer to the memory that holds the chunks.
@@ -164,7 +175,7 @@ namespace Apricot {
 		friend APRICOT_API void DestroyPoolArena(APoolArena*);
 
 		template<typename T, typename... Args>
-		friend T* MemConstruct(void*, Args&&...);
+		friend constexpr T* MemConstruct(void*, Args&&...);
 	};
 
 	/**

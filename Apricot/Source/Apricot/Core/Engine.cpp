@@ -14,6 +14,10 @@
 
 #include "Apricot/Containers/Hash.h"
 
+#include "Memory/PoolArena.h"
+#include "Memory/LinearArena.h"
+#include "Memory/StackArena.h"
+
 namespace Apricot {
 
 	AEngine* GEngine = nullptr;

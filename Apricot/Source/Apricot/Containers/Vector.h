@@ -29,7 +29,7 @@ namespace Apricot {
 
 			if (Allocator == nullptr)
 			{
-				if (Alloc::GetStaticType() == EAllocatorType::Global)
+				if (Alloc::GetStaticType() == EAllocatorType::Heap)
 				{
 					m_Allocator = (Alloc*)GHeapAllocator;
 				}

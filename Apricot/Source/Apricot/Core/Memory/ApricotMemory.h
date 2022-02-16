@@ -6,15 +6,17 @@
 
 #include <new>
 
-#define AE_ARRAY_LEN(Array)       (sizeof(Array) / sizeof(Array[0]))
-
 #define AE_MEMZERO_STRUCT(Struct) { ::Apricot::MemZero( &Struct, sizeof(  Struct )); }
 #define AE_MEMZERO_ARRAY(Array)   { ::Apricot::MemZero(  Array,  sizeof(  Array  )); }
 #define AE_MEMZERO_PTR(Ptr)       { ::Apricot::MemZero(  Ptr,    sizeof( *Ptr    )); }
 
 #define AE_INVALID_MEMSIZE (static_cast<uint64>(-1))
 
-#define AE_MEMPRF AE_FILE, AE_FUNCTION, AE_LINE
+#define GetAlignmentOffset(MemoryAddress, Alignment) (((uint64)(Alignment) - (uintptr)(MemoryAddress) % (uint64)(Alignment)) % (uint64)(Alignment))
+
+#define AE_KILOBYTES(Kilobytes) ((Kilobytes) * 1024)
+#define AE_MEGABYTES(Megabytes) ((Megabytes) * 1024 * 1024)
+#define AE_GIGABYTES(Gigabytes) ((Gigabytes) * 1024 * 1024 * 1024)
 
 namespace Apricot {
 
@@ -27,7 +29,8 @@ namespace Apricot {
 		AE_ALLOC_OUT_OF_MEMORY   = -2,
 		AE_ALLOC_BAD_ARENA       = -3,
 		AE_ALLOC_INVALID_SIZE    = -4,
-		AE_ALLOC_INVALID_PARAM   = -5,
+		AE_ALLOC_BAD_ALIGNMENT   = -5,
+		AE_ALLOC_INVALID_PARAM   = -6,
 	};
 
 	enum EFreeErrors : int32
@@ -40,6 +43,7 @@ namespace Apricot {
 		AE_FREE_BAD_ARENA            = -3,
 		AE_FREE_BAD_POINTER          = -4,
 		AE_FREE_ALREADY_FREED        = -5,
+		AE_FREE_SIZE_TOO_BIG         = -6,
 	};
 
 	/**
@@ -57,7 +61,7 @@ namespace Apricot {
 		static void Init();
 		static void Destroy();
 
-		static void* Malloc(uint64 Size, uint64 Alignment);
+		NODISCARD static void* Malloc(uint64 Size, uint64 Alignment);
 		static void Free(void* MemoryBlock, uint64 Size);
 
 		static void MemCpy(void* Destination, const void* Source, uint64 SizeBytes);
@@ -92,7 +96,7 @@ namespace Apricot {
 	APRICOT_API void MemZero(void* Destination, uint64 SizeBytes);
 
 	template<typename T, typename... Args>
-	T* MemConstruct(void* Destination, Args&&... args)
+	FORCEINLINE constexpr T* MemConstruct(void* Destination, Args&&... args)
 	{
 		return (T*)new (Destination) T(Forward<Args>(args)...);
 	}
@@ -112,6 +116,12 @@ namespace Apricot {
 
 	public:
 		virtual ~AMemoryArena() = default;
+
+		virtual void FreeAll() = 0;
+		virtual int32 TryFreeAll() = 0;
+		virtual void FreeAllUnsafe() = 0;
+
+		virtual void GarbageCollect() = 0;
 
 		virtual uint64 GetTotalSize() const = 0;
 		virtual uint64 GetAllocatedSize() const = 0;

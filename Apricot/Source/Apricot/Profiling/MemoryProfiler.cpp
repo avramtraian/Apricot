@@ -11,6 +11,10 @@ namespace Apricot {
 
 	APRICOT_API extern AMemoryProfiler* GMemoryProfiler = nullptr;
 
+	AMemoryProfiler::AMemoryProfiler()
+	{
+	}
+
 	void AMemoryProfiler::Init()
 	{
 		if (GMemoryProfiler)
@@ -32,16 +36,6 @@ namespace Apricot {
 		GMemoryProfiler->~AMemoryProfiler();
 		GMalloc->Free(GMemoryProfiler, sizeof(AMemoryProfiler));
 		GMemoryProfiler = nullptr;
-	}
-
-	void AMemoryProfiler::SubmitLowLevelMalloc(uint64 Size, const TChar* File, const TChar* Func, uint64 Line)
-	{
-		
-	}
-
-	void AMemoryProfiler::SubmitLowLevelFree(uint64 Size, const TChar* File, const TChar* Func, uint64 Line)
-	{
-		
 	}
 
 }
