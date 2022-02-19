@@ -66,12 +66,17 @@ namespace Apricot {
 			/**
 			* 
 			*/
-			uint64 Size = 0;
+			uint64 SizeBytes = 0;
 			
 			/**
 			* 
 			*/
-			uint64 Allocated = 0;
+			uint64 AllocatedBytes = 0;
+		};
+
+		struct AAlignmentInfo
+		{
+			uint16 AlignmentOffset = 0;
 		};
 
 	/* API interface */
@@ -168,6 +173,36 @@ namespace Apricot {
 		*/
 		FORCEINLINE const AStackArenaSpecification& GetSpecification() const { return m_Specification; }
 
+	private:
+		/**
+		* 
+		* 
+		* @param PageSize 
+		* 
+		* @returns 
+		*/
+		APage* AllocateNewPage(uint64 PageSize);
+
+		/**
+		* 
+		* 
+		* @param RequestedAllocationSize 
+		* 
+		* @returns 
+		*/
+		uint64 GetOptimalPageSize(uint64 RequestedAllocationSize);
+
+		/**
+		* 
+		* 
+		* @param Allocation 
+		* 
+		* @param Size 
+		* 
+		* @returns 
+		*/
+		bool8 CouldBeFreed(void* Allocation, uint64 Size) const;
+
 	/* Member variables */
 	private:
 		/**
@@ -180,6 +215,11 @@ namespace Apricot {
 		*/
 		TVector<APage*> m_Pages;
 
+		/**
+		* 
+		*/
+		uint64 m_CurrentPage;
+
 	/* Friends */
 	private:
 		friend APRICOT_API uint64 GetStackArenaMemoryRequirementEx(const AStackArenaSpecification&);
@@ -187,13 +227,13 @@ namespace Apricot {
 		friend APRICOT_API void DestroyStackArena(AStackArena*);
 
 		template<typename T, typename... Args>
-		friend constexpr T* MemConstruct(void*, Args&&...);
+		friend constexpr FORCEINLINE T* MemConstruct(void*, Args&&...);
 	};
 
 	/**
 	* 
 	*/
-	APRICOT_API uint64 GetStackArenaMemoryRequirementEx(const AStackArenaSpecification&);
+	APRICOT_API uint64 GetStackArenaMemoryRequirementEx(const AStackArenaSpecification& Specfication);
 
 	/**
 	* 

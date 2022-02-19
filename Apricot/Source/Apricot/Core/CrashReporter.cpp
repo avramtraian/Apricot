@@ -3,6 +3,8 @@
 #include "aepch.h"
 #include "CrashReporter.h"
 
+#include "Memory/ApricotMemory.h"
+
 namespace Apricot {
 	
 	ACrashReporter* GCrashReporter = nullptr;
@@ -127,6 +129,57 @@ namespace Apricot {
 				"            {}"),
 				Expression, File, Function, Line, Message);
 		}
+	}
+
+	void ACrashReporter::SubmitArenaFailure(EMemoryOperation PerformedOperation, EMemoryError ErrorFlag)
+	{
+		switch (PerformedOperation)
+		{
+			case EMemoryOperation::Allocate:
+			{
+				switch (ErrorFlag)
+				{
+					case EMemoryError::OutOfMemory:
+					{
+						AE_CORE_WARN(TEXT("CrashReporter: Allocate operation triggered OutOfMemory! RequestedSize: {}, FreeSize: {}"), MemoryState.Size, MemoryState.FreeSize);
+						break;
+					}
+					case EMemoryError::OutOfMemoryUnableToGrow:
+					{
+						AE_CORE_WARN(TEXT("CrashReporter: Allocate operation triggered OutOfMemoryUnableToGrow! Couldn't allocate a new page because 'bShouldGrow' is false... RequestedSize: {}, FreeSize: {}"), MemoryState.Size, MemoryState.FreeSize);
+						break;
+					}
+					default:
+					{
+						AE_CHECK_NO_ENTRY();
+						break;
+					}
+				}
+				break;
+			}
+			case EMemoryOperation::Free:
+			{
+				break;
+			}
+			case EMemoryOperation::NewPage:
+			{
+				break;
+			}
+			case EMemoryOperation::Create:
+			{
+				break;
+			}
+			case EMemoryOperation::Destroy:
+			{
+				break;
+			}
+			default:
+			{
+				AE_CHECK_NO_ENTRY();
+				break;
+			}
+		}
+		MemoryState = AMemoryState{};
 	}
 
 }

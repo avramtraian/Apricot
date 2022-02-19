@@ -46,6 +46,21 @@ namespace Apricot {
 		AE_FREE_SIZE_TOO_BIG         = -6,
 	};
 
+	enum class EMemoryError : int16
+	{
+		None = -1, Unknown = 0, Success = 1,
+
+		OutOfMemory = -2,
+		OutOfMemoryUnableToGrow = OutOfMemory             - 1,
+		AlignmentIsForbidden    = OutOfMemoryUnableToGrow - 1,
+		PointerOutOfRange       = AlignmentIsForbidden    - 1,
+		InvalidArena            = PointerOutOfRange       - 1,
+		InvalidSize             = InvalidArena            - 1,
+		InvalidAlignment        = InvalidSize             - 1,
+		InvalidMemoryPtr        = InvalidAlignment        - 1,
+		InvalidOuterPointer     = InvalidMemoryPtr        - 1,
+	};
+
 	/**
 	* 
 	*/

@@ -230,11 +230,8 @@ namespace Apricot {
 
 		for (uint64 Index = 0; Index < Specification.PagesCount; Index++)
 		{
-			uint64 PageAlignment = GetAlignmentOffset(MemoryRequirement, sizeof(void*));
-			MemoryRequirement += PageAlignment;
+			MemoryRequirement += GetAlignmentOffset(MemoryRequirement, sizeof(void*));;
 			MemoryRequirement += sizeof(ALinearArena::APage);
-
-			// Assumes ALinearArena::APage is aligned to sizeof(void*)
 			MemoryRequirement += Specification.PageSizes[Index];
 		}
 
@@ -271,9 +268,9 @@ namespace Apricot {
 		ALinearArena* Arena = (ALinearArena*)(ArenaMemory + MemoryOffset);
 		MemConstruct<ALinearArena>(Arena);
 
+		Arena->m_Specification = Specification;
 		Arena->m_Pages.Reserve(Specification.PagesCount);
 		Arena->m_CurrentPage = 0;
-		Arena->m_Specification = Specification;
 
 		MemoryOffset += sizeof(ALinearArena);
 		MemoryOffset += GetAlignmentOffset(MemoryOffset, sizeof(void*));
