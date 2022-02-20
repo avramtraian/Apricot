@@ -94,15 +94,15 @@ namespace Apricot {
 	{
 		if (!m_MemoryBlock)
 		{
-			return AE_ALLOC_BAD_ARENA;
+			return (int16)EMemoryError::InvalidArena;
 		}
 		if (Size > m_ChunkSizeBytes || Size == 0)
 		{
-			return AE_ALLOC_INVALID_SIZE;
+			return (int16)EMemoryError::InvalidSize;
 		}
 		if (m_FreeChunksCount == 0)
 		{
-			return AE_ALLOC_OUT_OF_MEMORY;
+			return (int16)EMemoryError::OutOfMemory;
 		}
 
 		void* Chunk = m_FreeChunks[--m_FreeChunksCount];
@@ -111,10 +111,10 @@ namespace Apricot {
 		{
 			m_FreeChunksCount++;
 			/* TODO: Information about the fact that this error is triggered due to alignment */
-			return AE_ALLOC_INVALID_SIZE;
+			return (int16)EMemoryError::InvalidSize;
 		}
 		*OutPointer = (uint8*)Chunk + AlignmentOffset;
-		return AE_ALLOC_SUCCESSFULLY;
+		return (int16)EMemoryError::Success;
 	}
 
 	void* APoolArena::AllocUnsafe(uint64 Size, uint64 Alignment /*= sizeof(void*)*/)
@@ -174,20 +174,20 @@ namespace Apricot {
 	{
 		if (!m_MemoryBlock)
 		{
-			return AE_FREE_BAD_ARENA;
+			return (int16)EMemoryError::InvalidArena;
 		}
 		if (m_MemoryBlock > Allocation || Allocation >= (uint8_t*)m_MemoryBlock + m_TotalSizeBytes)
 		{
-			return AE_FREE_POINTER_OUT_OF_RANGE;
+			return (int16)EMemoryError::PointerOutOfRange;
 		}
-		if (m_FreeChunksCount == m_TotalSizeBytes / m_ChunkSizeBytes)
+		if (m_FreeChunksCount == (m_TotalSizeBytes / m_ChunkSizeBytes))
 		{
-			return AE_FREE_ALREADY_FREED;
+			return (int16)EMemoryError::AlreadyFreed;
 		}
 
 		void* AllocationChunk = (uint8*)Allocation - ((uintptr)Allocation - (uintptr)m_MemoryBlock) % m_ChunkSizeBytes;
 		m_FreeChunks[m_FreeChunksCount++] = AllocationChunk;
-		return AE_FREE_SUCCESSFULLY;
+		return (int16)EMemoryError::Success;
 	}
 
 	void APoolArena::FreeUnsafe(void* Allocation, uint64 Size)
@@ -203,7 +203,7 @@ namespace Apricot {
 
 	int32 APoolArena::TryFreeAll()
 	{
-		return AE_FREE_SUCCESSFULLY;
+		return (int16)EMemoryError::InvalidCall;
 	}
 
 	void APoolArena::FreeAllUnsafe()

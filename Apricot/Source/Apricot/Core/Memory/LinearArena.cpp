@@ -81,21 +81,24 @@ namespace Apricot {
 
 	NODISCARD int32 ALinearArena::TryAlloc(uint64 Size, void** OutPointer, uint64 Alignment /*= sizeof(void*)*/)
 	{
+		if (OutPointer == nullptr)
+		{
+			return (int16)EMemoryError::InvalidOuterPointer;
+		}
 		if (m_Pages.IsEmpty())
 		{
-			return AE_ALLOC_BAD_ARENA;
+			*OutPointer = nullptr;
+			return (int16)EMemoryError::InvalidArena;
 		}
 		if (Size == 0)
 		{
-			return AE_ALLOC_INVALID_SIZE;
-		}
-		if (OutPointer == nullptr)
-		{
-			return AE_ALLOC_INVALID_PARAM;
+			*OutPointer = nullptr;
+			return (int16)EMemoryError::InvalidSize;
 		}
 		if (Alignment == 0)
 		{
-			return AE_ALLOC_BAD_ALIGNMENT;
+			*OutPointer = nullptr;
+			return (int16)EMemoryError::InvalidAlignment;
 		}
 
 		APage* Page = m_Pages[m_CurrentPage];
@@ -112,14 +115,14 @@ namespace Apricot {
 					m_CurrentPage = Index;
 					Page->AllocatedBytes += (AlignmentOffset + Size);
 					*OutPointer = (uint8*)Page->MemoryBlock + AlignmentOffset;
-					return AE_ALLOC_SUCCESSFULLY;
+					return (int16)EMemoryError::Success;
 				}
 			}
 
 			if (!m_Specification.bShouldGrow)
 			{
 				*OutPointer = nullptr;
-				return AE_ALLOC_OUT_OF_MEMORY;
+				return (int16)EMemoryError::OutOfMemoryUnableToGrow;
 			}
 
 			Page = AllocateNewPage(GetOptimalPageSize(Size));
@@ -130,7 +133,7 @@ namespace Apricot {
 
 		Page->AllocatedBytes += (AlignmentOffset + Size);
 		*OutPointer = (uint8*)Page->MemoryBlock + AlignmentOffset;
-		return AE_ALLOC_SUCCESSFULLY;
+		return (int16)EMemoryError::Success;
 	}
 
 	NODISCARD void* ALinearArena::AllocUnsafe(uint64 Size, uint64 Alignment /*= sizeof(void*)*/)
@@ -153,7 +156,7 @@ namespace Apricot {
 
 	int32 ALinearArena::TryFree(void* Allocation, uint64 Size)
 	{
-		return AE_FREE_UNKNOWN_FAILURE;
+		return (int16)EMemoryError::InvalidCall;
 	}
 
 	void ALinearArena::FreeUnsafe(void* Allocation, uint64 Size)
@@ -176,7 +179,7 @@ namespace Apricot {
 			m_Pages[Index]->AllocatedBytes = 0;
 		}
 		m_CurrentPage = 0;
-		return AE_FREE_SUCCESSFULLY;
+		return (int16)EMemoryError::Success;
 	}
 
 	void ALinearArena::FreeAllUnsafe()

@@ -25,6 +25,15 @@ namespace Apricot {
 		static void Init();
 		static void Destroy();
 
+		NODISCARD static void* Malloc(uint64 Size, uint64 Alignment);
+		static void Free(void* MemoryBlock, uint64 Size);
+
+		static void MemCpy(void* Destination, const void* Source, uint64 SizeBytes);
+		static void MemSet(void* Destination, int32 Value, uint64 SizeBytes);
+		static void MemZero(void* Destination, uint64 SizeBytes);
+
+		static uint64 GetAllocationSize(void* Allocation);
+
 		static void* Memory_Allocate(uint64 Size, bool8 Alligned);
 		static void Memory_Free(void* Address, uint64 Size);
 

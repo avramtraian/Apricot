@@ -3,17 +3,19 @@
 #include "aepch.h"
 #include "ApricotMemory.h"
 
+#include "Apricot/Core/Platform.h"
+
 #include "Apricot/Profiling/MemoryProfiler.h"
 
 namespace Apricot {
 
 	APRICOT_API void ApricotMemoryInit()
 	{
-		APlatformMemory::Init();
+		APlatform::Init();
 
 		if (!GMalloc)
 		{
-			GMalloc = (AMalloc*)APlatformMemory::Malloc(sizeof(AMalloc), 0);
+			GMalloc = (AMalloc*)APlatform::Malloc(sizeof(AMalloc), 0);
 			MemConstruct<AMalloc>(GMalloc);
 		}
 
@@ -31,11 +33,11 @@ namespace Apricot {
 		if (GMalloc)
 		{
 			GMalloc->~AMalloc();
-			APlatformMemory::Free(GMalloc, sizeof(AMalloc));
+			APlatform::Free(GMalloc, sizeof(AMalloc));
 			GMalloc = nullptr;
 		}
 
-		APlatformMemory::Destroy();
+		APlatform::Destroy();
 	}
 
 	APRICOT_API extern AMalloc* GMalloc = nullptr;
@@ -55,27 +57,27 @@ namespace Apricot {
 			return nullptr;
 		}
 
-		return APlatformMemory::Malloc(Size, Alignment);
+		return APlatform::Malloc(Size, Alignment);
 	}
 
 	int32 AMalloc::TryAlloc(uint64 Size, void** OutPointer, uint64 Alignment /*= sizeof(void*)*/)
 	{
 		if (Size == 0)
 		{
-			return AE_ALLOC_INVALID_SIZE;
+			return (int16)EMemoryError::InvalidSize;
 		}
 		if (!OutPointer)
 		{
-			return AE_ALLOC_INVALID_PARAM;
+			return (int16)EMemoryError::InvalidOuterPointer;
 		}
 
-		*OutPointer = APlatformMemory::Malloc(Size, Alignment);
-		return AE_ALLOC_SUCCESSFULLY;
+		*OutPointer = APlatform::Malloc(Size, Alignment);
+		return (int16)EMemoryError::Success;
 	}
 
 	void* AMalloc::AllocUnsafe(uint64 Size, uint64 Alignment /*= sizeof(void*)*/)
 	{
-		return APlatformMemory::Malloc(Size, Alignment);;
+		return APlatform::Malloc(Size, Alignment);;
 	}
 
 	void AMalloc::Free(void* Allocation, uint64 Size)
@@ -85,38 +87,38 @@ namespace Apricot {
 			return;
 		}
 
-		APlatformMemory::Free(Allocation, Size);
+		APlatform::Free(Allocation, Size);
 	}
 
 	int32 AMalloc::TryFree(void* Allocation, uint64 Size)
 	{
 		if (!Allocation)
 		{
-			return AE_FREE_BAD_POINTER;
+			return (int16)EMemoryError::InvalidMemoryPtr;
 		}
 
-		APlatformMemory::Free(Allocation, Size);
-		return AE_FREE_SUCCESSFULLY;
+		APlatform::Free(Allocation, Size);
+		return (int16)EMemoryError::Success;
 	}
 
 	void AMalloc::FreeUnsafe(void* Allocation, uint64 Size)
 	{
-		APlatformMemory::Free(Allocation, Size);
+		APlatform::Free(Allocation, Size);
 	}
 
 	APRICOT_API void MemCpy(void* Destination, const void* Source, uint64 SizeBytes)
 	{
-		APlatformMemory::MemCpy(Destination, Source, SizeBytes);
+		APlatform::MemCpy(Destination, Source, SizeBytes);
 	}
 
 	APRICOT_API void MemSet(void* Destination, int32 Value, uint64 SizeBytes)
 	{
-		APlatformMemory::MemSet(Destination, Value, SizeBytes);
+		APlatform::MemSet(Destination, Value, SizeBytes);
 	}
 
 	APRICOT_API void MemZero(void* Destination, uint64 SizeBytes)
 	{
-		APlatformMemory::MemZero(Destination, SizeBytes);
+		APlatform::MemZero(Destination, SizeBytes);
 	}
 
 }

@@ -32,6 +32,36 @@ namespace Apricot {
 		
 	}
 
+	void* APlatform::Malloc(uint64 Size, uint64 Alignment)
+	{
+		return ::operator new(Size);
+	}
+
+	void APlatform::Free(void* MemoryBlock, uint64 Size)
+	{
+		::operator delete(MemoryBlock, Size);
+	}
+
+	void APlatform::MemCpy(void* Destination, const void* Source, uint64 SizeBytes)
+	{
+		memcpy(Destination, Source, SizeBytes);
+	}
+
+	void APlatform::MemSet(void* Destination, int32 Value, uint64 SizeBytes)
+	{
+		memset(Destination, Value, SizeBytes);
+	}
+
+	void APlatform::MemZero(void* Destination, uint64 SizeBytes)
+	{
+		memset(Destination, 0, SizeBytes);
+	}
+
+	uint64 APlatform::GetAllocationSize(void* Allocation)
+	{
+		return _msize(Allocation);
+	}
+
 	void* APlatform::Memory_Allocate(uint64 Size, bool8 Alligned)
 	{
 		if (Size == 0)

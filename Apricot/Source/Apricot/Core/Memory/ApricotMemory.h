@@ -20,32 +20,9 @@
 
 namespace Apricot {
 
-	enum EAllocErrors : int32
-	{
-		AE_ALLOC_NONE            =  0,
-							     
-		AE_ALLOC_SUCCESSFULLY    =  1,
-		AE_ALLOC_UNKNOWN_FAILURE = -1,
-		AE_ALLOC_OUT_OF_MEMORY   = -2,
-		AE_ALLOC_BAD_ARENA       = -3,
-		AE_ALLOC_INVALID_SIZE    = -4,
-		AE_ALLOC_BAD_ALIGNMENT   = -5,
-		AE_ALLOC_INVALID_PARAM   = -6,
-	};
-
-	enum EFreeErrors : int32
-	{
-		AE_FREE_NONE                 =  0,
-							            
-		AE_FREE_SUCCESSFULLY         =  1,
-		AE_FREE_UNKNOWN_FAILURE      = -1,
-		AE_FREE_POINTER_OUT_OF_RANGE = -2,
-		AE_FREE_BAD_ARENA            = -3,
-		AE_FREE_BAD_POINTER          = -4,
-		AE_FREE_ALREADY_FREED        = -5,
-		AE_FREE_SIZE_TOO_BIG         = -6,
-	};
-
+	/**
+	* 
+	*/
 	enum class EMemoryError : int16
 	{
 		None = -1, Unknown = 0, Success = 1,
@@ -54,11 +31,13 @@ namespace Apricot {
 		OutOfMemoryUnableToGrow = OutOfMemory             - 1,
 		AlignmentIsForbidden    = OutOfMemoryUnableToGrow - 1,
 		PointerOutOfRange       = AlignmentIsForbidden    - 1,
-		InvalidArena            = PointerOutOfRange       - 1,
+		AlreadyFreed            = PointerOutOfRange       - 1,
+		InvalidArena            = AlreadyFreed            - 1,
 		InvalidSize             = InvalidArena            - 1,
 		InvalidAlignment        = InvalidSize             - 1,
 		InvalidMemoryPtr        = InvalidAlignment        - 1,
 		InvalidOuterPointer     = InvalidMemoryPtr        - 1,
+		InvalidCall             = InvalidOuterPointer     - 1,
 	};
 
 	/**
@@ -66,25 +45,6 @@ namespace Apricot {
 	*/
 	APRICOT_API void ApricotMemoryInit();
 	APRICOT_API void ApricotMemoryDestroy();
-
-	/**
-	* 
-	*/
-	class APlatformMemory
-	{
-	public:
-		static void Init();
-		static void Destroy();
-
-		NODISCARD static void* Malloc(uint64 Size, uint64 Alignment);
-		static void Free(void* MemoryBlock, uint64 Size);
-
-		static void MemCpy(void* Destination, const void* Source, uint64 SizeBytes);
-		static void MemSet(void* Destination, int32 Value, uint64 SizeBytes);
-		static void MemZero(void* Destination, uint64 SizeBytes);
-
-		static uint64 GetAllocationSize(void* Allocation);
-	};
 
 	/**
 	* 
