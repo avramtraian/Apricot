@@ -33,8 +33,10 @@ project "ApricotJam"
 
 	filter { "system:windows" }
 		systemversion "latest"
+		characterset "Unicode"
 		defines {
-			"AE_PLATFORM_WINDOWS"
+			"AE_PLATFORM_WINDOWS",
+			"AE_UNICODE"
 		}
 
 	filter { "configurations:Debug_Editor" }

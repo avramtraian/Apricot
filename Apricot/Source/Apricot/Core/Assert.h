@@ -2,85 +2,165 @@
 
 #pragma once
 
-#include "Base.h"
 #include "Log.h"
+#include "CrashReporter.h"
 
-namespace Apricot {
+#ifdef AE_ENABLE_DEBUG_CHECKS
 
-	APRICOT_API void OnCoreAssert(const char8* condition, const char8* file, uint64 line, const char8* funcSig, const char8* message);
+	#define AE_DEBUG_CHECK(Expression)                                                                \
+		if (!(Expression))                                                                            \
+		{                                                                                             \
+			GCrashReporter->PreCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), nullptr);  \
+			AE_DEBUGBREAK();                                                                          \
+			GCrashReporter->PostCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), nullptr); \
+		}
 
-	template<typename... Args>
-	void OnCoreAssert(const char8* condition, const char8* file, uint64 line, const char8* funcSig, const char8* message, Args&&... args)
-	{
-		Memory::LinearAllocator allocator = Memory::LinearAllocator(8192);
-		const char8* formatted = RawStringFormatter::Format(allocator, message, std::forward<Args>(args)...);
+	#define AE_DEBUG_CHECK_M(Expression, ...)                                                                                 \
+		if (!(Expression))                                                                                                    \
+		{                                                                                                                     \
+			Format(GCrashReporter->AssertionBuffer, GCrashReporter->AssertionBufferSize, TEXT("")##__VA_ARGS__);                    \
+			GCrashReporter->PreCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), GCrashReporter->AssertionBuffer);  \
+			AE_DEBUGBREAK();                                                                                                  \
+			GCrashReporter->PostCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), GCrashReporter->AssertionBuffer); \
+		}
 
-		OnCoreAssert(condition, file, line, funcSig, formatted);
-	}
+	#define AE_DEBUG_CHECK_NO_ENTRY()                                                  \
+		{                                                                              \
+			GCrashReporter->PreCheckNoEntryFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE);  \
+			AE_DEBUGBREAK();                                                           \
+			GCrashReporter->PostCheckNoEntryFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE); \
+		}
 
-	APRICOT_API void OnBaseAssert(const char8* condition, const char8* file, uint64 line, const char8* funcSig, const char8* message);
+	#define AE_DEBUG_CHECK_UNIMPLEMENTED()                                                   \
+		{                                                                                    \
+			GCrashReporter->PreCheckUnimplementedFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE);  \
+			AE_DEBUGBREAK();                                                                 \
+			GCrashReporter->PostCheckUnimplementedFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE); \
+		}
 
-}
-
-/*
-* Assertion macro definitions.
-*/
-#ifdef AE_ENABLE_ASSERTS
-	/*
-	* BASE_ASSERTs can be called at ANY time.
-	* They are used before initializing the major core-systems, such as logging.
-	*/
-	#define AE_BASE_ASSERT(Condition, Message)                     if (!(Condition)) { AE_DEBUGBREAK(); ::Apricot::OnBaseAssert(#Condition, AE_FILE, AE_LINE, AE_FUNCTION_SIG, Message); }
-	#define AE_BASE_ASSERT_RETURN(Condition, ReturnValue, Message) if (!(Condition)) { AE_DEBUGBREAK(); return ReturnValue; }
-	#define AE_BASE_ASSERT_BREAK(Condition, Message)               if (!(Condition)) { AE_DEBUGBREAK(); break; }
-	#define AE_BASE_ASSERT_CONTINUE(Condition, Message)            if (!(Condition)) { AE_DEBUGBREAK(); continue; }
-
-	/*
-	* CORE_ASSERTs are the most common.
-	* They provide much more info about the assertion, but the can't be called in the early stages of the engine lifetime.
-	* Calling them to early will not cause a crash, but can be undefined behavior, as well as confusing others.
-	*/
-	#define AE_CORE_ASSERT(Condition, ...)                         if (!(Condition)) { AE_CORE_FATAL(__VA_ARGS__); AE_DEBUGBREAK(); Apricot::OnCoreAssert(#Condition, AE_FILE, AE_LINE, AE_FUNCTION_SIG, __VA_ARGS__); }
-	#define AE_CORE_ASSERT_RETURN(Condition, ReturnValue, ...)     if (!(Condition)) { AE_CORE_ERROR(__VA_ARGS__); AE_DEBUGBREAK(); return ReturnValue; }
-	#define AE_CORE_ASSERT_BREAK(Condition, ...)                   if (!(Condition)) { AE_CORE_ERROR(__VA_ARGS__); AE_DEBUGBREAK(); break; }
-	#define AE_CORE_ASSERT_CONTINUE(Condition, ...)                if (!(Condition)) { AE_CORE_ERROR(__VA_ARGS__); AE_DEBUGBREAK(); continue; }
 #else
-	#define AE_BASE_ASSERT(Condition, Message) 
-	#define AE_BASE_ASSERT_RETURN(Condition, ReturnValue, Message) 
-	#define AE_BASE_ASSERT_BREAK(Condition, Message) 
-	#define AE_BASE_ASSERT_CONTINUE(Condition, Message) 
 
-	#define AE_CORE_ASSERT(Condition, ...) 
-	#define AE_CORE_ASSERT_RETURN(Condition, ReturnValue, ...) 
-	#define AE_CORE_ASSERT_BREAK(Condition, ...) 
-	#define AE_CORE_ASSERT_CONTINUE(Condition, ...) 
+	#define AE_DEBUG_CHECK(...)
+
+	#define AE_DEBUG_CHECK_M(...)
+
+	#define AE_DEBUG_CHECK_NO_ENTRY(...)
+
+	#define AE_DEBUG_CHECK_UNIMPLEMENTED(...)
+
 #endif
 
-/*
-* Verifies macro definitions.
-* They are the same as the assertion macros, but they are included in release builds as well.
-* BASE/CORE_VERIFYs serve the same purpose as the assertions.
-*/
+
+#ifdef AE_ENABLE_CHECKS
+
+	#define AE_CHECK(Expression) \
+		if (!(Expression))                                                                            \
+		{                                                                                             \
+			GCrashReporter->PreCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), nullptr);  \
+			AE_DEBUGBREAK();                                                                          \
+			GCrashReporter->PostCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), nullptr); \
+		}
+	
+	#define AE_CHECK_M(Expression, ...) \
+		if (!(Expression))                                                                                                    \
+		{                                                                                                                     \
+			Format(GCrashReporter->AssertionBuffer, GCrashReporter->AssertionBufferSize, TEXT("")##__VA_ARGS__);                    \
+			GCrashReporter->PreCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), GCrashReporter->AssertionBuffer);  \
+			AE_DEBUGBREAK();                                                                                                  \
+			GCrashReporter->PostCheckFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), GCrashReporter->AssertionBuffer); \
+		}
+
+	#define AE_CHECK_NO_ENTRY()                                                        \
+		{                                                                              \
+			GCrashReporter->PreCheckNoEntryFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE);  \
+			AE_DEBUGBREAK();                                                           \
+			GCrashReporter->PostCheckNoEntryFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE); \
+		}
+
+	#define AE_CHECK_UNIMPLEMENTED()                                                         \
+		{                                                                                    \
+			GCrashReporter->PreCheckUnimplementedFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE);  \
+			AE_DEBUGBREAK();                                                                 \
+			GCrashReporter->PostCheckUnimplementedFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE); \
+		}
+
+#else
+
+	#define AE_CHECK(...)
+
+	#define AE_CHECK_M(...)
+
+	#define AE_CHECK_NO_ENTRY(...)
+
+	#define AE_CHECK_UNIMPLEMENTED(...)
+
+#endif
+
+
 #ifdef AE_ENABLE_VERIFIES
-	#define AE_BASE_VERIFY(Condition, Message)                     if (!(Condition)) { AE_DEBUGBREAK(); ::Apricot::OnBaseAssert(#Condition, AE_FILE, AE_LINE, AE_FUNCTION_SIG, Message); }
-	#define AE_BASE_VERIFY_RETURN(Condition, ReturnValue, Message) if (!(Condition)) { AE_DEBUGBREAK(); return ReturnValue; }
-	#define AE_BASE_VERIFY_BREAK(Condition, Message)               if (!(Condition)) { AE_DEBUGBREAK(); break; }
-	#define AE_BASE_VERIFY_CONTINUE(Condition, Message)            if (!(Condition)) { AE_DEBUGBREAK(); continue; }
 
-	#define AE_CORE_VERIFY(Condition, ...)                         if (!(Condition)) { AE_CORE_FATAL(__VA_ARGS__); AE_DEBUGBREAK(); Apricot::OnCoreAssert(#Condition, AE_FILE, AE_LINE, AE_FUNCTION_SIG, __VA_ARGS__); }
-	#define AE_CORE_VERIFY_RETURN(Condition, ReturnValue, ...)     if (!(Condition)) { AE_CORE_ERROR(__VA_ARGS__); AE_DEBUGBREAK(); return ReturnValue; }
-	#define AE_CORE_VERIFY_BREAK(Condition, ...)                   if (!(Condition)) { AE_CORE_ERROR(__VA_ARGS__); AE_DEBUGBREAK(); break; }
-	#define AE_CORE_VERIFY_CONTINUE(Condition, ...)                if (!(Condition)) { AE_CORE_ERROR(__VA_ARGS__); AE_DEBUGBREAK(); continue; }
+#define AE_VERIFY(Expression)                                                                          \
+		if (!(Expression))                                                                             \
+		{                                                                                              \
+			GCrashReporter->PreVerifyFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), nullptr);  \
+			AE_DEBUGBREAK();                                                                           \
+			GCrashReporter->PostVerifyFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), nullptr); \
+		}
+
+	#define AE_VERIFY_M(Expression, ...)                                                                                       \
+		if (!(Expression))                                                                                                     \
+		{                                                                                                                      \
+			Format(GCrashReporter->AssertionBuffer, GCrashReporter->AssertionBufferSize, TEXT("")##__VA_ARGS__);                     \
+			GCrashReporter->PreVerifyFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), GCrashReporter->AssertionBuffer);  \
+			AE_DEBUGBREAK();                                                                                                   \
+			GCrashReporter->PostVerifyFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), GCrashReporter->AssertionBuffer); \
+		}
+
 #else
-	#define AE_BASE_VERIFY(Condition, Message) 
-	#define AE_BASE_VERIFY_RETURN(Condition, ReturnValue, Message) 
-	#define AE_BASE_VERIFY_BREAK(Condition, Message) 
-	#define AE_BASE_VERIFY_CONTINUE(Condition, Message) 
 
-	#define AE_CORE_VERIFY(Condition, ...) 
-	#define AE_CORE_VERIFY_RETURN(Condition, ReturnValue, ...) 
-	#define AE_CORE_VERIFY_BREAK(Condition, ...) 
-	#define AE_CORE_VERIFY_CONTINUE(Condition, ...) 
+	#define AE_VERIFY(Expression)        { Expression; }
+
+	#define AE_VERIFY_M(Expression, ...) { Expression; }
+
 #endif
 
-#define AE_VOID 
+
+#ifdef AE_ENABLE_ENSURES
+
+	#define AE_ENSURE(Expression)                                                                  \
+		if (!(Expression))                                                                         \
+		{                                                                                          \
+			GCrashReporter->EnsureFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), nullptr); \
+		}
+										        
+	#define AE_ENSURE_M(Expression, ...)                                                                                   \
+		if (!(Expression))                                                                                                 \
+		{                                                                                                                  \
+			Format(GCrashReporter->AssertionBuffer, GCrashReporter->AssertionBufferSize, TEXT("")##__VA_ARGS__);                 \
+			GCrashReporter->EnsureFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), GCrashReporter->AssertionBuffer); \
+		}
+										        
+	#define AE_ENSURE_ALWAYS(Expression)                                                                 \
+		if (!(Expression))                                                                               \
+		{                                                                                                \
+			GCrashReporter->EnsureAlwaysFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), nullptr); \
+		}
+
+	#define AE_ENSURE_ALWAYS_M(Expression, ...)                                                                                  \
+		if (!(Expression))                                                                                                       \
+		{                                                                                                                        \
+			Format(GCrashReporter->AssertionBuffer, GCrashReporter->AssertionBufferSize,  TEXT("")##__VA_ARGS__);                       \
+			GCrashReporter->EnsureAlwaysFailed(AE_FILE, AE_FUNCTION_SIG, AE_LINE, TEXT(#Expression), GCrashReporter->AssertionBuffer); \
+		}
+
+#else
+
+	#define AE_ENSURE(Expression)			    { Expression; }
+											    
+	#define AE_ENSURE_M(Expression, ...)	    { Expression; }
+											    
+	#define AE_ENSURE_ALWAYS(Expression, ...)   { Expression; }
+											    
+	#define AE_ENSURE_ALWAYS_M(Expression, ...) { Expression; }
+
+#endif

@@ -6,22 +6,22 @@
 
 namespace Apricot {
 
-	class WindowClosedEvent : public Event
+	class AWindowClosedEvent : public AEvent
 	{
 	public:
-		WindowClosedEvent()
-			: Event(EventCategory::Window, EventType::WindowClosed) {}
+		AWindowClosedEvent()
+			: AEvent(EEventCategory::Window, EEventType::WindowClosed) {}
 
-		static EventType GetStaticType() { return EventType::WindowClosed; }
+		static EEventType GetStaticType() { return EEventType::WindowClosed; }
 	};
 
-	class WindowResizedEvent : public Event
+	class AWindowResizedEvent : public AEvent
 	{
 	public:
-		WindowResizedEvent(uint32 width, uint32 height)
-			: Event(EventCategory::Window, EventType::WindowResized), m_Width(width), m_Height(height) {}
+		AWindowResizedEvent(uint32 Width, uint32 Height)
+			: AEvent(EEventCategory::Window, EEventType::WindowResized), m_Width(Width), m_Height(Height) {}
 
-		static EventType GetStaticType() { return EventType::WindowResized; }
+		static EEventType GetStaticType() { return EEventType::WindowResized; }
 
 		uint32 GetWidth() const { return m_Width; }
 		uint32 GetHeight() const { return m_Height; }
@@ -30,13 +30,13 @@ namespace Apricot {
 		uint32 m_Width, m_Height;
 	};
 
-	class WindowMovedEvent : public Event
+	class AWindowMovedEvent : public AEvent
 	{
 	public:
-		WindowMovedEvent(uint32 x, uint32 y)
-			: Event(EventCategory::Window, EventType::WindowMoved), m_X(x), m_Y(y) {}
+		AWindowMovedEvent(uint32 X, uint32 Y)
+			: AEvent(EEventCategory::Window, EEventType::WindowMoved), m_X(X), m_Y(Y) {}
 
-		static EventType GetStaticType() { return EventType::WindowMoved; }
+		static EEventType GetStaticType() { return EEventType::WindowMoved; }
 
 		int32 GetX() const { return m_X; }
 		int32 GetY() const { return m_Y; }

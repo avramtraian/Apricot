@@ -2,183 +2,145 @@
 
 #include "aepch.h"
 
-///////////////////////////////////////////////////////////////////////////////
-//////////////----  APRICOT PLATFORM WINDOWS IMPLEMENTATION  ----//////////////
-///////////////----  THIS FILE IS COMPILED ONLY ON WINDOWS  ----///////////////
-///////////////////////////////////////////////////////////////////////////////
-
 #ifdef AE_PLATFORM_WINDOWS
+
+#ifdef TEXT
+	#undef TEXT
+#endif
 
 #include "Apricot/Core/Platform.h"
 
-#include "Apricot/Filesystem/Filesystem.h"
-
 #include <Windows.h>
-#include <stdio.h>
 
 namespace Apricot {
 
-	struct HPlatformData
+	struct WindowsPlatformData
 	{
-		LARGE_INTEGER PerformanceCounterStart;
-		LARGE_INTEGER PerformanceFrequency;
+		HANDLE Console_OutputHandle = INVALID_HANDLE_VALUE;
+		HANDLE Console_ErrorHandle = INVALID_HANDLE_VALUE;
+		bool8 bIsConsoleAttached = false;
 	};
-	static HPlatformData s_Platform;
+	static WindowsPlatformData SWindowsPlatformData;
 
-	void Platform::Init()
-	{
-		BOOL result = QueryPerformanceCounter(&s_Platform.PerformanceCounterStart);
-		AE_CORE_VERIFY(result, "Couldn't QueryPerformanceCounter. Aborting.");
-
-		result = QueryPerformanceFrequency(&s_Platform.PerformanceFrequency);
-		AE_CORE_VERIFY(result, "Couldn't QueryPerformanceFrequency. Aborting.");
-	}
-
-	void Platform::Destroy()
+	void APlatform::Init()
 	{
 		
 	}
 
-	void Platform::CreateConsole()
+	void APlatform::Destroy()
 	{
-#ifdef AE_ENABLE_CONSOLE
-		AttachConsole(ATTACH_PARENT_PROCESS);
+		
+	}
+
+	void* APlatform::Malloc(uint64 Size, uint64 Alignment)
+	{
+		return ::operator new(Size);
+	}
+
+	void APlatform::Free(void* MemoryBlock, uint64 Size)
+	{
+		::operator delete(MemoryBlock, Size);
+	}
+
+	void APlatform::MemCpy(void* Destination, const void* Source, uint64 SizeBytes)
+	{
+		memcpy(Destination, Source, SizeBytes);
+	}
+
+	void APlatform::MemSet(void* Destination, int32 Value, uint64 SizeBytes)
+	{
+		memset(Destination, Value, SizeBytes);
+	}
+
+	void APlatform::MemZero(void* Destination, uint64 SizeBytes)
+	{
+		memset(Destination, 0, SizeBytes);
+	}
+
+	uint64 APlatform::GetAllocationSize(void* Allocation)
+	{
+		return _msize(Allocation);
+	}
+
+	void* APlatform::Memory_Allocate(uint64 Size, bool8 Alligned)
+	{
+		if (Size == 0)
+		{
+			return nullptr;
+		}
+		return ::operator new(Size);
+	}
+
+	void APlatform::Memory_Free(void* Address, uint64 Size)
+	{
+		::operator delete(Address, Size);
+	}
+
+	void APlatform::Memory_Copy(void* Destination, const void* Source, uint64 Size)
+	{
+		memcpy(Destination, Source, Size);
+	}
+
+	void APlatform::Memory_Set(void* Destination, int32 Value, uint64 Size)
+	{
+		memset(Destination, Value, Size);
+	}
+
+	void APlatform::Memory_Zero(void* Destination, uint64 Size)
+	{
+		ZeroMemory(Destination, Size);
+	}
+
+	void APlatform::Console_Attach()
+	{
+		if (SWindowsPlatformData.bIsConsoleAttached)
+		{
+			return;
+		}
+
 		AllocConsole();
+		AttachConsole(ATTACH_PARENT_PROCESS);
 
-		FILE* o;
-		freopen_s(&o, "CON", "w", stdout);
-		FILE* e;
-		freopen_s(&e, "CON", "w", stderr);
-		FILE* i;
-		freopen_s(&i, "CON", "r", stdin);
-#endif
+		SWindowsPlatformData.Console_OutputHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+		SWindowsPlatformData.Console_ErrorHandle = GetStdHandle(STD_ERROR_HANDLE);
+		SWindowsPlatformData.bIsConsoleAttached = true;
 	}
 
-	void Platform::PrintToConsole(const char* buffer, uint64 bufferSize, uint32 color)
+
+	void APlatform::Console_Free()
 	{
-#ifdef AE_ENABLE_CONSOLE
-		static HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-
-		SetConsoleTextAttribute(consoleHandle, (WORD)color);
-		WriteConsoleA(consoleHandle, buffer, (DWORD)(bufferSize / sizeof(char)), NULL, NULL);
-#endif
-	}
-
-	void Platform::PrintToConsole(const wchar_t* buffer, uint64 bufferSize, uint32 color)
-	{
-#ifdef AE_ENABLE_CONSOLE
-		static HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-
-		SetConsoleTextAttribute(consoleHandle, (WORD)color);
-		WriteConsoleW(consoleHandle, buffer, (DWORD)(bufferSize / sizeof(wchar_t)), NULL, NULL);
-#endif
-	}
-
-	HTime Platform::GetPerformanceTime()
-	{
-		LARGE_INTEGER performanceTimerNow;
-		BOOL result = QueryPerformanceCounter(&performanceTimerNow);
-		AE_CORE_VERIFY(result, "Couldn't QueryPerformanceFrequency. Aborting.");
-
-		LARGE_INTEGER elapsedNanoseconds;
-		// Get the number of ticks
-		elapsedNanoseconds.QuadPart = performanceTimerNow.QuadPart - s_Platform.PerformanceCounterStart.QuadPart;
-
-		// Transforms the "time" in nanoseconds (from seconds).
-		elapsedNanoseconds.QuadPart *= 1000000000;
-
-		// Divide the number of ticks by the frequency. Without the above multiplication, it will return
-		// an approximation in seconds.
-		elapsedNanoseconds.QuadPart /= s_Platform.PerformanceFrequency.QuadPart;
-
-		return elapsedNanoseconds.QuadPart;
-	}
-
-	void Platform::SleepFor(HTime duration)
-	{
-		Sleep((DWORD)duration.Miliseconds());
-	}
-
-	namespace Utils {
-
-		static uint32 ConvertMessageBoxFlags(MessageBoxFlags flags)
+		if (!SWindowsPlatformData.bIsConsoleAttached)
 		{
-			switch (flags)
-			{
-				case MessageBoxFlags::None:  return 0;
-				case MessageBoxFlags::Error: return MB_ICONERROR;
-			}
-			AE_CORE_ASSERT_RETURN(false, 0, "Invalid MessageBoxFlags!");
-			return 0;
+			return;
 		}
 
+		FreeConsole();
+
+		SWindowsPlatformData.Console_OutputHandle = INVALID_HANDLE_VALUE;
+		SWindowsPlatformData.Console_ErrorHandle = INVALID_HANDLE_VALUE;
+		SWindowsPlatformData.bIsConsoleAttached = false;
 	}
 
-	MessageBoxButton Platform::DisplayMessageBox(const char8* title, const char8* message, MessageBoxFlags flags)
+	void APlatform::Console_Write(const TChar* Message, uint64 MessageSize, EConsoleTextColor Color)
 	{
-		switch (MessageBoxA(NULL, message, title, Utils::ConvertMessageBoxFlags(flags)))
+		if (SWindowsPlatformData.bIsConsoleAttached)
 		{
-			case IDABORT:    return MessageBoxButton::Abort;
-			case IDCANCEL:   return MessageBoxButton::Cancel;
-			case IDCONTINUE: return MessageBoxButton::Continue;
-			case IDIGNORE:   return MessageBoxButton::Ignore;
-			case IDYES:      return MessageBoxButton::Yes;
-			case IDNO:       return MessageBoxButton::No;
-			case IDOK:       return MessageBoxButton::Ok;
-			case IDRETRY:    return MessageBoxButton::Retry;
-			case IDTRYAGAIN: return MessageBoxButton::TryAgain;
-			default:         return MessageBoxButton::None;
-		};
+			SetConsoleTextAttribute(SWindowsPlatformData.Console_OutputHandle, (WORD)Color);
+
+			DWORD NumberOfCharsWritten = 0;
+			WriteConsole(SWindowsPlatformData.Console_OutputHandle, Message, (DWORD)MessageSize, &NumberOfCharsWritten, NULL);
+		}
 	}
 
-	bool8 Platform::ReadConfigFile(const char16* filepath, ConfigFileKey* keys, uint64 keysCount)
+	void APlatform::Console_WriteError(const TChar* Message, uint64 MessageSize, EConsoleTextColor Color)
 	{
-		for (uint64 index = 0; index < keysCount; index++)
+		if (SWindowsPlatformData.bIsConsoleAttached)
 		{
-			ConfigFileKey& key = keys[index];
-			BOOL result = GetPrivateProfileString(key.Section, key.Key, key.Default, key.Value, (DWORD)key.ValueSize, filepath);
+			SetConsoleTextAttribute(SWindowsPlatformData.Console_ErrorHandle, (WORD)Color);
 
-			if (!result)
-			{
-				switch (GetLastError())
-				{
-					case ERROR_FILE_NOT_FOUND:
-					{
-						AE_CORE_ERROR("Failed to read configuration! Section: '{}', Key: '{}'. ERROR_FILE_NOT_FOUND");
-						return false;
-					}
-					default:
-					{
-						AE_CORE_ERROR("Failed to read configuration! Section: '{}', Key: '{}'. ERROR_UNKNOWN.");
-						return false;
-					}
-				}
-			}
+			DWORD NumberOfCharsWritten = 0;
+			WriteConsole(SWindowsPlatformData.Console_ErrorHandle, Message, (DWORD)MessageSize, &NumberOfCharsWritten, NULL);
 		}
-
-		return true;
-	}
-
-	bool8 Platform::WriteConfigFile(const char16* filepath, ConfigFileKey* keys, uint64 keysCount)
-	{
-		if (!Filesystem::Exists(filepath))
-		{
-			Filesystem::CreateDirectories(Filesystem::Path(filepath).Parent());
-		}
-
-		for (uint64 index = 0; index < keysCount; index++)
-		{
-			ConfigFileKey& key = keys[index];
-			BOOL result = WritePrivateProfileString(key.Section, key.Key, key.Value, filepath);
-
-			if (!result)
-			{
-				AE_CORE_ERROR("Failed to read configuration! Section: '{}', Key: '{}'. ERROR_UNKNOWN.");
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 }

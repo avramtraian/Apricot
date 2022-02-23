@@ -7,32 +7,32 @@
 
 namespace Apricot {
 
-	class KeyPressedEvent : public Event
+	class AKeyPressedEvent : public AEvent
 	{
 	public:
-		KeyPressedEvent(Key key)
-			: Event(EventCategory::Keyboard, EventType::KeyPressed), m_Key(key) {}
+		AKeyPressedEvent(EKey Key)
+			: AEvent(EEventCategory::Keyboard, EEventType::KeyPressed), m_Key(Key) {}
 
-		Key GetKey() const { return m_Key; }
+		EKey GetKey() const { return m_Key; }
 
-		static EventType GetStaticType() { return EventType::KeyPressed; }
+		static EEventType GetStaticType() { return EEventType::KeyPressed; }
 
 	private:
-		Key m_Key = Key::None;
+		EKey m_Key = EKey::None;
 	};
 
-	class KeyReleasedEvent : public Event
+	class AKeyReleasedEvent : public AEvent
 	{
 	public:
-		KeyReleasedEvent(Key key)
-			: Event(EventCategory::Keyboard, EventType::KeyReleased), m_Key(key) {}
+		AKeyReleasedEvent(EKey Key)
+			: AEvent(EEventCategory::Keyboard, EEventType::KeyReleased), m_Key(Key) {}
 
-		Key GetKey() const { return m_Key; }
+		EKey GetKey() const { return m_Key; }
 
-		static EventType GetStaticType() { return EventType::KeyReleased; }
+		static EEventType GetStaticType() { return EEventType::KeyReleased; }
 
 	private:
-		Key m_Key = Key::None;
+		EKey m_Key = EKey::None;
 	};
 
 }
