@@ -30,6 +30,9 @@ namespace Apricot {
 		bool8 OnMouseButtonPressed(const AMouseButtonPressedEvent* Event);
 		bool8 OnMouseButtonReleased(const AMouseButtonReleasedEvent* Event);
 		bool8 OnMouseWheelScrolled(const AMouseWheelScrolledEvent* Event);
+
+	private:
+		AEventDispatchMap m_DispatchMap;
 	};
 
 	extern AEngine* CreateEngine();

@@ -12,7 +12,15 @@
 
 #define AE_INVALID_MEMSIZE (static_cast<uint64>(-1))
 
+/**
+* 
+*/
 #define GetAlignmentOffset(MemoryAddress, Alignment) (((uint64)(Alignment) - (uintptr)(MemoryAddress) % (uint64)(Alignment)) % (uint64)(Alignment))
+
+/**
+*
+*/
+#define IsAddressBetween(Address, Begin, End) ( (uintptr)(Begin) <= (uintptr)(Address) && (uintptr)(Address) <= (uintptr)(End) )
 
 #define AE_KILOBYTES(Kilobytes) ((Kilobytes) * 1024)
 #define AE_MEGABYTES(Megabytes) ((Megabytes) * 1024 * 1024)
@@ -79,7 +87,7 @@ namespace Apricot {
 	/**
 	* 
 	*/
-	class APRICOT_API AMemoryArena : public AMalloc
+	class APRICOT_API AMemoryArena : public AMalloc, public AObject
 	{
 	public:
 		enum class EFailureMode : uint8
@@ -92,15 +100,8 @@ namespace Apricot {
 	public:
 		virtual ~AMemoryArena() = default;
 
-		virtual void FreeAll() = 0;
-		virtual int32 TryFreeAll() = 0;
-		virtual void FreeAllUnsafe() = 0;
-
 		virtual void GarbageCollect() = 0;
 
-		virtual uint64 GetTotalSize() const = 0;
-		virtual uint64 GetAllocatedSize() const = 0;
-		virtual uint64 GetFreeSize() const = 0;
 		virtual const TChar* GetDebugName() const = 0;
 
 		FORCEINLINE EFailureMode GetFailureMode() const { return m_FailureMode; }
@@ -108,6 +109,11 @@ namespace Apricot {
 
 	protected:
 		EFailureMode m_FailureMode = EFailureMode::Ignore;
+	};
+
+	enum class EAllocStrategy : uint8
+	{
+		BestFit, FirstFit
 	};
 
 }

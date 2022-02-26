@@ -17,7 +17,7 @@ namespace Apricot {
 		OpenGL = 5
 	};
 
-	inline bool IsRenderingAPISupported(ERenderingAPI Api)
+	inline bool8 IsRenderingAPISupported(ERenderingAPI Api)
 	{
 		switch (Api)
 		{

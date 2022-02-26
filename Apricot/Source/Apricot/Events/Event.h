@@ -78,16 +78,16 @@ namespace Apricot {
 		template<typename T>
 		using PFN_Dispatch = bool8(*)(const T* Ev);
 
-		PFN_Dispatch<AEvent> OnUnknown                                = [](const AEvent* e) -> bool8 { return false; };
-		PFN_Dispatch<AWindowClosedEvent> OnWindowClosed               = [](const AWindowClosedEvent* e) -> bool8 { return false; };
-		PFN_Dispatch<AWindowResizedEvent> OnWindowResized             = [](const AWindowResizedEvent* e) -> bool8 { return false; };
-		PFN_Dispatch<AWindowMovedEvent> OnWindowMoved                 = [](const AWindowMovedEvent* e) -> bool8 { return false; };
-		PFN_Dispatch<AKeyPressedEvent> OnKeyPressed                   = [](const AKeyPressedEvent* e) -> bool8 { return false; };
-		PFN_Dispatch<AKeyReleasedEvent> OnKeyReleased                 = [](const AKeyReleasedEvent* e) -> bool8 { return false; };
-		PFN_Dispatch<AMouseMovedEvent> OnMouseMoved                   = [](const AMouseMovedEvent* e) -> bool8 { return false; };
-		PFN_Dispatch<AMouseButtonPressedEvent> OnMouseButtonPressed   = [](const AMouseButtonPressedEvent* e) -> bool8 { return false; };
-		PFN_Dispatch<AMouseButtonReleasedEvent> OnMouseButtonReleased = [](const AMouseButtonReleasedEvent* e) -> bool8 { return false; };
-		PFN_Dispatch<AMouseWheelScrolledEvent> OnMouseWheelScrolled   = [](const AMouseWheelScrolledEvent* e) -> bool8 { return false; };
+		PFN_Dispatch<AEvent> OnUnknown                                = [](const AEvent*) -> bool8 { return false; };
+		PFN_Dispatch<AWindowClosedEvent> OnWindowClosed               = [](const AWindowClosedEvent*) -> bool8 { return false; };
+		PFN_Dispatch<AWindowResizedEvent> OnWindowResized             = [](const AWindowResizedEvent*) -> bool8 { return false; };
+		PFN_Dispatch<AWindowMovedEvent> OnWindowMoved                 = [](const AWindowMovedEvent*) -> bool8 { return false; };
+		PFN_Dispatch<AKeyPressedEvent> OnKeyPressed                   = [](const AKeyPressedEvent*) -> bool8 { return false; };
+		PFN_Dispatch<AKeyReleasedEvent> OnKeyReleased                 = [](const AKeyReleasedEvent*) -> bool8 { return false; };
+		PFN_Dispatch<AMouseMovedEvent> OnMouseMoved                   = [](const AMouseMovedEvent*) -> bool8 { return false; };
+		PFN_Dispatch<AMouseButtonPressedEvent> OnMouseButtonPressed   = [](const AMouseButtonPressedEvent*) -> bool8 { return false; };
+		PFN_Dispatch<AMouseButtonReleasedEvent> OnMouseButtonReleased = [](const AMouseButtonReleasedEvent*) -> bool8 { return false; };
+		PFN_Dispatch<AMouseWheelScrolledEvent> OnMouseWheelScrolled   = [](const AMouseWheelScrolledEvent*) -> bool8 { return false; };
 	};
 
 	class AEventDispatcher

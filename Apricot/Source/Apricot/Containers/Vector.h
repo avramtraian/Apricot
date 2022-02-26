@@ -9,6 +9,10 @@
 
 #include "Apricot/Core/Memory/HeapAllocator.h"
 
+#include "Iterators/VectorIterator.h"
+
+#include <initializer_list>
+
 namespace Apricot {
 
 	/*
@@ -20,13 +24,19 @@ namespace Apricot {
 	template<typename T, typename Alloc = AHeapAllocator>
 	class TVector
 	{
+	/* Typedefs */
+	public:
+		using ValueType = T;
+
+		using TIterator             = TVectorIterator<T>;
+		using TConstIterator        = TVectorIterator<const T>;
+		using TReverseIterator      = TVectorIterator<T>;
+		using TReverseConstIterator = TVectorIterator<const T>;
+
 	public:
 		TVector(Alloc* Allocator = nullptr)
+			: m_Data(nullptr), m_Capacity(0), m_Size(0)
 		{
-			m_Data = nullptr;
-			m_Capacity = 0;
-			m_Size = 0;
-
 			if (Allocator == nullptr)
 			{
 				if (Alloc::GetStaticType() == EAllocatorType::Heap)
@@ -46,6 +56,7 @@ namespace Apricot {
 		}
 
 		TVector(uint64 Capacity, Alloc* Allocator = nullptr)
+			: m_Data(nullptr), m_Capacity(0), m_Size(0)
 		{
 			if (Allocator == nullptr)
 			{
@@ -71,9 +82,11 @@ namespace Apricot {
 		}
 
 		TVector(const TVector<T, Alloc>& Other)
+			: m_Data(nullptr), m_Capacity(0), m_Size(0)
 		{
 			m_Allocator = Other.m_Allocator;
 			ReAllocate(Other.m_Size);
+			m_Size = Other.m_Size;
 
 			for (uint64 Index = 0; Index < Other.m_Size; Index++)
 			{
@@ -82,6 +95,7 @@ namespace Apricot {
 		}
 
 		TVector(TVector<T, Alloc>&& other) noexcept
+			: m_Data(nullptr), m_Capacity(0), m_Size(0)
 		{
 			m_Data = other.m_Data;
 			m_Capacity = other.m_Capacity;
@@ -93,6 +107,18 @@ namespace Apricot {
 			other.m_Size = 0;
 		}
 
+		TVector(std::initializer_list<T> IntializerList)
+			: m_Data(nullptr), m_Allocator(GHeapAllocator), m_Capacity(0), m_Size(0)
+		{
+			ReAllocate(IntializerList.size());
+
+			for (auto Element : IntializerList)
+			{
+				MemConstruct<T>(m_Data + m_Size, Element);
+				m_Size++;
+			}
+		}
+
 		~TVector()
 		{
 			ClearNoShrink();
@@ -100,11 +126,11 @@ namespace Apricot {
 		}
 
 	public:
-		T* Data() const { return m_Data; }
-		uint64 Capacity() const { return m_Capacity; }
-		uint64 Size() const { return m_Size; }
+		FORCEINLINE T* Data() const { return m_Data; }
+		FORCEINLINE uint64 Capacity() const { return m_Capacity; }
+		FORCEINLINE uint64 Size() const { return m_Size; }
 
-		bool8 IsEmpty() const { return (m_Size == 0); }
+		FORCEINLINE bool8 IsEmpty() const { return (m_Size == 0); }
 
 		/*
 		* 
@@ -168,12 +194,38 @@ namespace Apricot {
 			m_Data[m_Size].~T();
 		}
 
-		// TODO: Implement Insert, Emplace, Erase
+		// TODO: Implement Insert, Emplace
+
+		void Erase(TIterator First, TIterator Last)
+		{
+			AE_DEBUG_CHECK(First < Last);
+
+			Erase(First, Last - First);
+		}
+
+		void Erase(TIterator Element, uint64 Count = 1)
+		{
+			AE_DEBUG_CHECK(m_Data <= Element);
+
+			Erase(Element - m_Data, Count);
+		}
+
+		void Erase(uint64 ErasureIndex, uint64 Count = 1)
+		{
+			AE_DEBUG_CHECK(ErasureIndex + Count <= m_Size);
+
+			for (uint64 Index = ErasureIndex; Index < m_Size - Count; Index++)
+			{
+				m_Data[Index].~T();
+				MemConstruct<T>(m_Data + Index, Move(m_Data[Index + Count]));
+			}
+			m_Size -= Count;
+		}
 
 		/*
 		*
 		*/
-		void Resize(uint64 NewSize)
+		void SetSize(uint64 NewSize)
 		{
 			for (uint64 Index = NewSize; Index < m_Size; Index++)
 			{
@@ -190,7 +242,7 @@ namespace Apricot {
 		/*
 		*
 		*/
-		void Reserve(uint64 NewCapacity)
+		void SetCapacity(uint64 NewCapacity)
 		{
 			if (NewCapacity < m_Size)
 			{
@@ -441,6 +493,48 @@ namespace Apricot {
 			Other.m_Size = 0;
 
 			return *this;
+		}
+
+	/* Iterators */
+	public:
+		TIterator begin()
+		{
+			return TIterator(m_Data);
+		}
+
+		TIterator end()
+		{
+			return TIterator(m_Data + m_Size);
+		}
+
+		TConstIterator begin() const
+		{
+			return TConstIterator(m_Data);
+		}
+
+		TConstIterator end() const
+		{
+			return TConstIterator(m_Data + m_Size);
+		}
+
+		TReverseIterator rbegin()
+		{
+			return TReverseIterator(m_Data + m_Size - 1);
+		}
+
+		TReverseIterator rend()
+		{
+			return TReverseIterator(m_Data - 1);
+		}
+
+		TReverseConstIterator rbegin() const
+		{
+			return TReverseConstIterator(m_Data + m_Size - 1);
+		}
+
+		TReverseConstIterator rend() const
+		{
+			return TReverseConstIterator(m_Data - 1);
 		}
 
 	// Raw Memory Accesses

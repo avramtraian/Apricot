@@ -7,11 +7,11 @@
 #include "Apricot/Core/Types.h"
 #include "Apricot/Core/Assert.h"
 
-#include "Apricot/Containers/SmartPointers/SharedPtr.h"
-#include "Apricot/Containers/SmartPointers/SharedRef.h"
-#include "Apricot/Containers/SmartPointers/WeakPtr.h"
-#include "Apricot/Containers/SmartPointers/UniquePtr.h"
-#include "Apricot/Containers/SmartPointers/PtrConversions.h"
+#include "Apricot/Containers/SharedPtr.h"
+#include "Apricot/Containers/SharedRef.h"
+#include "Apricot/Containers/WeakPtr.h"
+#include "Apricot/Containers/UniquePtr.h"
+#include "Apricot/Containers/PtrConversions.h"
 
 #include "Apricot/Containers/Array.h"
 #include "Apricot/Containers/Vector.h"

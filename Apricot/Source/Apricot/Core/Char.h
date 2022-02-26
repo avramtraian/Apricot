@@ -23,8 +23,8 @@
 
 	using TChar = char16;
 	
-	#define AE_INTERNAL_TEXT(Text) L##Text
-	#define TEXT(Text) AE_INTERNAL_TEXT(Text)
+	#define ___TEXT(Text) L##Text
+	#define TEXT(Text) ___TEXT(Text)
 
 	#ifdef AE_COMPILER_MSVC
 		#define AE_FILE         TEXT(__FILE__)

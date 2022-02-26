@@ -4,7 +4,31 @@
 
 #include "ApricotMemory.h"
 
+#include "Apricot/Containers/SharedPtr.h"
+
 namespace Apricot {
+
+	/**
+	* 
+	*/
+	struct APoolArenaSpecification
+	{
+		uint64 PagesCount = 0;
+
+		uint64* PageChunkCounts = nullptr;
+
+		uint64* PageChunkSizes = nullptr;
+
+		void* ArenaMemory = nullptr;
+
+		uint64 ArenaMemoryOffset = 0;
+
+		bool bShouldGrow = true;
+
+		bool bBulkAllocateSpecPages = true;
+
+		bool bUseArenaMemoryAlways = false;
+	};
 
 	/**
 	* C++ Core Engine Architecture
@@ -17,39 +41,40 @@ namespace Apricot {
 	*/
 	class APRICOT_API APoolArena : public AMemoryArena
 	{
+	public:
+		NODISCARD static TSharedPtr<APoolArena> Create(const APoolArenaSpecification& Specification);
+
+		NODISCARD static uint64 GetMemoryRequirementEx(const APoolArenaSpecification& Specification);
+
+		NODISCARD static uint64 GetPageMemoryRequirement(uint64 ChunksCount, uint64 ChunkSize);
+
 	/* Constructors & Deconstructor */
 	private:
-		APoolArena();
-		virtual ~APoolArena() override = default;
+		APoolArena(const APoolArenaSpecification& Specification);
+		virtual ~APoolArena() override;
 
 		APoolArena(const APoolArena&) = delete;
 		APoolArena(APoolArena&&) = delete;
 		APoolArena& operator=(const APoolArena&) = delete;
 		APoolArena& operator=(APoolArena&&) = delete;
+
+	/* Typedefs */
+	public:
+		struct APage
+		{
+			void* MemoryBlock = nullptr;
+
+			uint64 ChunksCount = 0;
+
+			uint64 ChunkSize = 0;
+
+			void** FreeChunks = nullptr;
+
+			uint64 FreeChunksCount = 0;
+		};
 	
 	/* API interface */
 	public:
-		/**
-		* Returns the total size of the used chunks.
-		* Might not be accurate with the requested allocations' sizes.
-		*/
-		virtual uint64 GetAllocatedSize() const override;
-
-		/**
-		* Returns the debug tag of the arena.
-		*/
-		virtual const TChar* GetDebugName() const override;
-
-		/**
-		* Returns the total size of the free chunks.
-		*/
-		virtual uint64 GetFreeSize() const override;
-
-		/**
-		* Returns the total size of all chunks (free or not).
-		*/
-		virtual uint64 GetTotalSize() const override;
-
 		/**
 		* Allocates from a single chunk of memory. Because of this, the maximum size is the chunk size (but this ignores alignment).
 		* Generates errors based on the EFailureMode enum value. Always return nullptr on error.
@@ -62,7 +87,7 @@ namespace Apricot {
 		* 
 		* @returns A pointer that is guaranteed to have the specified Size and aligned to the specified Alignment.
 		*/
-		NODISCARD virtual void* Alloc(uint64 Size, uint64 Alignment = sizeof(void*)) override;
+		NODISCARD void* Alloc(uint64 Size, uint64 Alignment = sizeof(void*), EAllocStrategy Mode = EAllocStrategy::BestFit);
 
 		/**
 		* Allocates from a single chunk of memory. Because of this, the maximum size is the chunk size (but this ignores alignment).
@@ -79,7 +104,7 @@ namespace Apricot {
 		* @returns A flag specifying if any errors were encountered. A simple 'if' statement will check for any error flags.
 		*				All possible error return flags: AE_ALLOC_BAD_ARENA, AE_ALLOC_INVALID_SIZE, AE_ALLOC_OUT_OF_MEMORY.
 		*/
-		NODISCARD virtual int32 TryAlloc(uint64 Size, void** OutPointer, uint64 Alignment = sizeof(void*)) override;
+		NODISCARD int32 TryAlloc(uint64 Size, void** OutPointer, uint64 Alignment = sizeof(void*), EAllocStrategy Mode = EAllocStrategy::BestFit);
 
 		/**
 		* Allocates from a single chunk of memory. Because of this, the maximum size is the chunk size (but this ignores alignment).
@@ -93,7 +118,7 @@ namespace Apricot {
 		*
 		* @returns A pointer that is guaranteed to have the specified Size and aligned to the specified Alignment. If the function doesn't fail, of course.
 		*/
-		NODISCARD virtual void* AllocUnsafe(uint64 Size, uint64 Alignment = sizeof(void*)) override;
+		NODISCARD void* AllocUnsafe(uint64 Size, uint64 Alignment = sizeof(void*), EAllocStrategy Mode = EAllocStrategy::BestFit);
 
 		/**
 		* Frees the chunk where Allocation is placed.
@@ -103,7 +128,7 @@ namespace Apricot {
 		* 
 		* @param Size Size of the allocation. Currently, used only for debugging.
 		*/
-		virtual void Free(void* Allocation, uint64 Size) override;
+		virtual void Free(void* Allocation, uint64 Size);
 
 		/**
 		* Frees the chunk where Allocation is placed.
@@ -116,7 +141,7 @@ namespace Apricot {
 		* @returns A flag specifying if any errors were encountered. A simple 'if' statement will check for any error flags.
 		*				All possible error return flags: AE_FREE_BAD_ARENA, AE_FREE_POINTER_OUT_OF_RANGE, AE_FREE_ALREADY_FREED.
 		*/
-		virtual int32 TryFree(void* Allocation, uint64 Size) override;
+		int32 TryFree(void* Allocation, uint64 Size);
 
 		/**
 		* Frees the chunk where Allocation is placed.
@@ -126,83 +151,71 @@ namespace Apricot {
 		*
 		* @param Size Size of the allocation. Currently, used only for debugging.
 		*/
-		virtual void FreeUnsafe(void* Allocation, uint64 Size) override;
+		void FreeUnsafe(void* Allocation, uint64 Size);
 
-		virtual void FreeAll() override;
+		/**
+		* 
+		* 
+		* @returns 
+		*/
+		void FreeAll();
 
-		virtual int32 TryFreeAll() override;
+		/**
+		* 
+		* 
+		* @returns 
+		*/
+		int32 TryFreeAll();
 
-		virtual void FreeAllUnsafe() override;
+		/**
+		* 
+		*/
+		void FreeAllUnsafe();
 
 		/**
 		* 
 		*/
 		virtual void GarbageCollect() override;
 
-	private:
+		void AllocateNewPage(uint64 ChunksCount, uint64 ChunkSize);
+
+	/* Getters & Setters */
+	public:
 		/**
-		* Pointer to the memory that holds the chunks.
+		* Returns the total size of the used chunks.
+		* Might not be accurate with the requested allocations' sizes.
 		*/
-		void* m_MemoryBlock;
+		uint64 GetAllocatedSize() const;
 
 		/**
-		* Total size of the chunks.
+		* Returns the debug tag of the arena.
 		*/
-		uint64 m_TotalSizeBytes;
+		virtual const TChar* GetDebugName() const override;
 
 		/**
-		* Size of a single chunk.
+		* Returns the total size of the free chunks.
 		*/
-		uint64 m_ChunkSizeBytes;
+		uint64 GetFreeSize() const;
 
 		/**
-		* The memory used might be allocated from somewhere else, so we have to keep track if the arena allocated its memory on creation or not.
+		* Returns the total size of all chunks (free or not).
 		*/
-		bool8 m_bOwnsMemory;
+		uint64 GetTotalSize() const;
 
-		/**
-		* Array of pointers to each free chunk. Each chunk should have one freelist spot.
-		*/
-		void** m_FreeChunks;
-
-		/**
-		* Count of free chunks.
-		*/
-		uint64 m_FreeChunksCount;
+		FORCEINLINE const APoolArenaSpecification& GetSpecification() const { return m_Specification; }
 
 	private:
-		friend APRICOT_API APoolArena* CreatePoolArena(uint64, uint64, void*, uint64*);
-		friend APRICOT_API void DestroyPoolArena(APoolArena*);
+		APoolArenaSpecification m_Specification;
 
+		TVector<APage*> m_Pages;
+	
+	/* Friends */
+	private:
 		template<typename T, typename... Args>
 		friend constexpr T* MemConstruct(void*, Args&&...);
+
+		template<typename T>
+		friend class TSharedPtr;
 	};
-
-	/**
-	* Allocate & Create a Pool Arena.
-	* 
-	* @param ChunksCount The count of the pool's total chunks.
-	* 
-	* @param ChunkSizeBytes The size of a chunks, in bytes.
-	* 
-	* @param Memory Optional parameter that provides the pool with memory. If this is nullptr, the pool with allocate on the global heap, via GMalloc, the required memory.
-	*			Default value is nullptr.
-	* 
-	* @param OutMemoryRequirement Optional outer parameter that indicates how much memory was actually allocated/used. Default value is nullptr.
-	* 
-	* @returns Pointer to the freshly created pool.
-	*/
-	NODISCARD APRICOT_API APoolArena* CreatePoolArena(uint64 ChunksCount, uint64 ChunkSizeBytes, void* Memory = nullptr, uint64* OutMemoryRequirement = nullptr);
-
-	/**
-	* Destroys a Pool Arena.
-	*/
-	APRICOT_API void DestroyPoolArena(APoolArena* Pool);
-
-	/**
-	* Calculates how much memory is actually required for creating a pool arena (Chunks, Freelist alignment, Freelist).
-	* This function is also called internally when 'CreatePoolArena', the return value being placed in the OutMemoryRequirement outer parameter.
-	*/
-	APRICOT_API uint64 GetPoolArenaMemoryRequirement(uint64 ChunksCount, uint64 ChunkSizeBytes);
 
 }

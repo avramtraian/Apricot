@@ -35,9 +35,9 @@ namespace Apricot {
 			return AE_EXIT_FAILED_INIT;
 		}
 
-		AE_CORE_DEBUG(TEXT("{}"), AMemoryDebugger::GetRegionsUsageString());
-		AE_CORE_DEBUG(TEXT("{}"), AMemoryDebugger::GetSubregionsUsageString());
-		AE_CORE_DEBUG(TEXT("{}"), AMemoryDebugger::GetTaggedUsageString());
+		// AE_CORE_DEBUG(TEXT("{}"), AMemoryDebugger::GetRegionsUsageString());
+		// AE_CORE_DEBUG(TEXT("{}"), AMemoryDebugger::GetSubregionsUsageString());
+		// AE_CORE_DEBUG(TEXT("{}"), AMemoryDebugger::GetTaggedUsageString());
 
 		while (true)
 		{
@@ -54,25 +54,22 @@ namespace Apricot {
 
 	void AEngine::OnEvent(AEvent* Event)
 	{
-		static AEventDispatchMap Map;
-		Map.OnWindowClosed = [](const AWindowClosedEvent* Ev) -> bool8 { return GEngine->OnWindowClosed(Ev); };
-		Map.OnWindowResized = [](const AWindowResizedEvent* Ev) -> bool8 { return GEngine->OnWindowResized(Ev); };
-		Map.OnWindowMoved = [](const AWindowMovedEvent* Ev) -> bool8 { return GEngine->OnWindowMoved(Ev); };
-
-		Map.OnKeyPressed = [](const AKeyPressedEvent* Ev) -> bool8 { return GEngine->OnKeyPressed(Ev); };
-		Map.OnKeyReleased = [](const AKeyReleasedEvent* Ev) -> bool8 { return GEngine->OnKeyReleased(Ev); };
-
-		Map.OnMouseMoved = [](const AMouseMovedEvent* Ev) -> bool8 { return GEngine->OnMouseMoved(Ev); };
-		Map.OnMouseButtonPressed = [](const AMouseButtonPressedEvent* Ev) -> bool8 { return GEngine->OnMouseButtonPressed(Ev); };
-		Map.OnMouseButtonReleased = [](const AMouseButtonReleasedEvent* Ev) -> bool8 { return GEngine->OnMouseButtonReleased(Ev); };
-		Map.OnMouseWheelScrolled = [](const AMouseWheelScrolledEvent* Ev) -> bool8 { return GEngine->OnMouseWheelScrolled(Ev); };
-
-		AEventDispatcher Dispatcher(Event, &Map);
+		AEventDispatcher Dispatcher(Event, &m_DispatchMap);
 		Dispatcher.Dispatch();
 	}
 
 	bool8 AEngine::OnEngineInitialize(const char8* CommandLine)
 	{
+		m_DispatchMap.OnWindowClosed = [](const AWindowClosedEvent* Ev) -> bool8 { return GEngine->OnWindowClosed(Ev); };
+		m_DispatchMap.OnWindowResized = [](const AWindowResizedEvent* Ev) -> bool8 { return GEngine->OnWindowResized(Ev); };
+		m_DispatchMap.OnWindowMoved = [](const AWindowMovedEvent* Ev) -> bool8 { return GEngine->OnWindowMoved(Ev); };
+		m_DispatchMap.OnKeyPressed = [](const AKeyPressedEvent* Ev) -> bool8 { return GEngine->OnKeyPressed(Ev); };
+		m_DispatchMap.OnKeyReleased = [](const AKeyReleasedEvent* Ev) -> bool8 { return GEngine->OnKeyReleased(Ev); };
+		m_DispatchMap.OnMouseMoved = [](const AMouseMovedEvent* Ev) -> bool8 { return GEngine->OnMouseMoved(Ev); };
+		m_DispatchMap.OnMouseButtonPressed = [](const AMouseButtonPressedEvent* Ev) -> bool8 { return GEngine->OnMouseButtonPressed(Ev); };
+		m_DispatchMap.OnMouseButtonReleased = [](const AMouseButtonReleasedEvent* Ev) -> bool8 { return GEngine->OnMouseButtonReleased(Ev); };
+		m_DispatchMap.OnMouseWheelScrolled = [](const AMouseWheelScrolledEvent* Ev) -> bool8 { return GEngine->OnMouseWheelScrolled(Ev); };
+
 		ALogger::Init();
 
 		AE_CORE_INFO(TEXT("Engine initialization succeded!"));

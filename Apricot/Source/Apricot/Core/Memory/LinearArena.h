@@ -89,7 +89,7 @@ namespace Apricot {
 		* 
 		* @returns Pointer to the aligned memory block. In case of failure, it will return nullptr.
 		*/
-		NODISCARD virtual void* Alloc(uint64 Size, uint64 Alignment = sizeof(void*)) override;
+		NODISCARD void* Alloc(uint64 Size, uint64 Alignment = sizeof(void*));
 
 		/**
 		* Allocates a block of memory.
@@ -105,7 +105,7 @@ namespace Apricot {
 		* @returns EEAllocErrors flag indicating failure or success. Possible error return codes: AE_ALLOC_BAD_ARENA, AE_ALLOC_INVALID_SIZE, AE_ALLOC_INVALID_PARAM,
 		*				AE_ALLOC_BAD_ALIGNMENT, AE_ALLOC_OUT_OF_MEMORY.
 		*/
-		NODISCARD virtual int32 TryAlloc(uint64 Size, void** OutPointer, uint64 Alignment = sizeof(void*)) override;
+		NODISCARD int32 TryAlloc(uint64 Size, void** OutPointer, uint64 Alignment = sizeof(void*));
 
 		/**
 		* Allocates a block of memory.
@@ -118,7 +118,7 @@ namespace Apricot {
 		*
 		* @returns Pointer to the aligned memory block. It will return nullptr ONLY when the arena is fully allocated and 'bShouldGrow' is false.
 		*/
-		NODISCARD virtual void* AllocUnsafe(uint64 Size, uint64 Alignment = sizeof(void*)) override;
+		NODISCARD void* AllocUnsafe(uint64 Size, uint64 Alignment = sizeof(void*));
 
 		/**
 		* Inheritance artifact.
@@ -126,7 +126,7 @@ namespace Apricot {
 		* 
 		* None of the parameters matters.
 		*/
-		virtual void Free(void* Allocation, uint64 Size) override;
+		void Free(void* Allocation, uint64 Size);
 
 		/**
 		* Inheritance artifact.
@@ -134,7 +134,7 @@ namespace Apricot {
 		* 
 		* None of the parameters matters.
 		*/
-		virtual int32 TryFree(void* Allocation, uint64 Size) override;
+		int32 TryFree(void* Allocation, uint64 Size);
 
 		/**
 		* Inheritance artifact.
@@ -142,13 +142,13 @@ namespace Apricot {
 		* 
 		* None of the parameters matters.
 		*/
-		virtual void FreeUnsafe(void* Allocation, uint64 Size) override;
+		void FreeUnsafe(void* Allocation, uint64 Size);
 
 		/**
 		* This will free all pages, and will not delete any of them.
 		* It will always succeed.
 		*/
-		virtual void FreeAll() override;
+		void FreeAll();
 
 		/**
 		* This will free all pages, and will not delete any of them.
@@ -156,13 +156,13 @@ namespace Apricot {
 		* 
 		* @returns A flag specifying if any errors were encountered. A simple 'if' statement will check for any error flags.
 		*/
-		virtual int32 TryFreeAll() override;
+		int32 TryFreeAll();
 
 		/**
 		* This will free all pages, and will not delete any of them.
 		* It will always succeed.
 		*/
-		virtual void FreeAllUnsafe() override;
+		void FreeAllUnsafe();
 
 		/**
 		* Deletes all the unused pages. It cannot delete the specification pages, because they aren't allocated individually.
@@ -174,19 +174,19 @@ namespace Apricot {
 		/**
 		* Returns the total size of all pages.
 		*/
-		virtual uint64 GetTotalSize() const override;
+		uint64 GetTotalSize() const;
 
 		/**
 		* Returns the total allocated size from each page.
 		* Might not be accurate with the requested allocations' sizes.
 		*/
-		virtual uint64 GetAllocatedSize() const override;
+		uint64 GetAllocatedSize() const;
 
 		/**
 		* Returns the available size. Remember that this memory might not be contiguous, so this is not as the biggest size
 		*	that can be allocated without having to allocate a new page.
 		*/
-		virtual uint64 GetFreeSize() const override;
+		uint64 GetFreeSize() const;
 
 		/**
 		* Returns the debug tag of the arena.

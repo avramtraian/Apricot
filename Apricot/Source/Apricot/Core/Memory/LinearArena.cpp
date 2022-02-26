@@ -272,7 +272,7 @@ namespace Apricot {
 		MemConstruct<ALinearArena>(Arena);
 
 		Arena->m_Specification = Specification;
-		Arena->m_Pages.Reserve(Specification.PagesCount);
+		Arena->m_Pages.SetCapacity(Specification.PagesCount);
 		Arena->m_CurrentPage = 0;
 
 		MemoryOffset += sizeof(ALinearArena);

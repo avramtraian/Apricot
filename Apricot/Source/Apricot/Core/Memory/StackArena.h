@@ -84,47 +84,47 @@ namespace Apricot {
 		/**
 		*
 		*/
-		NODISCARD virtual void* Alloc(uint64 Size, uint64 Alignment = sizeof(void*)) override;
+		NODISCARD void* Alloc(uint64 Size, uint64 Alignment = sizeof(void*));
 
 		/**
 		*
 		*/
-		NODISCARD virtual int32 TryAlloc(uint64 Size, void** OutPointer, uint64 Alignment = sizeof(void*)) override;
+		NODISCARD int32 TryAlloc(uint64 Size, void** OutPointer, uint64 Alignment = sizeof(void*));
 
 		/**
 		*
 		*/
-		NODISCARD virtual void* AllocUnsafe(uint64 Size, uint64 Alignment = sizeof(void*)) override;
+		NODISCARD void* AllocUnsafe(uint64 Size, uint64 Alignment = sizeof(void*));
 
 		/**
 		*
 		*/
-		virtual void Free(void* Allocation, uint64 Size) override;
+		void Free(void* Allocation, uint64 Size);
 
 		/**
 		*
 		*/
-		virtual int32 TryFree(void* Allocation, uint64 Size) override;
+		int32 TryFree(void* Allocation, uint64 Size);
 
 		/**
 		*
 		*/
-		virtual void FreeUnsafe(void* Allocation, uint64 Size) override;
+		void FreeUnsafe(void* Allocation, uint64 Size);
 
 		/**
 		*
 		*/
-		virtual void FreeAll() override;
+		void FreeAll();
 
 		/**
 		*
 		*/
-		virtual int32 TryFreeAll() override;
+		int32 TryFreeAll();
 
 		/**
 		*
 		*/
-		virtual void FreeAllUnsafe() override;
+		void FreeAllUnsafe();
 
 		/**
 		*
@@ -151,17 +151,17 @@ namespace Apricot {
 		/**
 		*
 		*/
-		virtual uint64 GetTotalSize() const override;
+		uint64 GetTotalSize() const;
 
 		/**
 		*
 		*/
-		virtual uint64 GetAllocatedSize() const override;
+		uint64 GetAllocatedSize() const;
 
 		/**
 		*
 		*/
-		virtual uint64 GetFreeSize() const override;
+		uint64 GetFreeSize() const;
 
 		/**
 		*
@@ -224,7 +224,7 @@ namespace Apricot {
 	private:
 		friend APRICOT_API uint64 GetStackArenaMemoryRequirementEx(const AStackArenaSpecification&);
 		friend APRICOT_API AStackArena* CreateStackArenaEx(const AStackArenaSpecification&);
-		friend APRICOT_API void DestroyStackArena(AStackArena*);
+		friend APRICOT_API void DestroyStackArena(AStackArena* Arena);
 
 		template<typename T, typename... Args>
 		friend constexpr FORCEINLINE T* MemConstruct(void*, Args&&...);
@@ -238,7 +238,7 @@ namespace Apricot {
 	/**
 	* 
 	*/
-	NODISCARD APRICOT_API AStackArena* CreateStackArenaEx(const AStackArenaSpecification&);
+	NODISCARD APRICOT_API AStackArena* CreateStackArenaEx(const AStackArenaSpecification& Specfication);
 
 	/**
 	* 

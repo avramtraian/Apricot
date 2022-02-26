@@ -274,7 +274,7 @@ namespace Apricot {
 #endif
 
 		TSharedPtr<T> SharedPtr;
-		SharedPtr.RawSetPointer(Memory_Placement<T>(Memory, Forward<Args>(args)...));
+		SharedPtr.RawSetPointer(MemConstruct<T>(Memory, Forward<Args>(args)...));
 		((TRemoveConst_Type<T>*)SharedPtr.Get())->SetAllocator(GHeapAllocator);
 		((TRemoveConst_Type<T>*)SharedPtr.Get())->IncreaseReferenceCount();
 		return SharedPtr;

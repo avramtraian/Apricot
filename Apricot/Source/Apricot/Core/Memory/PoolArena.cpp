@@ -5,195 +5,257 @@
 
 namespace Apricot {
 
-	APoolArena::APoolArena()
-		: m_MemoryBlock(nullptr), m_TotalSizeBytes(AE_INVALID_MEMSIZE), m_ChunkSizeBytes(AE_INVALID_MEMSIZE), m_bOwnsMemory(false), m_FreeChunks(nullptr), m_FreeChunksCount(0)
+	namespace Utils {
+		
+		static APoolArena::APage* ConstructNewPage(uint8* ArenaMemory, uint64& Offset, uint64 ChunksCount, uint64 ChunkSize)
+		{
+			Offset += GetAlignmentOffset(Offset, sizeof(void*));
+
+			APoolArena::APage* Page = (APoolArena::APage*)(ArenaMemory + Offset);
+			MemConstruct<APoolArena::APage>(Page);
+			Offset += sizeof(APoolArena::APage);
+
+			Page->FreeChunksCount = ChunksCount;
+			Page->FreeChunks = (void**)(ArenaMemory + Offset);
+			Offset += Page->FreeChunksCount * sizeof(void*);
+
+			Page->MemoryBlock = ArenaMemory + Offset;
+			Page->ChunksCount = ChunksCount;
+			Page->ChunkSize = ChunkSize;
+
+			for (uint64 Index = 0; Index < Page->FreeChunksCount; Index++)
+			{
+				Page->FreeChunks[Index] = ArenaMemory + Offset;
+				Offset += Page->ChunkSize;
+			}
+
+			return Page;
+		}
+
+	}
+
+	TSharedPtr<APoolArena> APoolArena::Create(const APoolArenaSpecification& Specification)
 	{
+		return MakeShared<APoolArena>(Specification);
+	}
+
+	NODISCARD uint64 APoolArena::GetMemoryRequirementEx(const APoolArenaSpecification& Specification)
+	{
+		uint64 MemoryRequirement = 0;
+
+		for (uint64 Index = 0; Index < Specification.PagesCount; Index++)
+		{
+			MemoryRequirement += GetPageMemoryRequirement(Specification.PageChunkCounts[Index], Specification.PageChunkSizes[Index]);
+		}
+
+		return MemoryRequirement;
+	}
+
+	NODISCARD uint64 APoolArena::GetPageMemoryRequirement(uint64 ChunksCount, uint64 ChunkSize)
+	{
+		uint64 MemoryRequirement = 0;
+
+		MemoryRequirement += GetAlignmentOffset(MemoryRequirement, sizeof(void*));
+		MemoryRequirement += sizeof(APage);
+		MemoryRequirement += ChunksCount * sizeof(void*);
+		MemoryRequirement += ChunksCount * ChunkSize;
+
+		return MemoryRequirement;
+	}
+
+	APoolArena::APoolArena(const APoolArenaSpecification& Specification)
+		: m_Specification(Specification)
+	{
+		m_Pages.SetCapacity(m_Specification.PagesCount);
+
+		uint8* ArenaMemory = (uint8*)m_Specification.ArenaMemory;
+
+		if (m_Specification.bBulkAllocateSpecPages || ArenaMemory)
+		{
+			if (!ArenaMemory)
+			{
+				ArenaMemory = (uint8*)GMalloc->Alloc(GetMemoryRequirementEx(m_Specification));
+			}
+			uint64 MemoryOffset = 0;
+
+			for (uint64 Index = 0; Index < m_Specification.PagesCount; Index++)
+			{
+				m_Pages.PushBack(Utils::ConstructNewPage(ArenaMemory, MemoryOffset, m_Specification.PageChunkCounts[Index], m_Specification.PageChunkSizes[Index]));
+			}
+		}
+		else
+		{
+			for (uint64 Index = 0; Index < m_Specification.PagesCount; Index++)
+			{
+				uint64 MemoryOffset = 0;
+				uint64 PageChunksCount = m_Specification.PageChunkCounts[Index];
+				uint64 PageChunkSize = m_Specification.PageChunkSizes[Index];
+
+				ArenaMemory = (uint8*)GMalloc->Alloc(GetPageMemoryRequirement(PageChunksCount, PageChunkSize));
+				m_Pages.PushBack(Utils::ConstructNewPage(ArenaMemory, MemoryOffset, PageChunksCount, PageChunkSize));
+			}
+		}
+	}
+
+	APoolArena::~APoolArena()
+	{
+		if (!m_Specification.bUseArenaMemoryAlways)
+		{
+			for (uint64 Index = m_Specification.PagesCount; Index < m_Pages.Size(); Index++)
+			{
+				GMalloc->Free(m_Pages[Index], GetPageMemoryRequirement(m_Pages[Index]->ChunksCount, m_Pages[Index]->ChunkSize));
+			}
+		}
+		if (!m_Specification.ArenaMemory && !m_Pages.IsEmpty())
+		{
+			GMalloc->Free(m_Pages[0], GetMemoryRequirementEx(m_Specification));
+		}
 	}
 
 	uint64 APoolArena::GetAllocatedSize() const
 	{
-		return m_TotalSizeBytes - m_FreeChunksCount * m_ChunkSizeBytes;
+		uint64 AllocatedSize = 0;
+
+		for (uint64 Index = 0; Index < m_Pages.Size(); Index++)
+		{
+			AllocatedSize += (m_Pages[Index]->ChunksCount - m_Pages[Index]->FreeChunksCount) * m_Pages[Index]->ChunkSize;
+		}
+
+		return AllocatedSize;
 	}
 
 	const TChar* APoolArena::GetDebugName() const
 	{
-		return TEXT("Base_POOLARENA");
+		return TEXT("POOL_ARENA");
 	}
 
 	uint64 APoolArena::GetFreeSize() const
 	{
-		return m_FreeChunksCount * m_ChunkSizeBytes;
+		uint64 FreeSize = 0;
+
+		for (uint64 Index = 0; Index < m_Pages.Size(); Index++)
+		{
+			FreeSize += m_Pages[Index]->FreeChunksCount * m_Pages[Index]->ChunkSize;
+		}
+
+		return FreeSize;
 	}
 
 	uint64 APoolArena::GetTotalSize() const
 	{
-		return m_TotalSizeBytes;
+		uint64 TotalSize = 0;
+
+		for (uint64 Index = 0; Index < m_Pages.Size(); Index++)
+		{
+			TotalSize += m_Pages[Index]->ChunksCount * m_Pages[Index]->ChunkSize;
+		}
+
+		return TotalSize;
 	}
 
-	void* APoolArena::Alloc(uint64 Size, uint64 Alignment /*= sizeof(void*)*/)
+	NODISCARD void* APoolArena::Alloc(uint64 Size, uint64 Alignment /*= sizeof(void*)*/, EAllocStrategy Mode /*= EFindMode::BestFit*/)
 	{
-		if (!m_MemoryBlock)
+		if (Mode == EAllocStrategy::BestFit)
 		{
-			switch (m_FailureMode)
+			uint64 MinimumSize = AE_UINT64_MAX;
+			APage* BestPage = nullptr;
+
+			for (uint64 Index = 0; Index < m_Pages.Size(); Index++)
 			{
-				case AMemoryArena::EFailureMode::Assert:
-					AE_CHECK(false); /* Invalid PoolArena */
-					break;
-				case AMemoryArena::EFailureMode::Error:
-					AE_CORE_ERROR(TEXT("PoolArena failure - Invalid PoolArena. Returning nullptr."));
-					break;
+				if (m_Pages[Index]->FreeChunksCount > 0 && Size + Alignment - 1 <= m_Pages[Index]->ChunkSize)
+				{
+					if (m_Pages[Index]->ChunkSize < MinimumSize)
+					{
+						MinimumSize = m_Pages[Index]->ChunkSize;
+						BestPage = m_Pages[Index];
+						if (MinimumSize == Size + Alignment - 1)
+						{
+							break;
+						}
+					}
+				}
 			}
-			return nullptr;
+
+			if (BestPage != nullptr)
+			{
+				uint8* Memory = (uint8*)BestPage->FreeChunks[--BestPage->FreeChunksCount];
+				uint64 AlignmentOffset = GetAlignmentOffset(Memory, Alignment);
+				return Memory + AlignmentOffset;
+			}
 		}
-		if (Size > m_ChunkSizeBytes)
+		else if (Mode == EAllocStrategy::FirstFit)
 		{
-			switch (m_FailureMode)
+			for (uint64 Index = 0; Index < m_Pages.Size(); Index++)
 			{
-				case AMemoryArena::EFailureMode::Assert:
-					AE_CHECK(false); /* Pool chunk too small for this allocation */
-					break;
-				case AMemoryArena::EFailureMode::Error:
-					AE_CORE_ERROR(TEXT("PoolArena failure - Pool chunk too small for the requested allocation. Returning nullptr."));
-					break;
+				if (m_Pages[Index]->FreeChunksCount > 0 && Size + Alignment - 1 <= m_Pages[Index]->ChunkSize)
+				{
+					uint8* Memory = (uint8*)m_Pages[Index]->FreeChunks[--m_Pages[Index]->FreeChunksCount];
+					uint64 AlignmentOffset = GetAlignmentOffset(Memory, Alignment);
+					return Memory + AlignmentOffset;
+				}
 			}
-			return nullptr;
 		}
-		if (m_FreeChunksCount == 0)
+
+		if (!m_Specification.bShouldGrow)
 		{
-			switch (m_FailureMode)
-			{
-				case AMemoryArena::EFailureMode::Assert:
-					AE_CHECK(false); /* Pool arena out of memory */
-					break;
-				case AMemoryArena::EFailureMode::Error:
-					AE_CORE_ERROR(TEXT("PoolArena failure - Pool arena out of memory. Returning nullptr."));
-					break;
-			}
+			// TODO: Report error
 			return nullptr;
 		}
 
-		void* Chunk = m_FreeChunks[--m_FreeChunksCount];
-		uint64 AlignmentOffset = (Alignment - (uintptr)Chunk % Alignment) % Alignment;
-		if (Size + AlignmentOffset > m_ChunkSizeBytes)
+		// Arbitrary number
+		// TODO (Avr): Think about a better way of calculating these values 
+		uint64 NewPageChunksCount = 32;
+		uint64 NewPageChunkSize = Size + Alignment - 1;
+		if (!m_Pages.IsEmpty())
 		{
-			switch (m_FailureMode)
+			uint64 MedianChunksCount = 0;
+			uint64 MedianChunkSize = 0;
+			for (const APage* Page : m_Pages)
 			{
-				case AMemoryArena::EFailureMode::Assert:
-					AE_CHECK(false); /* Pool chunk too small for the requested allocation, taking into account the alignment */
-					break;
-				case AMemoryArena::EFailureMode::Error:
-					AE_CORE_ERROR(TEXT("PoolArena failure - Pool chunk too small for the requested allocation, taking into account the alignment. Returning nullptr."));
-					break;
+				MedianChunksCount += Page->ChunksCount;
+				MedianChunkSize += Page->ChunkSize;
 			}
-			return nullptr;
+			MedianChunksCount /= m_Pages.Size();
+			MedianChunkSize /= m_Pages.Size();
+
+			NewPageChunksCount = MedianChunksCount;
+			if (NewPageChunkSize < MedianChunkSize)
+			{
+				NewPageChunkSize = MedianChunkSize;
+			}
 		}
-		return (uint8*)Chunk + AlignmentOffset;
+
+		AllocateNewPage(NewPageChunksCount, NewPageChunkSize);
+		APage* NewPage = m_Pages.Back();
+
+		uint8* Memory = (uint8*)NewPage->FreeChunks[--NewPage->FreeChunksCount];
+		uint64 AlignmentOffset = GetAlignmentOffset(Memory, Alignment);
+		return Memory + AlignmentOffset;
 	}
 
-	int32 APoolArena::TryAlloc(uint64 Size, void** OutPointer, uint64 Alignment /*= sizeof(void*)*/)
+	NODISCARD int32 APoolArena::TryAlloc(uint64 Size, void** OutPointer, uint64 Alignment /*= sizeof(void*)*/, EAllocStrategy Mode /*= EFindMode::BestFit*/)
 	{
-		if (!m_MemoryBlock)
-		{
-			return (int16)EMemoryError::InvalidArena;
-		}
-		if (Size > m_ChunkSizeBytes || Size == 0)
-		{
-			return (int16)EMemoryError::InvalidSize;
-		}
-		if (m_FreeChunksCount == 0)
-		{
-			return (int16)EMemoryError::OutOfMemory;
-		}
-
-		void* Chunk = m_FreeChunks[--m_FreeChunksCount];
-		uint64 AlignmentOffset = (Alignment - (uintptr)Chunk % Alignment) % Alignment;
-		if (Size + AlignmentOffset > m_ChunkSizeBytes)
-		{
-			m_FreeChunksCount++;
-			/* TODO: Information about the fact that this error is triggered due to alignment */
-			return (int16)EMemoryError::InvalidSize;
-		}
-		*OutPointer = (uint8*)Chunk + AlignmentOffset;
-		return (int16)EMemoryError::Success;
+		return (int32)EMemoryError::Success;
 	}
 
-	void* APoolArena::AllocUnsafe(uint64 Size, uint64 Alignment /*= sizeof(void*)*/)
+	NODISCARD void* APoolArena::AllocUnsafe(uint64 Size, uint64 Alignment /*= sizeof(void*)*/, EAllocStrategy Mode /*= EFindMode::BestFit*/)
 	{
-		void* Chunk = m_FreeChunks[--m_FreeChunksCount];
-		uint64 AlignmentOffset = (Alignment - (uintptr)Chunk % Alignment) % Alignment;
-		return (uint8*)Chunk + AlignmentOffset;
+		return nullptr;
 	}
 
 	void APoolArena::Free(void* Allocation, uint64 Size)
 	{
-		if (!m_MemoryBlock)
-		{
-			switch (m_FailureMode)
-			{
-				case AMemoryArena::EFailureMode::Assert:
-					AE_CHECK(false); /* Invalid PoolArena */
-					break;
-				case AMemoryArena::EFailureMode::Error:
-					AE_CORE_ERROR(TEXT("PoolArena failure - Invalid PoolArena. Returning."));
-					break;
-			}
-			return;
-		}
-		if (m_MemoryBlock > Allocation || Allocation >= (uint8_t*)m_MemoryBlock + m_TotalSizeBytes)
-		{
-			switch (m_FailureMode)
-			{
-				case AMemoryArena::EFailureMode::Assert:
-					AE_CHECK(false); /* Pointer out of range */
-					break;
-				case AMemoryArena::EFailureMode::Error:
-					AE_CORE_ERROR(TEXT("PoolArena failure - Pointer out of range. Returning."));
-					break;
-			}
-			return;
-		}
-		if (m_FreeChunksCount == m_TotalSizeBytes / m_ChunkSizeBytes)
-		{
-			switch (m_FailureMode)
-			{
-				case AMemoryArena::EFailureMode::Assert:
-					AE_CHECK(false); /* There are no allocated chunks (to free) */
-					break;
-				case AMemoryArena::EFailureMode::Error:
-					AE_CORE_ERROR(TEXT("PoolArena failure - There are no allocated chunks (to free). Returning."));
-					break;
-			}
-			return;
-		}
-
-		void* AllocationChunk = (uint8*)Allocation - ((uintptr)Allocation - (uintptr)m_MemoryBlock) % m_ChunkSizeBytes;
-		m_FreeChunks[m_FreeChunksCount++] = AllocationChunk;
+		
 	}
 
 	int32 APoolArena::TryFree(void* Allocation, uint64 Size)
 	{
-		if (!m_MemoryBlock)
-		{
-			return (int16)EMemoryError::InvalidArena;
-		}
-		if (m_MemoryBlock > Allocation || Allocation >= (uint8_t*)m_MemoryBlock + m_TotalSizeBytes)
-		{
-			return (int16)EMemoryError::PointerOutOfRange;
-		}
-		if (m_FreeChunksCount == (m_TotalSizeBytes / m_ChunkSizeBytes))
-		{
-			return (int16)EMemoryError::AlreadyFreed;
-		}
-
-		void* AllocationChunk = (uint8*)Allocation - ((uintptr)Allocation - (uintptr)m_MemoryBlock) % m_ChunkSizeBytes;
-		m_FreeChunks[m_FreeChunksCount++] = AllocationChunk;
-		return (int16)EMemoryError::Success;
+		return (int32)EMemoryError::Success;
 	}
 
 	void APoolArena::FreeUnsafe(void* Allocation, uint64 Size)
 	{
-		void* AllocationChunk = (uint8*)Allocation - ((uintptr)Allocation - (uintptr)m_MemoryBlock) % m_ChunkSizeBytes;
-		m_FreeChunks[m_FreeChunksCount++] = AllocationChunk;
+		
 	}
 
 	void APoolArena::FreeAll()
@@ -203,7 +265,7 @@ namespace Apricot {
 
 	int32 APoolArena::TryFreeAll()
 	{
-		return (int16)EMemoryError::InvalidCall;
+		return (int32)EMemoryError::Success;
 	}
 
 	void APoolArena::FreeAllUnsafe()
@@ -213,72 +275,35 @@ namespace Apricot {
 
 	void APoolArena::GarbageCollect()
 	{
-		
-	}
-
-	APRICOT_API APoolArena* CreatePoolArena(uint64 ChunksCount, uint64 ChunkSizeBytes, void* Memory /*= nullptr*/, uint64* OutMemoryRequirement /*= nullptr*/)
-	{
-		/* TODO: Allocate the actual pool arena */
-		APoolArena* Pool = (APoolArena*)GMalloc->Alloc(sizeof(APoolArena));
-		MemConstruct<APoolArena>(Pool);
-
-		Pool->m_TotalSizeBytes = ChunksCount * ChunkSizeBytes;
-		Pool->m_ChunkSizeBytes = ChunkSizeBytes;
-		Pool->m_FreeChunksCount = ChunksCount;
-
-		uint64 PoolMemorySize = GetPoolArenaMemoryRequirement(ChunksCount, ChunkSizeBytes);
-		if (OutMemoryRequirement)
+		for (int64 Index = m_Pages.Size() - 1; Index >= (int64)m_Specification.PagesCount; Index--)
 		{
-			*OutMemoryRequirement = PoolMemorySize;
+			APage* Page = m_Pages[Index];
+			if (Page->FreeChunksCount == Page->ChunksCount)
+			{
+				if (!m_Specification.bUseArenaMemoryAlways)
+				{
+					GMalloc->Free(Page, GetPageMemoryRequirement(Page->ChunksCount, Page->ChunkSize));
+				}
+
+				m_Pages.Erase(Index);
+			}
 		}
 
-		if (Memory)
+		// TODO (Avr): Garbage collect the specification pages aswell
+	}
+
+	void APoolArena::AllocateNewPage(uint64 ChunksCount, uint64 ChunkSize)
+	{
+		if (m_Specification.bUseArenaMemoryAlways)
 		{
-			Pool->m_MemoryBlock = Memory;
-			Pool->m_bOwnsMemory = false;
+			m_Pages.PushBack(Utils::ConstructNewPage((uint8*)m_Specification.ArenaMemory, m_Specification.ArenaMemoryOffset, ChunksCount, ChunkSize));
 		}
 		else
 		{
-			Pool->m_MemoryBlock = GMalloc->Alloc(PoolMemorySize, sizeof(void*));
-			Pool->m_bOwnsMemory = true;
+			uint8* Memory = (uint8*)GMalloc->Alloc(GetPageMemoryRequirement(ChunksCount, ChunkSize));
+			uint64 Offset = 0;
+			m_Pages.PushBack(Utils::ConstructNewPage(Memory, Offset, ChunksCount, ChunkSize));
 		}
-		Pool->m_FreeChunks = (void**)((uint8*)Pool->m_MemoryBlock + PoolMemorySize - (ChunksCount * sizeof(void*)));
-
-		for (uint64 Index = 0; Index < Pool->m_FreeChunksCount; Index++)
-		{
-			Pool->m_FreeChunks[Index] = (uint8*)Pool->m_MemoryBlock + Pool->m_ChunkSizeBytes * Index;
-		}
-
-		return Pool;
-	}
-
-	APRICOT_API void DestroyPoolArena(APoolArena* Pool)
-	{
-		if (Pool)
-		{
-			if (Pool->m_bOwnsMemory)
-			{
-				void* PoolMemory = Pool->m_MemoryBlock;
-				uint64 PoolMemorySize = ((uintptr)Pool->m_FreeChunks + Pool->m_FreeChunksCount * sizeof(void*)) - (uintptr)Pool->m_MemoryBlock;
-				if (PoolMemory && PoolMemorySize > 0)
-				{
-					GMalloc->Free(PoolMemory, PoolMemorySize);
-				}
-			}
-
-			Pool->~APoolArena();
-			GMalloc->Free(Pool, sizeof(APoolArena));
-		}
-	}
-
-	APRICOT_API uint64 GetPoolArenaMemoryRequirement(uint64 ChunksCount, uint64 ChunkSizeBytes)
-	{
-		uint64 TotalSize = ChunksCount * ChunkSizeBytes;
-		uint64 FreelistAlignment = (sizeof(void*) - TotalSize % sizeof(void*)) % sizeof(void*);
-		return
-			TotalSize +                  /* Memory storage */
-			FreelistAlignment +          /* Alignment for the freelist */
-			ChunksCount * sizeof(void*); /* Freelist */
 	}
 
 }

@@ -263,65 +263,34 @@ namespace Apricot {
 
 	void AStackArena::Free(void* Allocation, uint64 Size)
 	{
-		if (m_Pages.Size() == 0)
-		{
-			GCrashReporter->MemoryState.Arena = this;
-			GCrashReporter->MemoryState.MemoryBlock = Allocation;
-			GCrashReporter->MemoryState.Size = Size;
-			GCrashReporter->SubmitArenaFailure(ACrashReporter::EMemoryOperation::Free, EMemoryError::InvalidArena);
-			return;
-		}
-
-		if (Allocation == nullptr)
-		{
-			GCrashReporter->MemoryState.Arena = this;
-			GCrashReporter->MemoryState.MemoryBlock = Allocation;
-			GCrashReporter->MemoryState.Size = Size;
-			GCrashReporter->SubmitArenaFailure(ACrashReporter::EMemoryOperation::Free, EMemoryError::InvalidMemoryPtr);
-			return;
-		}
-		if (Size == 0)
-		{
-			GCrashReporter->MemoryState.Arena = this;
-			GCrashReporter->MemoryState.MemoryBlock = Allocation;
-			GCrashReporter->MemoryState.Size = Size;
-			GCrashReporter->SubmitArenaFailure(ACrashReporter::EMemoryOperation::Free, EMemoryError::InvalidSize);
-			return;
-		}
-
-		APage* Page = m_Pages[m_CurrentPage];
-		if (Page->AllocatedBytes == 0)
-		{
-			Page = m_Pages[--m_CurrentPage];
-		}
-
+		uint64 PopSize = Size;
 		if (m_Specification.bAllowAlignment)
 		{
-			if ((uintptr)Allocation + Size + sizeof(AAlignmentInfo) != (uintptr)Page->MemoryBlock + Page->AllocatedBytes)
-			{
-				GCrashReporter->MemoryState.Arena = this;
-				GCrashReporter->MemoryState.MemoryBlock = Allocation;
-				GCrashReporter->MemoryState.Size = Size;
-				GCrashReporter->SubmitArenaFailure(ACrashReporter::EMemoryOperation::Free, EMemoryError::PointerOutOfRange);
-				return;
-			}
-
 			AAlignmentInfo* AlignmentInfo = (AAlignmentInfo*)((uint8*)Allocation + Size);
-			Pop(AlignmentInfo->AlignmentOffset + Size + sizeof(AAlignmentInfo));
+			PopSize += AlignmentInfo->AlignmentOffset;
 		}
-		else
-		{
-			if ((uintptr)Allocation + Size != (uintptr)Page->MemoryBlock + Page->AllocatedBytes)
-			{
-				GCrashReporter->MemoryState.Arena = this;
-				GCrashReporter->MemoryState.MemoryBlock = Allocation;
-				GCrashReporter->MemoryState.Size = Size;
-				GCrashReporter->SubmitArenaFailure(ACrashReporter::EMemoryOperation::Free, EMemoryError::PointerOutOfRange);
-				return;
-			}
 
-			Pop(Size);
+		bool8 bFoundHomePage = false;
+
+		for (int64 Index = m_CurrentPage; Index >= 0; Index--)
+		{
+			if (!IsAddressBetween(Allocation, m_Pages[Index]->MemoryBlock, (uint8*)m_Pages[Index]->MemoryBlock + m_Pages[Index]->SizeBytes))
+			{
+				PopSize += m_Pages[Index]->AllocatedBytes;
+			}
+			else
+			{
+				bFoundHomePage = true;
+				break;
+			}
 		}
+
+		if (!bFoundHomePage)
+		{
+
+		}
+
+		Pop(PopSize);
 	}
 
 	int32 AStackArena::TryFree(void* Allocation, uint64 Size)
@@ -433,11 +402,12 @@ namespace Apricot {
 		for (int64 Index = m_CurrentPage; Index >= 0; Index--)
 		{
 			APage* Page = m_Pages[Index];
+			m_CurrentPage = Index;
+
 			if (PopSize > Page->AllocatedBytes)
 			{
 				PopSize -= Page->AllocatedBytes;
 				Page->AllocatedBytes = 0;
-				m_CurrentPage = Index;
 			}
 			else
 			{
@@ -454,12 +424,13 @@ namespace Apricot {
 
 		for (int64 Index = m_CurrentPage; Index >= 0; Index--)
 		{
+			m_CurrentPage = Index;
 			APage* Page = m_Pages[Index];
+
 			if (PopSize > Page->AllocatedBytes)
 			{
 				PopSize -= Page->AllocatedBytes;
 				Page->AllocatedBytes = 0;
-				m_CurrentPage = Index;
 			}
 			else
 			{
@@ -477,12 +448,13 @@ namespace Apricot {
 
 		for (int64 Index = m_CurrentPage; Index >= 0; Index--)
 		{
+			m_CurrentPage = Index;
 			APage* Page = m_Pages[Index];
+
 			if (PopSize > Page->AllocatedBytes)
 			{
 				PopSize -= Page->AllocatedBytes;
 				Page->AllocatedBytes = 0;
-				m_CurrentPage = Index;
 			}
 			else
 			{
@@ -545,7 +517,7 @@ namespace Apricot {
 		MemConstruct<AStackArena>(Arena);
 
 		Arena->m_Specification = Specification;
-		Arena->m_Pages.Reserve(Specification.PagesCount);
+		Arena->m_Pages.SetCapacity(Specification.PagesCount);
 		Arena->m_CurrentPage = 0;
 
 		for (uint64 Index = 0; Index < Specification.PagesCount; Index++)
