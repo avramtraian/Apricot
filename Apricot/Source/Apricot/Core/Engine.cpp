@@ -1,10 +1,10 @@
 // Part of Apricot Engine. 2022-2022.
+// Module: Core
 
 #include "aepch.h"
 #include "Engine.h"
 
 #include "Platform.h"
-#include "Memory/Memory.h"
 #include "Memory/ApricotMemory.h"
 
 #include "Apricot/Events/ApplicationEvents.h"
@@ -35,9 +35,9 @@ namespace Apricot {
 			return AE_EXIT_FAILED_INIT;
 		}
 
-		// AE_CORE_DEBUG(TEXT("{}"), AMemoryDebugger::GetRegionsUsageString());
-		// AE_CORE_DEBUG(TEXT("{}"), AMemoryDebugger::GetSubregionsUsageString());
-		// AE_CORE_DEBUG(TEXT("{}"), AMemoryDebugger::GetTaggedUsageString());
+		// AE_CORE_DEBUG(TEXT("{}"), AMemoryProfiler::GetRegionsUsageString());
+		// AE_CORE_DEBUG(TEXT("{}"), AMemoryProfiler::GetSubregionsUsageString());
+		// AE_CORE_DEBUG(TEXT("{}"), AMemoryProfiler::GetTaggedUsageString());
 
 		while (true)
 		{

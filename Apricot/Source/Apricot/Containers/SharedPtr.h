@@ -1,14 +1,13 @@
 // Part of Apricot Engine. 2022-2022.
+// Submodule: Containers
 
 #pragma once
 
 #include "Apricot/Core/Base.h"
 #include "Apricot/Core/Types.h"
+#include "Apricot/Core/Memory/ApricotMemory.h"
 
 #include "Apricot/Containers/Null.h"
-#include "Apricot/Core/AObject.h"
-
-#include "Apricot/Core/Memory/HeapAllocator.h"
 
 namespace Apricot {
 
@@ -33,32 +32,26 @@ namespace Apricot {
 		TSharedPtr()
 			: m_Pointer(nullptr)
 		{
-			AE_STATIC_ASSERT(IsDerivedFrom<T, AObject>(), "Classes used with TSharedPtr must derive from AObject!");
 		}
 
 		TSharedPtr(const TSharedPtr<T>& Other)
 			: m_Pointer(Other.m_Pointer)
 		{
-			AE_STATIC_ASSERT(IsDerivedFrom<T, AObject>(), "Classes used with TSharedPtr must derive from AObject!");
-
 			if (m_Pointer)
 			{
-				((TRemoveConst_Type<T>*)m_Pointer)->IncreaseReferenceCount();
+				m_Pointer->__IncreaseReferenceCount();
 			}
 		}
 
 		TSharedPtr(TSharedPtr<T>&& Other) noexcept
 			: m_Pointer(Other.m_Pointer)
 		{
-			AE_STATIC_ASSERT(IsDerivedFrom<T, AObject>(), "Classes used with TSharedPtr must derive from AObject!");
-
 			Other.m_Pointer = nullptr;
 		}
 
 		TSharedPtr(NullPlaceholder Null)
 			: m_Pointer(nullptr)
 		{
-			AE_STATIC_ASSERT(IsDerivedFrom<T, AObject>(), "Classes used with TSharedPtr must derive from AObject!");
 		}
 
 		~TSharedPtr()
@@ -174,11 +167,11 @@ namespace Apricot {
 		{
 			if (m_Pointer)
 			{
-				((TRemoveConst_Type<T>*)m_Pointer)->DecreaseReferenceCount();
-				if (m_Pointer->GetReferenceCount() == 0)
+				m_Pointer->__m_ReferenceCount--;
+				if (m_Pointer->__m_ReferenceCount == 0)
 				{
 					m_Pointer->~T();
-					m_Pointer->GetAllocator()->Free((void*)m_Pointer, sizeof(T), EAllocTag::SharedPtr);
+					GMalloc->Free((void*)m_Pointer, sizeof(T));
 					m_Pointer = nullptr;
 				}
 			}
@@ -262,7 +255,7 @@ namespace Apricot {
 	template<typename T, typename... Args>
 	constexpr TSharedPtr<T> MakeShared(Args&&... args)
 	{
-		void* Memory = GHeapAllocator->Allocate(sizeof(T), EAllocTag::SharedPtr);
+		void* Memory = GMalloc->Alloc(sizeof(T));
 
 #ifdef AE_DEBUG
 		if (!Memory)
@@ -275,41 +268,7 @@ namespace Apricot {
 
 		TSharedPtr<T> SharedPtr;
 		SharedPtr.RawSetPointer(MemConstruct<T>(Memory, Forward<Args>(args)...));
-		((TRemoveConst_Type<T>*)SharedPtr.Get())->SetAllocator(GHeapAllocator);
-		((TRemoveConst_Type<T>*)SharedPtr.Get())->IncreaseReferenceCount();
-		return SharedPtr;
-	}
-
-	/*
-	* Create a TSharedPtr, holding the newly created object.
-	* It allocates the memory via a custom allocator.
-	*
-	* @tparam T The complete type of the object.
-	*
-	* @param Allocator The allocator used for allocating the object's memory (and freeing it). If the request fails, this function will return an invalid pointer.
-	* @param args The arguments used in construction of the object. They will be forwarded to the object constructor.
-	*
-	* @return The TSharedPtr. It might return an invalid pointer if the memory allocation fails.
-	*/
-	template<typename T, typename AllocatorType, typename... Args>
-	constexpr TSharedPtr<T> MakeSharedWithAllocator(AllocatorType* Allocator, Args&&... args)
-	{
-		void* Memory = Allocator->Allocate(sizeof(T), EAllocTag::SharedPtr);
-
-#ifdef AE_DEBUG
-		if (!Memory)
-		{
-			// Something went wrong with the allocator...
-			// Invalid or corrupt?
-			AE_DEBUG_CHECK(false);
-			return TSharedPtr<T>();
-		}
-#endif
-
-		TSharedPtr<T> SharedPtr;
-		SharedPtr.RawSetPointer(Memory_Placement<T>(Memory, Forward<Args>(args)...));
-		((TRemoveConst_Type<T>*)SharedPtr.Get())->SetAllocator(Allocator);
-		((TRemoveConst_Type<T>*)SharedPtr.Get())->IncreaseReferenceCount();
+		SharedPtr.Get()->__m_ReferenceCount++;
 		return SharedPtr;
 	}
 

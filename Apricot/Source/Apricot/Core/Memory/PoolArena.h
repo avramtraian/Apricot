@@ -1,8 +1,11 @@
 // Part of Apricot Engine. 2022-2022.
+// Module: Memory
 
 #pragma once
 
 #include "ApricotMemory.h"
+
+#include "Apricot/Core/AClass.h"
 
 #include "Apricot/Containers/SharedPtr.h"
 
@@ -41,6 +44,8 @@ namespace Apricot {
 	*/
 	class APRICOT_API APoolArena : public AMemoryArena
 	{
+		ACLASS_CORE()
+
 	public:
 		NODISCARD static TSharedPtr<APoolArena> Create(const APoolArenaSpecification& Specification);
 

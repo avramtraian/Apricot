@@ -1,12 +1,13 @@
 // Part of Apricot Engine. 2022-2022.
+// Submodule: Containers
 
 #pragma once
 
 #include "Apricot/Core/Base.h"
 #include "Apricot/Core/Types.h"
+#include "Apricot/Core/Memory/ApricotMemory.h"
 
 #include "Apricot/Containers/Null.h"
-#include "Apricot/Core/AObject.h"
 
 namespace Apricot {
 
@@ -33,23 +34,18 @@ namespace Apricot {
 		TSharedRef(const TSharedRef<T>& Other)
 			: m_Pointer(Other.m_Pointer)
 		{
-			AE_STATIC_ASSERT(IsDerivedFrom<T, AObject>(), "Classes used with TSharedRef must derive from AObject!");
-
-			((TRemoveConst_Type<T>*)m_Pointer)->IncreaseReferenceCount();
+			m_Pointer->__m_ReferenceCount++;
 		}
 
 		TSharedRef(TSharedRef<T>&& Other) noexcept
 			: m_Pointer(Other.m_Pointer)
 		{
-			AE_STATIC_ASSERT(IsDerivedFrom<T, AObject>(), "Classes used with TSharedRef must derive from AObject!");
-
 			Other.m_Pointer = nullptr;
 		}
 
 		TSharedRef(NullPlaceholder Null)
 			: m_Pointer(nullptr)
 		{
-			AE_STATIC_ASSERT(IsDerivedFrom<T, AObject>(), "Classes used with TSharedRef must derive from AObject!");
 		}
 
 		~TSharedRef()
@@ -61,7 +57,6 @@ namespace Apricot {
 		TSharedRef()
 			: m_Pointer(nullptr)
 		{
-			AE_STATIC_ASSERT(IsDerivedFrom<T, AObject>(), "Classes used with TSharedRef must derive from AObject!");
 		}
 
 	/* Overloaded operators */
@@ -186,7 +181,7 @@ namespace Apricot {
 				if (m_Pointer->GetReferenceCount() == 0)
 				{
 					m_Pointer->~T();
-					m_Pointer->GetAllocator()->Free((void*)m_Pointer, sizeof(T), EAllocTag::SharedPtr);
+					GMalloc->Free((void*)m_Pointer, sizeof(T));
 					m_Pointer = nullptr;
 				}
 			}

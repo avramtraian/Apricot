@@ -15,15 +15,15 @@ namespace Apricot {
 
 	AEngine* CreateEngine()
 	{
-		AApricotJamEngine* Engine = (AApricotJamEngine*)GHeapAllocator->Allocate(sizeof(AApricotJamEngine), EAllocTag::Core);
-		Memory_Placement<AApricotJamEngine>(Engine);
+		AApricotJamEngine* Engine = (AApricotJamEngine*)GMalloc->Alloc(sizeof(AApricotJamEngine));
+		MemConstruct<AApricotJamEngine>(Engine);
 		return Engine;
 	}
 
 	void DeleteEngine(AEngine* Engine)
 	{
 		((AApricotJamEngine*)Engine)->~AApricotJamEngine();
-		GHeapAllocator->Free(Engine, sizeof(AApricotJamEngine), EAllocTag::Core);
+		GMalloc->Free(Engine, sizeof(AApricotJamEngine));
 	}
 
 }

@@ -1,8 +1,10 @@
 // Part of Apricot Engine. 2022-2022.
+// Module: Memory
 
 #pragma once
 
 #include "ApricotMemory.h"
+#include "Apricot/Core/AClass.h"
 
 namespace Apricot {
 
@@ -46,6 +48,8 @@ namespace Apricot {
 	*/
 	class APRICOT_API ALinearArena : public AMemoryArena
 	{
+		ACLASS_CORE()
+
 	/* Constructors & Deconstructor */
 	private:
 		ALinearArena();

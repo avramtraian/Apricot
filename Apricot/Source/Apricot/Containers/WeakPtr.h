@@ -1,4 +1,5 @@
 // Part of Apricot Engine. 2022-2022.
+// Submodule: Containers
 
 #pragma once
 
@@ -6,7 +7,6 @@
 #include "Apricot/Core/Types.h"
 
 #include "Apricot/Containers/Null.h"
-#include "Apricot/Core/AObject.h"
 
 namespace Apricot {
 	
@@ -33,27 +33,22 @@ namespace Apricot {
 		TWeakPtr()
 			: m_Pointer(nullptr)
 		{
-			AE_STATIC_ASSERT(IsDerivedFrom<T, AObject>(), "Classes used with TWeakPtr must derive from AObject!");
 		}
 
 		TWeakPtr(const TWeakPtr<T>& Other)
 			: m_Pointer(Other.m_Pointer)
 		{
-			AE_STATIC_ASSERT(IsDerivedFrom<T, AObject>(), "Classes used with TWeakPtr must derive from AObject!");
 		}
 
 		TWeakPtr(TWeakPtr<T>&& Other) noexcept
 			: m_Pointer(Other.m_Pointer)
 		{
-			AE_STATIC_ASSERT(IsDerivedFrom<T, AObject>(), "Classes used with TWeakPtr must derive from AObject!");
-
 			Other.m_Pointer = nullptr;
 		}
 
 		TWeakPtr(NullPlaceholder Null)
 			: m_Pointer(nullptr)
 		{
-			AE_STATIC_ASSERT(IsDerivedFrom<T, AObject>(), "Classes used with TWeakPtr must derive from AObject!");
 		}
 
 		~TWeakPtr()

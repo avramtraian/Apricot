@@ -1,4 +1,5 @@
 // Part of Apricot Engine. 2022-2022.
+// Module: Core
 
 #include "aepch.h"
 #include "CrashReporter.h"
@@ -28,7 +29,7 @@ namespace Apricot {
 			return;
 		}
 
-		GCrashReporter = (ACrashReporter*)GHeapAllocator->Allocate(sizeof(ACrashReporter), EAllocTag::Core);
+		GCrashReporter = (ACrashReporter*)GMalloc->Alloc(sizeof(ACrashReporter));
 
 		GCrashReporter->AssertionBuffer = SAssertionBuffer;
 		GCrashReporter->AssertionBufferSize = AE_ARRAY_LENGTH(SAssertionBuffer);
@@ -44,7 +45,7 @@ namespace Apricot {
 			return;
 		}
 
-		GHeapAllocator->Free(GCrashReporter, sizeof(ACrashReporter), EAllocTag::Core);
+		GMalloc->Free(GCrashReporter, sizeof(ACrashReporter));
 		GCrashReporter = nullptr;
 	}
 

@@ -1,4 +1,5 @@
 // Part of Apricot Engine. 2022-2022.
+// Module: Memory
 
 #pragma once
 
@@ -74,7 +75,7 @@ namespace Apricot {
 
 	APRICOT_API extern AMalloc* GMalloc;
 
-	APRICOT_API void MemCpy(const void* Source, void* Destination, uint64 SizeBytes);
+	APRICOT_API void MemCpy(void* Destination, const void* Source, uint64 SizeBytes);
 	APRICOT_API void MemSet(void* Destination, int32 Value, uint64 SizeBytes);
 	APRICOT_API void MemZero(void* Destination, uint64 SizeBytes);
 
@@ -87,7 +88,7 @@ namespace Apricot {
 	/**
 	* 
 	*/
-	class APRICOT_API AMemoryArena : public AMalloc, public AObject
+	class APRICOT_API AMemoryArena : public AMalloc
 	{
 	public:
 		enum class EFailureMode : uint8

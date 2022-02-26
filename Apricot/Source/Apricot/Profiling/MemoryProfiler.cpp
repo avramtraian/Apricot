@@ -1,9 +1,8 @@
 // Part of Apricot Engine. 2022-2022.
+// Submodule: Profiling
 
 #include "aepch.h"
 #include "MemoryProfiler.h"
-
-#ifdef AE_ENABLE_MEMORY_TRACE
 
 #include "Apricot/Core/Memory/ApricotMemory.h"
 
@@ -39,5 +38,3 @@ namespace Apricot {
 	}
 
 }
-
-#endif

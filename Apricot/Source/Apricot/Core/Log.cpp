@@ -1,10 +1,11 @@
 // Part of Apricot Engine. 2022-2022.
+// Module: Core
 
 #include "aepch.h"
 #include "Log.h"
 #include "Assert.h"
 
-#include "Memory/Memory.h"
+#include "Memory/ApricotMemory.h"
 #include "Apricot/Containers/Strings/String.h"
 #include "Platform.h"
 
@@ -53,8 +54,8 @@ namespace Apricot {
 		uint64 MessageSize = Str_Length(Message);
 		AE_CHECK(SLogTypeSize + MessageSize + 1 <= sizeof(SBuffer) / sizeof(TChar));
 
-		Memory_Copy(SLogBuffer, SLogTypes[(uint8)Type], SLogTypeSize * sizeof(TChar));
-		Memory_Copy(SLogBuffer + SLogTypeSize, Message, MessageSize * sizeof(TChar));
+		MemCpy(SLogBuffer, SLogTypes[(uint8)Type], SLogTypeSize * sizeof(TChar));
+		MemCpy(SLogBuffer + SLogTypeSize, Message, MessageSize * sizeof(TChar));
 		SLogBuffer[SLogTypeSize + MessageSize] = '\n';
 
 		APlatform::Console_Write(SLogBuffer, SLogTypeSize + MessageSize + 1, SLogTypesColors[(uint8)Type]);
@@ -65,8 +66,8 @@ namespace Apricot {
 		uint64 MessageSize = Str_Length(Message);
 		AE_CHECK(SLogTypeSize + MessageSize + 1 <= sizeof(SBuffer) / sizeof(TChar));
 
-		Memory_Copy(SLogBuffer, SLogTypes[(uint8)Type], SLogTypeSize * sizeof(TChar));
-		Memory_Copy(SLogBuffer + SLogTypeSize, Message, MessageSize * sizeof(TChar));
+		MemCpy(SLogBuffer, SLogTypes[(uint8)Type], SLogTypeSize * sizeof(TChar));
+		MemCpy(SLogBuffer + SLogTypeSize, Message, MessageSize * sizeof(TChar));
 		SLogBuffer[SLogTypeSize + MessageSize] = '\n';
 
 		APlatform::Console_WriteError(SLogBuffer, SLogTypeSize + MessageSize + 1, SLogTypesColors[(uint8)Type]);

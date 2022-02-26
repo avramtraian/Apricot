@@ -1,13 +1,12 @@
 // Part of Apricot Engine. 2022-2022.
+// Submodule: Containers
 
 #pragma once
 
 #include "Apricot/Core/Base.h"
 #include "Apricot/Core/Types.h"
 #include "Apricot/Core/Assert.h"
-#include "Apricot/Core/Memory/Memory.h"
-
-#include "Apricot/Core/Memory/HeapAllocator.h"
+#include "Apricot/Core/Memory/ApricotMemory.h"
 
 #include "Iterators/VectorIterator.h"
 
@@ -21,7 +20,7 @@ namespace Apricot {
 	* @tparam T The type that the vector stores.
 	* @tparam Alloc The allocator class used for managing the internal memory. Default value = it allocates directly from the global heap.
 	*/
-	template<typename T, typename Alloc = AHeapAllocator>
+	template<typename T>
 	class TVector
 	{
 	/* Typedefs */
@@ -34,73 +33,35 @@ namespace Apricot {
 		using TReverseConstIterator = TVectorIterator<const T>;
 
 	public:
-		TVector(Alloc* Allocator = nullptr)
+		TVector()
 			: m_Data(nullptr), m_Capacity(0), m_Size(0)
 		{
-			if (Allocator == nullptr)
-			{
-				if (Alloc::GetStaticType() == EAllocatorType::Heap)
-				{
-					m_Allocator = (Alloc*)GHeapAllocator;
-				}
-				else
-				{
-					AE_CHECK(false);
-					m_Allocator = nullptr;
-				}
-			}
-			else
-			{
-				m_Allocator = Allocator;
-			}
 		}
 
-		TVector(uint64 Capacity, Alloc* Allocator = nullptr)
+		TVector(uint64 Capacity)
 			: m_Data(nullptr), m_Capacity(0), m_Size(0)
 		{
-			if (Allocator == nullptr)
-			{
-				if (Alloc::GetStaticType() == EAllocatorType::Global)
-				{
-					m_Allocator = (Alloc*)GHeapAllocator;
-				}
-				else
-				{
-					AE_CHECK(false);
-					m_Allocator = nullptr;
-				}
-			}
-			else
-			{
-				m_Allocator = Allocator;
-			}
-
-			m_Data = nullptr;
-			m_Capacity = 0;
 			ReAllocate(Capacity);
-			m_Size = 0;
 		}
 
-		TVector(const TVector<T, Alloc>& Other)
+		TVector(const TVector& Other)
 			: m_Data(nullptr), m_Capacity(0), m_Size(0)
 		{
-			m_Allocator = Other.m_Allocator;
 			ReAllocate(Other.m_Size);
 			m_Size = Other.m_Size;
 
 			for (uint64 Index = 0; Index < Other.m_Size; Index++)
 			{
-				Memory_Placement<T>(m_Data + Index, Other.m_Data[Index]);
+				MemConstruct<T>(m_Data + Index, Other.m_Data[Index]);
 			}
 		}
 
-		TVector(TVector<T, Alloc>&& other) noexcept
+		TVector(TVector&& other) noexcept
 			: m_Data(nullptr), m_Capacity(0), m_Size(0)
 		{
 			m_Data = other.m_Data;
 			m_Capacity = other.m_Capacity;
 			m_Size = other.m_Size;
-			m_Allocator = other.m_Allocator;
 
 			other.m_Data = nullptr;
 			other.m_Capacity = 0;
@@ -108,7 +69,7 @@ namespace Apricot {
 		}
 
 		TVector(std::initializer_list<T> IntializerList)
-			: m_Data(nullptr), m_Allocator(GHeapAllocator), m_Capacity(0), m_Size(0)
+			: m_Data(nullptr), m_Capacity(0), m_Size(0)
 		{
 			ReAllocate(IntializerList.size());
 
@@ -142,7 +103,7 @@ namespace Apricot {
 				ReAllocateCopy(m_Capacity + m_Capacity / 2 + 1);
 			}
 
-			Memory_Placement<T>(m_Data + m_Size, element);
+			MemConstruct<T>(m_Data + m_Size, element);
 
 			T& Value = m_Data[m_Size];
 			m_Size++;
@@ -159,7 +120,7 @@ namespace Apricot {
 				ReAllocateCopy(m_Capacity + m_Capacity / 2 + 1);
 			}
 
-			Memory_Placement<T>(m_Data + m_Size, std::move(element));
+			MemConstruct<T>(m_Data + m_Size, std::move(element));
 
 			T& Value = m_Data[m_Size];
 			m_Size++;
@@ -177,7 +138,7 @@ namespace Apricot {
 				ReAllocateCopy(m_Capacity + m_Capacity / 2 + 1);
 			}
 
-			Memory_Placement<T>(m_Data + m_Size, std::forward<Args>(args)...);
+			MemConstruct<T>(m_Data + m_Size, std::forward<Args>(args)...);
 
 			T& Value = m_Data[m_Size];
 			m_Size++;
@@ -347,90 +308,19 @@ namespace Apricot {
 		/*
 		*
 		*/
-		Alloc* GetAllocator() const
+		void Swap(TVector&& Vector)
 		{
-			return m_Allocator;
-		}
+			T* TempData = m_Data;
+			uint64 TempCapacity = m_Capacity;
+			uint64 TempSize = m_Size;
 
-		/*
-		*
-		*/
-		void SetAllocator(Alloc* NewAllocator)
-		{
-			AE_CHECK(NewAllocator != nullptr);
+			m_Data = Vector.m_Data;
+			m_Capacity = Vector.m_Capacity;
+			m_Size = Vector.m_Size;
 
-			if ((void*)m_Allocator == (void*)NewAllocator)
-			{
-				return;
-			}
-
-			T* NewBlock = (T*)NewAllocator->Allocate(m_Capacity * sizeof(T), EAllocTag::Vector);
-
-			for (uint64 Index = 0; Index < m_Size; Index++)
-			{
-				Memory_Placement<T>(NewBlock + Index, std::move(m_Data[Index]));
-				m_Data[Index].~T();
-			}
-
-			m_Allocator->Free(m_Data, m_Capacity * sizeof(T), EAllocTag::Vector);
-
-			m_Data = NewBlock;
-			m_Allocator = NewAllocator;
-		}
-
-		/*
-		*
-		*/
-		template<typename A>
-		void Swap(TVector<T, A>&& Vector)
-		{
-			if ((void*)m_Allocator == (void*)Vector.m_Allocator)
-			{
-				T* TempData = m_Data;
-				uint64 TempCapacity = m_Capacity;
-				uint64 TempSize = m_Size;
-
-				m_Data = Vector.m_Data;
-				m_Capacity = Vector.m_Capacity;
-				m_Size = Vector.m_Size;
-
-				Vector.m_Data = TempData;
-				Vector.m_Capacity = TempCapacity;
-				Vector.m_Size = TempSize;
-			}
-			else
-			{
-				// NOTE: This could be implemented so it determines at runtime if any new memory should be allocated, or to reuse the existing one.
-				//           The reason why we don't to that is because it can get very difficult to read, understand, or modify the code.
-				//           Also, this function is rarely called anyway.
-				// TODO: Maybe implement? If there are any performance problems caused by this.
-
-				T* NewBlock = (T*)m_Allocator->Allocate(Vector.m_Size * sizeof(T), EAllocTag::Vector);
-				for (uint64 Index = 0; Index < Vector.m_Size; Index++)
-				{
-					Memory_Placement<T>(NewBlock + Index, std::move(Vector.m_Data[Index]));
-					Vector.m_Data[Index].~T();
-				}
-
-				T* Vector_NewBlock = (T*)Vector.m_Allocator->Allocate(m_Size * sizeof(T), EAllocTag::Vector);
-				for (uint64 Index = 0; Index < m_Size; Index++)
-				{
-					Memory_Placement<T>(Vector_NewBlock + Index, std::move(m_Data[Index]));
-					m_Data[Index].~T();
-				}
-
-				m_Allocator->Free(m_Data, m_Capacity * sizeof(T), EAllocTag::Vector);
-				Vector.m_Allocator->Free(Vector.m_Data, Vector.m_Capacity * sizeof(T), EAllocTag::Vector);
-
-				m_Data = NewBlock;
-				Vector.m_Data = Vector_NewBlock;
-
-				m_Capacity = Vector.m_Size;
-				Vector.m_Capacity = m_Size;
-
-				m_Size = m_Capacity;
-				Vector.m_Size = Vector.m_Capacity;
-			}
+			Vector.m_Data = TempData;
+			Vector.m_Capacity = TempCapacity;
+			Vector.m_Size = TempSize;
 		}
 
 	public:
@@ -446,28 +336,21 @@ namespace Apricot {
 			return m_Data[Index];
 		}
 
-		template<typename A>
-		TVector<T, Alloc>& operator=(const TVector<T, A>& Other)
+		TVector& operator=(const TVector& Other)
 		{
 			for (uint64 Index = 0; Index < m_Size; Index++)
 			{
 				m_Data[Index].~T();
 			}
 
-			if ((void*)m_Allocator != (void*)Other.m_Allocator)
-			{
-				DeleteMemory();
-				m_Allocator = Other.m_Allocator;
-				ReAllocate(Other.m_Size);
-			}
-			else if (Other.m_Size > m_Capacity)
+			if (m_Capacity < Other.m_Size)
 			{
 				ReAllocate(Other.m_Size);
 			}
 
 			for (uint64 Index = 0; Index < Other.m_Size; Index++)
 			{
-				Memory_Placement<T>(m_Data + Index, Other.m_Data[Index]);
+				MemConstruct<T>(m_Data + Index, Other.m_Data[Index]);
 			}
 
 			m_Size = Other.m_Size;
@@ -475,7 +358,7 @@ namespace Apricot {
 			return *this;
 		}
 
-		TVector<T, Alloc>& operator=(TVector<T, Alloc>&& Other) noexcept
+		TVector& operator=(TVector&& Other) noexcept
 		{
 			for (uint64 Index = 0; Index < m_Size; Index++)
 			{
@@ -486,7 +369,6 @@ namespace Apricot {
 			m_Data = Other.m_Data;
 			m_Capacity = Other.m_Capacity;
 			m_Size = Other.m_Size;
-			m_Allocator = Other.m_Allocator;
 
 			Other.m_Data = nullptr;
 			Other.m_Capacity = 0;
@@ -556,7 +438,7 @@ namespace Apricot {
 		void ReAllocate(uint64 NewCapacity)
 		{
 			DeleteMemory();
-			m_Data = (T*)m_Allocator->Allocate(NewCapacity * sizeof(T), EAllocTag::Vector);
+			m_Data = (T*)GMalloc->Alloc(NewCapacity * sizeof(T));
 			m_Capacity = NewCapacity;
 		}
 
@@ -565,11 +447,11 @@ namespace Apricot {
 		*/
 		void ReAllocateCopy(uint64 NewCapacity)
 		{
-			T* NewBlock = (T*)m_Allocator->Allocate(NewCapacity * sizeof(T), EAllocTag::Vector);
+			T* NewBlock = (T*)GMalloc->Alloc(NewCapacity * sizeof(T));
 
 			for (uint64 Index = 0; Index < m_Size; Index++)
 			{
-				Memory_Placement<T>(NewBlock + Index, std::move(m_Data[Index]));
+				MemConstruct<T>(NewBlock + Index, Move(m_Data[Index]));
 				m_Data[Index].~T();
 			}
 
@@ -583,7 +465,7 @@ namespace Apricot {
 		*/
 		void DeleteMemory()
 		{
-			m_Allocator->Free(m_Data, m_Capacity * sizeof(T), EAllocTag::Vector);
+			GMalloc->Free(m_Data, m_Capacity * sizeof(T));
 		}
 
 	private:
@@ -601,11 +483,6 @@ namespace Apricot {
 		* 
 		*/
 		uint64 m_Size;
-
-		/*
-		* 
-		*/
-		Alloc* m_Allocator;
 	};
 
 }

@@ -1,9 +1,10 @@
 // Part of Apricot Engine. 2022-2022.
+// Submodule: Containers
 
 #include "aepch.h"
 #include "Format.h"
 
-#include "Apricot/Core/Memory/Memory.h"
+#include "Apricot/Core/Memory/ApricotMemory.h"
 
 namespace Apricot {
 	
@@ -228,7 +229,7 @@ namespace Apricot {
 			{
 				Size = BufferSize;
 			}
-			Memory_Copy(Buffer, "true", Size);
+			MemCpy(Buffer, "true", Size);
 			return Size;
 		}
 		else
@@ -238,7 +239,7 @@ namespace Apricot {
 			{
 				Size = BufferSize;
 			}
-			Memory_Copy(Buffer, "false", Size);
+			MemCpy(Buffer, "false", Size);
 			return Size;
 		}
 	}
@@ -252,7 +253,7 @@ namespace Apricot {
 			StringSize = BufferSize;
 		}
 
-		Memory_Copy(Buffer, Value, StringSize * sizeof(TChar));
+		MemCpy(Buffer, Value, StringSize * sizeof(TChar));
 		return StringSize;
 	}
 
