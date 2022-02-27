@@ -66,25 +66,25 @@ namespace Apricot {
 
 		T* operator->()
 		{
-			AE_DEBUG_CHECK(m_Pointer != nullptr); /* Pointer is null */
+			AE_CORE_ASSERT(m_Pointer != nullptr); /* Pointer is null */
 			return m_Pointer;
 		}
 
 		const T* operator->() const
 		{
-			AE_DEBUG_CHECK(m_Pointer != nullptr); /* Pointer is null */
+			AE_CORE_ASSERT(m_Pointer != nullptr); /* Pointer is null */
 			return m_Pointer;
 		}
 
 		T& operator*()
 		{
-			AE_DEBUG_CHECK(m_Pointer != nullptr); /* Pointer is null */
+			AE_CORE_ASSERT(m_Pointer != nullptr); /* Pointer is null */
 			return *m_Pointer;
 		}
 
 		const T& operator*() const
 		{
-			AE_DEBUG_CHECK(m_Pointer != nullptr); /* Pointer is null */
+			AE_CORE_ASSERT(m_Pointer != nullptr); /* Pointer is null */
 			return *m_Pointer;
 		}
 
@@ -216,7 +216,7 @@ namespace Apricot {
 		if (!Memory)
 		{
 			// We should never get here.
-			AE_DEBUG_CHECK(false);
+			AE_CORE_ASSERT(false);
 			return TUniquePtr<T>();
 		}
 #endif

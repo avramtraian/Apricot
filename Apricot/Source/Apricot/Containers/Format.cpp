@@ -247,7 +247,7 @@ namespace Apricot {
 	template<>
 	APRICOT_API uint64 FormatType(const TChar* Value, TChar* Buffer, uint64 BufferSize)
 	{
-		uint64 StringSize = Str_Length(Value);
+		uint64 StringSize = StrLength(Value);
 		if (BufferSize < StringSize)
 		{
 			StringSize = BufferSize;

@@ -32,23 +32,58 @@ namespace Apricot {
 
 		if (!OnEngineInitialize(CommandLine))
 		{
+			GEngine = nullptr;
 			return AE_EXIT_FAILED_INIT;
 		}
 
-		// AE_CORE_DEBUG(TEXT("{}"), AMemoryProfiler::GetRegionsUsageString());
-		// AE_CORE_DEBUG(TEXT("{}"), AMemoryProfiler::GetSubregionsUsageString());
-		// AE_CORE_DEBUG(TEXT("{}"), AMemoryProfiler::GetTaggedUsageString());
+		for (auto layer : m_LayerStack.GetLayers())
+		{
+			layer->OnAttach();
+		}
+		for (auto overlay : m_LayerStack.GetOverlays())
+		{
+			overlay->OnAttach();
+		}
 
+		Time lastTime = APlatform::GetSystemPerformanceTime();
 		while (true)
 		{
-			
+			Time nowTime = APlatform::GetSystemPerformanceTime();
+			Timestep ts = nowTime.Seconds() - lastTime.Seconds();
+			lastTime = nowTime;
+
+			m_LayerStack.OnUpdate(ts);
+		}
+
+		for (TVector<Layer*>::TReverseIterator it = m_LayerStack.GetOverlays().rbegin(); it != m_LayerStack.GetOverlays().rend(); it--)
+		{
+			(*it)->OnDetach();
+		}
+		for (TVector<Layer*>::TReverseIterator it = m_LayerStack.GetLayers().rbegin(); it != m_LayerStack.GetLayers().rend(); it--)
+		{
+			(*it)->OnDetach();
+		}
+
+		for (auto layer : m_LayerStack.GetLayers())
+		{
+			uint64 layerSize = layer->GetLayerSize();
+			layer->~Layer();
+			GMalloc->Free(layer, layerSize);
+		}
+		for (auto overlay : m_LayerStack.GetOverlays())
+		{
+			uint64 overlaySize = overlay->GetLayerSize();
+			overlay->~Layer();
+			GMalloc->Free(overlay, overlaySize);
 		}
 
 		if (!OnEngineDestroy())
 		{
+			GEngine = nullptr;
 			return AE_EXIT_FAILED_DESTROY;
 		}
 
+		GEngine = nullptr;
 		return AE_EXIT_SUCCESS;
 	}
 
@@ -56,6 +91,8 @@ namespace Apricot {
 	{
 		AEventDispatcher Dispatcher(Event, &m_DispatchMap);
 		Dispatcher.Dispatch();
+
+		m_LayerStack.OnEvent(Event);
 	}
 
 	bool8 AEngine::OnEngineInitialize(const char8* CommandLine)

@@ -20,7 +20,7 @@ namespace Apricot {
 	public:
 		NODISCARD static TSharedPtr<AFreelistArena> Create();
 	
-	/* Constructors & Deconstructor */
+		/* Constructors & Deconstructor */
 	private:
 		AFreelistArena();
 		virtual ~AFreelistArena() override;
@@ -36,11 +36,11 @@ namespace Apricot {
 
 	/* API */
 	public:
-		
+		virtual void GarbageCollect() override;
 
 	/* Getters & Setters */
 	public:
-		
+		virtual const TChar* GetDebugName() const override;
 
 	/* Member variables */
 	private:

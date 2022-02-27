@@ -65,13 +65,13 @@ namespace Apricot {
 		AMalloc();
 		virtual ~AMalloc();
 
-		NODISCARD virtual void* Alloc(uint64 Size, uint64 Alignment = sizeof(void*));
-		NODISCARD virtual int32 TryAlloc(uint64 Size, void** OutPointer, uint64 Alignment = sizeof(void*));
-		NODISCARD virtual void* AllocUnsafe(uint64 Size, uint64 Alignment = sizeof(void*));
+		NODISCARD void* Alloc(uint64 Size, uint64 Alignment = sizeof(void*));
+		NODISCARD int32 TryAlloc(uint64 Size, void** OutPointer, uint64 Alignment = sizeof(void*));
+		NODISCARD void* AllocUnsafe(uint64 Size, uint64 Alignment = sizeof(void*));
 
-		virtual void Free(void* Allocation, uint64 Size);
-		virtual int32 TryFree(void* Allocation, uint64 Size);
-		virtual void FreeUnsafe(void* Allocation, uint64 Size);
+		void Free(void* Allocation, uint64 Size);
+		int32 TryFree(void* Allocation, uint64 Size);
+		void FreeUnsafe(void* Allocation, uint64 Size);
 	};
 
 	APRICOT_API extern AMalloc* GMalloc;
@@ -89,7 +89,7 @@ namespace Apricot {
 	/**
 	* 
 	*/
-	class APRICOT_API AMemoryArena : public AMalloc
+	class APRICOT_API AMemoryArena
 	{
 	public:
 		enum class EFailureMode : uint8

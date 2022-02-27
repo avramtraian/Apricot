@@ -150,7 +150,7 @@ namespace Apricot {
 		*/
 		void PopBack()
 		{
-			AE_DEBUG_CHECK(m_Size > 0);
+			AE_CORE_ASSERT(m_Size > 0);
 			m_Size--;
 			m_Data[m_Size].~T();
 		}
@@ -159,21 +159,21 @@ namespace Apricot {
 
 		void Erase(TIterator First, TIterator Last)
 		{
-			AE_DEBUG_CHECK(First < Last);
+			AE_CORE_ASSERT(First < Last);
 
 			Erase(First, Last - First);
 		}
 
 		void Erase(TIterator Element, uint64 Count = 1)
 		{
-			AE_DEBUG_CHECK(m_Data <= Element);
+			AE_CORE_ASSERT(m_Data <= Element.Get());
 
-			Erase(Element - m_Data, Count);
+			Erase(Element.Get() - m_Data, Count);
 		}
 
 		void Erase(uint64 ErasureIndex, uint64 Count = 1)
 		{
-			AE_DEBUG_CHECK(ErasureIndex + Count <= m_Size);
+			AE_CORE_ASSERT(ErasureIndex + Count <= m_Size);
 
 			for (uint64 Index = ErasureIndex; Index < m_Size - Count; Index++)
 			{
@@ -256,7 +256,7 @@ namespace Apricot {
 		*/
 		T& At(uint64 Index)
 		{
-			AE_DEBUG_CHECK(Index < m_Size);
+			AE_CORE_ASSERT(Index < m_Size);
 			return m_Data[Index];
 		}
 
@@ -265,7 +265,7 @@ namespace Apricot {
 		*/
 		const T& At(uint64 Index) const
 		{
-			AE_DEBUG_CHECK(Index < m_Size);
+			AE_CORE_ASSERT(Index < m_Size);
 			return m_Data[Index];
 		}
 
@@ -274,7 +274,7 @@ namespace Apricot {
 		*/
 		T& Front()
 		{
-			AE_DEBUG_CHECK(m_Size > 0);
+			AE_CORE_ASSERT(m_Size > 0);
 			return m_Data[0];
 		}
 
@@ -283,7 +283,7 @@ namespace Apricot {
 		*/
 		const T& Front() const
 		{
-			AE_DEBUG_CHECK(m_Size > 0);
+			AE_CORE_ASSERT(m_Size > 0);
 			return m_Data[0];
 		}
 
@@ -292,7 +292,7 @@ namespace Apricot {
 		*/
 		T& Back()
 		{
-			AE_DEBUG_CHECK(m_Size > 0);
+			AE_CORE_ASSERT(m_Size > 0);
 			return m_Data[m_Size - 1];
 		}
 
@@ -301,7 +301,7 @@ namespace Apricot {
 		*/
 		const T& Back() const
 		{
-			AE_DEBUG_CHECK(m_Size > 0);
+			AE_CORE_ASSERT(m_Size > 0);
 			return m_Data[m_Size - 1];
 		}
 
@@ -326,13 +326,13 @@ namespace Apricot {
 	public:
 		T& operator[](uint64 Index)
 		{
-			AE_DEBUG_CHECK(Index < m_Size);
+			AE_CORE_ASSERT(Index < m_Size);
 			return m_Data[Index];
 		}
 
 		const T& operator[](uint64 Index) const
 		{
-			AE_DEBUG_CHECK(Index < m_Size);
+			AE_CORE_ASSERT(Index < m_Size);
 			return m_Data[Index];
 		}
 

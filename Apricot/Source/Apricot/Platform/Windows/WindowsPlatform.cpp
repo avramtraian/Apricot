@@ -30,7 +30,7 @@ namespace Apricot {
 				case APlatform::EConsoleTextColor::BrightRed:   return 12;
 				case APlatform::EConsoleTextColor::Black_RedBg: return 64;
 			}
-			AE_CHECK_NO_ENTRY();
+			AE_CORE_RASSERT_NO_ENTRY();
 			return 0;
 		}
 
@@ -38,15 +38,20 @@ namespace Apricot {
 
 	struct WindowsPlatformData
 	{
-		HANDLE Console_OutputHandle = INVALID_HANDLE_VALUE;
-		HANDLE Console_ErrorHandle = INVALID_HANDLE_VALUE;
+		LARGE_INTEGER PerformanceCounterStart = { 0 };
+		LARGE_INTEGER PerformanceFrequency = { 0 };
+
+		HANDLE ConsoleOutputHandle = INVALID_HANDLE_VALUE;
+		HANDLE ConsoleErrorHandle = INVALID_HANDLE_VALUE;
 		bool8 bIsConsoleAttached = false;
 	};
 	static WindowsPlatformData SWindowsPlatformData;
 
 	void APlatform::Init()
 	{
-		
+		AE_CORE_VERIFY(QueryPerformanceCounter(&SWindowsPlatformData.PerformanceCounterStart));
+
+		AE_CORE_VERIFY(QueryPerformanceFrequency(&SWindowsPlatformData.PerformanceFrequency));
 	}
 
 	void APlatform::Destroy()
@@ -88,7 +93,27 @@ namespace Apricot {
 		return _msize(Allocation);
 	}
 
-	void APlatform::Console_Attach()
+	NODISCARD Time APlatform::GetSystemPerformanceTime()
+	{
+		LARGE_INTEGER performanceTimerNow;
+		AE_CORE_VERIFY(QueryPerformanceCounter(&performanceTimerNow));
+
+		LARGE_INTEGER elapsedNanoseconds;
+		// Get the number of ticks since the initialization of the platform
+		elapsedNanoseconds.QuadPart = performanceTimerNow.QuadPart - SWindowsPlatformData.PerformanceCounterStart.QuadPart;
+
+		// Divide the number of ticks by the frequency, resulting in seconds. Multiplying the ticks before makes the result be in nanoseconds. Accuracy
+		elapsedNanoseconds.QuadPart = (elapsedNanoseconds.QuadPart * 1000000000) / SWindowsPlatformData.PerformanceFrequency.QuadPart;
+
+		return elapsedNanoseconds.QuadPart;
+	}
+
+	void APlatform::SleepFor(Time duration)
+	{
+		Sleep((DWORD)(duration.Miliseconds()));
+	}
+
+	void APlatform::ConsoleAttach()
 	{
 		if (SWindowsPlatformData.bIsConsoleAttached)
 		{
@@ -98,13 +123,13 @@ namespace Apricot {
 		AllocConsole();
 		AttachConsole(ATTACH_PARENT_PROCESS);
 
-		SWindowsPlatformData.Console_OutputHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-		SWindowsPlatformData.Console_ErrorHandle = GetStdHandle(STD_ERROR_HANDLE);
+		SWindowsPlatformData.ConsoleOutputHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+		SWindowsPlatformData.ConsoleErrorHandle = GetStdHandle(STD_ERROR_HANDLE);
 		SWindowsPlatformData.bIsConsoleAttached = true;
 	}
 
 
-	void APlatform::Console_Free()
+	void APlatform::ConsoleFree()
 	{
 		if (!SWindowsPlatformData.bIsConsoleAttached)
 		{
@@ -113,60 +138,31 @@ namespace Apricot {
 
 		FreeConsole();
 
-		SWindowsPlatformData.Console_OutputHandle = INVALID_HANDLE_VALUE;
-		SWindowsPlatformData.Console_ErrorHandle = INVALID_HANDLE_VALUE;
+		SWindowsPlatformData.ConsoleOutputHandle = INVALID_HANDLE_VALUE;
+		SWindowsPlatformData.ConsoleErrorHandle = INVALID_HANDLE_VALUE;
 		SWindowsPlatformData.bIsConsoleAttached = false;
 	}
 
-	void APlatform::Console_Write(const TChar* Message, uint64 MessageSize, EConsoleTextColor Color)
+	void APlatform::ConsoleWrite(const TChar* Message, uint64 MessageSize, EConsoleTextColor Color)
 	{
 		if (SWindowsPlatformData.bIsConsoleAttached)
 		{
-			SetConsoleTextAttribute(SWindowsPlatformData.Console_OutputHandle, Utils::GetConsoleColor(Color));
+			SetConsoleTextAttribute(SWindowsPlatformData.ConsoleOutputHandle, Utils::GetConsoleColor(Color));
 
 			DWORD NumberOfCharsWritten = 0;
-			WriteConsole(SWindowsPlatformData.Console_OutputHandle, Message, (DWORD)MessageSize, &NumberOfCharsWritten, NULL);
+			WriteConsole(SWindowsPlatformData.ConsoleOutputHandle, Message, (DWORD)MessageSize, &NumberOfCharsWritten, NULL);
 		}
 	}
 
-	void APlatform::Console_WriteError(const TChar* Message, uint64 MessageSize, EConsoleTextColor Color)
+	void APlatform::ConsoleWriteError(const TChar* Message, uint64 MessageSize, EConsoleTextColor Color)
 	{
 		if (SWindowsPlatformData.bIsConsoleAttached)
 		{
-			SetConsoleTextAttribute(SWindowsPlatformData.Console_ErrorHandle, Utils::GetConsoleColor(Color));
+			SetConsoleTextAttribute(SWindowsPlatformData.ConsoleErrorHandle, Utils::GetConsoleColor(Color));
 
 			DWORD NumberOfCharsWritten = 0;
-			WriteConsole(SWindowsPlatformData.Console_ErrorHandle, Message, (DWORD)MessageSize, &NumberOfCharsWritten, NULL);
+			WriteConsole(SWindowsPlatformData.ConsoleErrorHandle, Message, (DWORD)MessageSize, &NumberOfCharsWritten, NULL);
 		}
-	}
-
-	void* APlatform::Memory_Allocate(uint64 Size, bool8 Alligned)
-	{
-		if (Size == 0)
-		{
-			return nullptr;
-		}
-		return ::operator new(Size);
-	}
-
-	void APlatform::Memory_Free(void* Address, uint64 Size)
-	{
-		::operator delete(Address, Size);
-	}
-
-	void APlatform::Memory_Copy(void* Destination, const void* Source, uint64 Size)
-	{
-		memcpy(Destination, Source, Size);
-	}
-
-	void APlatform::Memory_Set(void* Destination, int32 Value, uint64 Size)
-	{
-		memset(Destination, Value, Size);
-	}
-
-	void APlatform::Memory_Zero(void* Destination, uint64 Size)
-	{
-		ZeroMemory(Destination, Size);
 	}
 
 }

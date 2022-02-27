@@ -12,7 +12,7 @@ namespace Apricot {
 	template<typename T>
 	TSharedRef<T> TSharedPtr<T>::ToSharedRef() const
 	{
-		AE_DEBUG_CHECK(m_Pointer != nullptr); /* A TSharedRef must always be valid */
+		AE_CORE_ASSERT(m_Pointer != nullptr); /* A TSharedRef must always be valid */
 
 		TSharedRef<T> SharedRef;
 		SharedRef.m_Pointer = m_Pointer;
@@ -60,7 +60,7 @@ namespace Apricot {
 	template<typename T>
 	TSharedRef<T> TWeakPtr<T>::ToSharedRef() const
 	{
-		AE_DEBUG_CHECK(m_Pointer != nullptr); /* A TSharedRef must always be valid */
+		AE_CORE_ASSERT(m_Pointer != nullptr); /* A TSharedRef must always be valid */
 
 		TSharedRef<T> SharedRef;
 		SharedRef.m_Pointer = m_Pointer;

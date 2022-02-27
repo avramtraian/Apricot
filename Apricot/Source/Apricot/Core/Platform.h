@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Base.h"
+#include "Timestep.h"
 
 namespace Apricot {
 	
@@ -46,20 +47,18 @@ namespace Apricot {
 
 		static uint64 GetAllocationSize(void* Allocation);
 
+	/* Timing */
+	public:
+		static NODISCARD Time GetSystemPerformanceTime();
+
+		static void SleepFor(Time duration);
+
 	/* Console */
 	public:
-		static void Console_Attach();
-		static void Console_Free();
-		static void Console_Write(const TChar* Message, uint64 MessageSize, EConsoleTextColor Color);
-		static void Console_WriteError(const TChar* Message, uint64 MessageSize, EConsoleTextColor Color);
-
-	/* Legacy code */
-		static void* Memory_Allocate(uint64 Size, bool8 Alligned);
-		static void Memory_Free(void* Address, uint64 Size);
-
-		static void Memory_Copy(void* Destination, const void* Source, uint64 Size);
-		static void Memory_Set(void* Destination, int32 Value, uint64 Size);
-		static void Memory_Zero(void* Destination, uint64 Size);
+		static void ConsoleAttach();
+		static void ConsoleFree();
+		static void ConsoleWrite(const TChar* Message, uint64 MessageSize, EConsoleTextColor Color);
+		static void ConsoleWriteError(const TChar* Message, uint64 MessageSize, EConsoleTextColor Color);
 	};
 
 }

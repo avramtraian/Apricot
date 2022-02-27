@@ -39,38 +39,38 @@ namespace Apricot {
 
 	void ALogger::Init()
 	{
-		APlatform::Console_Attach();
+		APlatform::ConsoleAttach();
 
 		AE_CORE_TRACE(TEXT("Logger initialized succesfully!"));
 	}
 
 	void ALogger::Destroy()
 	{
-		APlatform::Console_Free();
+		APlatform::ConsoleFree();
 	}
 
 	void ALogger::Write(ELog Type, const TChar* Message)
 	{
-		uint64 MessageSize = Str_Length(Message);
-		AE_CHECK(SLogTypeSize + MessageSize + 1 <= sizeof(SBuffer) / sizeof(TChar));
+		uint64 MessageSize = StrLength(Message);
+		AE_CORE_RASSERT(SLogTypeSize + MessageSize + 1 <= sizeof(SBuffer) / sizeof(TChar));
 
 		MemCpy(SLogBuffer, SLogTypes[(uint8)Type], SLogTypeSize * sizeof(TChar));
 		MemCpy(SLogBuffer + SLogTypeSize, Message, MessageSize * sizeof(TChar));
 		SLogBuffer[SLogTypeSize + MessageSize] = '\n';
 
-		APlatform::Console_Write(SLogBuffer, SLogTypeSize + MessageSize + 1, SLogTypesColors[(uint8)Type]);
+		APlatform::ConsoleWrite(SLogBuffer, SLogTypeSize + MessageSize + 1, SLogTypesColors[(uint8)Type]);
 	}
 
 	void ALogger::WriteError(ELog Type, const TChar* Message)
 	{
-		uint64 MessageSize = Str_Length(Message);
-		AE_CHECK(SLogTypeSize + MessageSize + 1 <= sizeof(SBuffer) / sizeof(TChar));
+		uint64 MessageSize = StrLength(Message);
+		AE_CORE_RASSERT(SLogTypeSize + MessageSize + 1 <= sizeof(SBuffer) / sizeof(TChar));
 
 		MemCpy(SLogBuffer, SLogTypes[(uint8)Type], SLogTypeSize * sizeof(TChar));
 		MemCpy(SLogBuffer + SLogTypeSize, Message, MessageSize * sizeof(TChar));
 		SLogBuffer[SLogTypeSize + MessageSize] = '\n';
 
-		APlatform::Console_WriteError(SLogBuffer, SLogTypeSize + MessageSize + 1, SLogTypesColors[(uint8)Type]);
+		APlatform::ConsoleWriteError(SLogBuffer, SLogTypeSize + MessageSize + 1, SLogTypesColors[(uint8)Type]);
 	}
 
 }

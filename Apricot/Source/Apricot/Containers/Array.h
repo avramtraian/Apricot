@@ -20,13 +20,13 @@ namespace Apricot {
 	public:
 		T& operator[](uint64 Index)
 		{
-			AE_DEBUG_CHECK(Index < S); // Array index out of range!
+			AE_CORE_ASSERT(Index < S); // Array index out of range!
 			return m_Data[Index];
 		}
 
 		const T& operator[](uint64 Index) const
 		{
-			AE_DEBUG_CHECK(Index < S); // Array index out of range!
+			AE_CORE_ASSERT(Index < S); // Array index out of range!
 			return m_Data[Index];
 		}
 

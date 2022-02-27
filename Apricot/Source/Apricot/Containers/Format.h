@@ -57,9 +57,16 @@ namespace Apricot {
 	}
 
 	template<typename... Args>
-	void Format(TChar* Buffer, uint64 BufferSize, const TChar* String, Args&&... args)
+	bool Format(TChar* Buffer, uint64 BufferSize, const TChar* String, Args&&... args)
 	{
-		Internal_Format(String, Str_Length(String) + 1, Buffer, BufferSize, std::forward<Args>(args)...);
+		uint64 StringSize = StrLength(String);
+		if (StringSize == 1)
+		{
+			return false;
+		}
+
+		Internal_Format(String, StringSize + 1, Buffer, BufferSize, std::forward<Args>(args)...);
+		return true;
 	}
 
 }

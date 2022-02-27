@@ -56,7 +56,7 @@ namespace Apricot {
 #endif
 		}
 
-		AE_DEBUG_CHECK_NO_ENTRY(); // Invalid RenderingAPI!
+		AE_CORE_ASSERT_NO_ENTRY(); // Invalid RenderingAPI!
 		return false;
 	}
 

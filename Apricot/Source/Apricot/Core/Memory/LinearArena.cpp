@@ -244,7 +244,7 @@ namespace Apricot {
 		switch (m_FailureMode)
 		{
 			case AMemoryArena::EFailureMode::Assert:
-				AE_CHECK_NO_ENTRY();
+				AE_CORE_RASSERT_NO_ENTRY();
 				break;
 			case AMemoryArena::EFailureMode::Error:
 				AE_CORE_WARN(TEXT("A Linear Arena can't free specific allocations!"));

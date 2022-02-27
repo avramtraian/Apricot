@@ -78,25 +78,25 @@ namespace Apricot {
 
 		T* operator->()
 		{
-			AE_DEBUG_CHECK(m_Pointer != nullptr); /* Pointer is null */
+			AE_CORE_ASSERT(m_Pointer != nullptr); /* Pointer is null */
 			return m_Pointer;
 		}
 
 		const T* operator->() const
 		{
-			AE_DEBUG_CHECK(m_Pointer != nullptr); /* Pointer is null */
+			AE_CORE_ASSERT(m_Pointer != nullptr); /* Pointer is null */
 			return m_Pointer;
 		}
 
 		T& operator*()
 		{
-			AE_DEBUG_CHECK(m_Pointer != nullptr); /* Pointer is null */
+			AE_CORE_ASSERT(m_Pointer != nullptr); /* Pointer is null */
 			return *m_Pointer;
 		}
 
 		const T& operator*() const
 		{
-			AE_DEBUG_CHECK(m_Pointer != nullptr); /* Pointer is null */
+			AE_CORE_ASSERT(m_Pointer != nullptr); /* Pointer is null */
 			return *m_Pointer;
 		}
 

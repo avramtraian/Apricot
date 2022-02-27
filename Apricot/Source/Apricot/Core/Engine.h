@@ -5,6 +5,8 @@
 
 #include "Base.h"
 
+#include "LayerStack.h"
+
 #include "Apricot/Events/Event.h"
 
 namespace Apricot {
@@ -12,9 +14,29 @@ namespace Apricot {
 	class APRICOT_API AEngine
 	{
 	public:
+		AEngine() = default;
+		virtual ~AEngine() = default;
+
+	public:
 		int32 Run(const char8* CommandLine);
 
 		void OnEvent(AEvent* e);
+
+		template<typename T>
+		void PushLayer()
+		{
+			T* layer = (T*)GMalloc->Alloc(sizeof(T));
+			MemConstruct<T>(layer);
+			m_LayerStack.PushLayer(layer);
+		}
+
+		template<typename T>
+		void PushOverlay()
+		{
+			T* overlay = (T*)GMalloc->Alloc(sizeof(T));
+			MemConstruct<T>(overlay);
+			m_LayerStack.PushOverlay(overlay);
+		}
 
 	private:
 		bool8 OnEngineInitialize(const char8* CommandLine);
@@ -32,7 +54,9 @@ namespace Apricot {
 		bool8 OnMouseButtonReleased(const AMouseButtonReleasedEvent* Event);
 		bool8 OnMouseWheelScrolled(const AMouseWheelScrolledEvent* Event);
 
-	private:
+	protected:
+		LayerStack m_LayerStack;
+
 		AEventDispatchMap m_DispatchMap;
 	};
 

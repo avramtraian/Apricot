@@ -152,7 +152,7 @@ namespace Apricot {
 					}
 					default:
 					{
-						AE_CHECK_NO_ENTRY();
+						AE_CORE_RASSERT_NO_ENTRY();
 						break;
 					}
 				}
@@ -176,7 +176,7 @@ namespace Apricot {
 			}
 			default:
 			{
-				AE_CHECK_NO_ENTRY();
+				AE_CORE_RASSERT_NO_ENTRY();
 				break;
 			}
 		}

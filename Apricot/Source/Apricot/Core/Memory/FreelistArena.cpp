@@ -19,4 +19,14 @@ namespace Apricot {
 	{
 	}
 
+	void AFreelistArena::GarbageCollect()
+	{
+		
+	}
+
+	const TChar* AFreelistArena::GetDebugName() const
+	{
+		return TEXT("FREELIST_ARENA");
+	}
+
 }

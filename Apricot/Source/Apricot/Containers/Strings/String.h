@@ -8,6 +8,14 @@
 
 namespace Apricot {
 
-	APRICOT_API uint64 Str_Length(const TChar* String);
+	APRICOT_API uint64 StrLength(const TChar* String);
+
+	class APRICOT_API AString
+	{
+	public:
+		AString();
+
+		AString(const TChar* Other);
+	};
 
 }

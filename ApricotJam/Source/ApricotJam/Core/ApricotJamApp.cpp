@@ -1,6 +1,9 @@
 // Part of Apricot Engine. 2022-2022.
+// Module: EditorCore
 
 #include "ajpch.h"
+
+#include "EditorLayer.h"
 
 #include <Apricot/Core/EntryPoint.h>
 #include <Apricot/Core/Engine.h>
@@ -10,7 +13,14 @@ namespace Apricot {
 	class AApricotJamEngine : public AEngine
 	{
 	public:
-		
+		AApricotJamEngine()
+		{
+			PushOverlay<EditorLayer>();
+		}
+
+		virtual ~AApricotJamEngine() override
+		{
+		}
 	};
 
 	AEngine* CreateEngine()
