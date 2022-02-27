@@ -12,25 +12,25 @@ namespace Apricot {
 		{
 			Offset += GetAlignmentOffset(Offset, sizeof(void*));
 
-			APoolArena::APage* Page = (APoolArena::APage*)(ArenaMemory + Offset);
-			MemConstruct<APoolArena::APage>(Page);
+			APoolArena::APage* NewPage = (APoolArena::APage*)(ArenaMemory + Offset);
+			MemConstruct<APoolArena::APage>(NewPage);
 			Offset += sizeof(APoolArena::APage);
 
-			Page->FreeChunksCount = ChunksCount;
-			Page->FreeChunks = (void**)(ArenaMemory + Offset);
-			Offset += Page->FreeChunksCount * sizeof(void*);
+			NewPage->FreeChunksCount = ChunksCount;
+			NewPage->FreeChunks = (void**)(ArenaMemory + Offset);
+			Offset += NewPage->FreeChunksCount * sizeof(void*);
 
-			Page->MemoryBlock = ArenaMemory + Offset;
-			Page->ChunksCount = ChunksCount;
-			Page->ChunkSize = ChunkSize;
+			NewPage->MemoryBlock = ArenaMemory + Offset;
+			NewPage->ChunksCount = ChunksCount;
+			NewPage->ChunkSize = ChunkSize;
 
-			for (uint64 Index = 0; Index < Page->FreeChunksCount; Index++)
+			for (uint64 Index = 0; Index < NewPage->FreeChunksCount; Index++)
 			{
-				Page->FreeChunks[Index] = ArenaMemory + Offset;
-				Offset += Page->ChunkSize;
+				NewPage->FreeChunks[Index] = ArenaMemory + Offset;
+				Offset += NewPage->ChunkSize;
 			}
 
-			return Page;
+			return NewPage;
 		}
 
 	}
@@ -40,12 +40,13 @@ namespace Apricot {
 		return MakeShared<APoolArena>(Specification);
 	}
 
-	NODISCARD uint64 APoolArena::GetMemoryRequirementEx(const APoolArenaSpecification& Specification)
+	NODISCARD uint64 APoolArena::GetMemoryRequirement(const APoolArenaSpecification& Specification)
 	{
 		uint64 MemoryRequirement = 0;
 
 		for (uint64 Index = 0; Index < Specification.PagesCount; Index++)
 		{
+			MemoryRequirement += GetAlignmentOffset(MemoryRequirement, sizeof(void*));
 			MemoryRequirement += GetPageMemoryRequirement(Specification.PageChunkCounts[Index], Specification.PageChunkSizes[Index]);
 		}
 
@@ -56,7 +57,6 @@ namespace Apricot {
 	{
 		uint64 MemoryRequirement = 0;
 
-		MemoryRequirement += GetAlignmentOffset(MemoryRequirement, sizeof(void*));
 		MemoryRequirement += sizeof(APage);
 		MemoryRequirement += ChunksCount * sizeof(void*);
 		MemoryRequirement += ChunksCount * ChunkSize;
@@ -75,7 +75,7 @@ namespace Apricot {
 		{
 			if (!ArenaMemory)
 			{
-				ArenaMemory = (uint8*)GMalloc->Alloc(GetMemoryRequirementEx(m_Specification));
+				ArenaMemory = (uint8*)GMalloc->Alloc(GetMemoryRequirement(m_Specification));
 			}
 			uint64 MemoryOffset = 0;
 
@@ -109,7 +109,7 @@ namespace Apricot {
 		}
 		if (!m_Specification.ArenaMemory && !m_Pages.IsEmpty())
 		{
-			GMalloc->Free(m_Pages[0], GetMemoryRequirementEx(m_Specification));
+			GMalloc->Free(m_Pages[0], GetMemoryRequirement(m_Specification));
 		}
 	}
 
@@ -290,7 +290,7 @@ namespace Apricot {
 			}
 		}
 
-		// TODO (Avr): Garbage collect the specification pages aswell
+		// TODO (Avr): Garbage collect the specification pages as well
 	}
 
 	void APoolArena::AllocateNewPage(uint64 ChunksCount, uint64 ChunkSize)

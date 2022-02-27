@@ -39,7 +39,7 @@ namespace Apricot {
 		{
 			if (m_Pointer)
 			{
-				m_Pointer->__IncreaseReferenceCount();
+				m_Pointer->__m_ReferenceCount++;
 			}
 		}
 
@@ -68,7 +68,7 @@ namespace Apricot {
 			m_Pointer = Other.m_Pointer;
 			if (m_Pointer)
 			{
-				((TRemoveConst_Type<T>*)m_Pointer)->IncreaseReferenceCount();
+				((TRemoveConst_Type<T>*)m_Pointer)->__m_ReferenceCount++;
 			}
 
 			return *this;
@@ -167,7 +167,7 @@ namespace Apricot {
 		{
 			if (m_Pointer)
 			{
-				m_Pointer->__m_ReferenceCount--;
+				((TRemoveConst_Type<T>*)m_Pointer)->__m_ReferenceCount--;
 				if (m_Pointer->__m_ReferenceCount == 0)
 				{
 					m_Pointer->~T();
@@ -196,7 +196,7 @@ namespace Apricot {
 			SharedPtr.m_Pointer = (R*)m_Pointer;
 			if (SharedPtr.m_Pointer)
 			{
-				((TRemoveConst_Type<R>*)SharedPtr.m_Pointer)->IncreaseReferenceCount();
+				((TRemoveConst_Type<R>*)SharedPtr.m_Pointer)->__m_ReferenceCount++;
 			}
 			return SharedPtr;
 		}
@@ -215,7 +215,7 @@ namespace Apricot {
 			SharedPtr.m_Pointer = dynamic_cast<R*>((TRemoveConst_Type<T>*)m_Pointer);
 			if (SharedPtr.m_Pointer)
 			{
-				((TRemoveConst_Type<R>*)SharedPtr.m_Pointer)->IncreaseReferenceCount();
+				((TRemoveConst_Type<R>*)SharedPtr.m_Pointer)->__m_ReferenceCount++;
 			}
 			return SharedPtr;
 		}

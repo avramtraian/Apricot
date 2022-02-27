@@ -34,7 +34,7 @@ namespace Apricot {
 		TSharedRef(const TSharedRef<T>& Other)
 			: m_Pointer(Other.m_Pointer)
 		{
-			m_Pointer->__m_ReferenceCount++;
+			((TRemoveConst_Type<T>*)m_Pointer)->__m_ReferenceCount++;
 		}
 
 		TSharedRef(TSharedRef<T>&& Other) noexcept
@@ -66,7 +66,7 @@ namespace Apricot {
 			Release();
 
 			m_Pointer = Other.m_Pointer;
-			((TRemoveConst_Type<T>*)m_Pointer)->IncreaseReferenceCount();
+			((TRemoveConst_Type<T>*)m_Pointer)->__m_ReferenceCount++;
 			return *this;
 		}
 
@@ -152,7 +152,7 @@ namespace Apricot {
 			TSharedRef<R> SharedRef;
 			// NOTE: Type-unsafe... Use a static_cast instead?
 			SharedRef.m_Pointer = (R*)m_Pointer;
-			((TRemoveConst_Type<R>*)SharedRef.m_Pointer)->IncreaseReferenceCount();
+			((TRemoveConst_Type<R>*)SharedRef.m_Pointer)->__m_ReferenceCount++;
 			return SharedRef;
 		}
 
@@ -177,8 +177,8 @@ namespace Apricot {
 			/* In case the TSharedRef was moved, we first check */
 			if (m_Pointer)
 			{
-				((TRemoveConst_Type<T>*)m_Pointer)->DecreaseReferenceCount();
-				if (m_Pointer->GetReferenceCount() == 0)
+				((TRemoveConst_Type<T>*)m_Pointer)->__m_ReferenceCount--;
+				if (m_Pointer->__m_ReferenceCount == 0)
 				{
 					m_Pointer->~T();
 					GMalloc->Free((void*)m_Pointer, sizeof(T));

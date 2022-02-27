@@ -49,7 +49,7 @@ namespace Apricot {
 	public:
 		NODISCARD static TSharedPtr<APoolArena> Create(const APoolArenaSpecification& Specification);
 
-		NODISCARD static uint64 GetMemoryRequirementEx(const APoolArenaSpecification& Specification);
+		NODISCARD static uint64 GetMemoryRequirement(const APoolArenaSpecification& Specification);
 
 		NODISCARD static uint64 GetPageMemoryRequirement(uint64 ChunksCount, uint64 ChunkSize);
 

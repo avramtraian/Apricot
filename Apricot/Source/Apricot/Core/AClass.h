@@ -20,4 +20,17 @@
 		friend class TUniquePtr; \
 		\
 		template<typename T, typename... Args> \
-		friend constexpr TSharedPtr<T> MakeShared(Args&&...);
+		friend constexpr TSharedPtr<T> MakeShared(Args&&...); \
+		\
+		template<typename T> \
+		friend TSharedRef<T> TSharedPtr<T>::ToSharedRef() const; \
+		template<typename T> \
+		friend TWeakPtr<T> TSharedPtr<T>::ToWeakPtr() const; \
+		template<typename T> \
+		friend TSharedPtr<T> TSharedRef<T>::ToSharedPtr() const; \
+		template<typename T> \
+		friend TWeakPtr<T> TSharedRef<T>::ToWeakPtr() const; \
+		template<typename T> \
+		friend TSharedPtr<T> TWeakPtr<T>::ToSharedPtr() const; \
+		template<typename T> \
+		friend TSharedRef<T> TWeakPtr<T>::ToSharedRef() const;

@@ -16,7 +16,7 @@ namespace Apricot {
 
 		TSharedRef<T> SharedRef;
 		SharedRef.m_Pointer = m_Pointer;
-		((TRemoveConst_Type<T>*)SharedRef.m_Pointer)->IncreaseReferenceCount();
+		SharedRef.m_Pointer->__m_ReferenceCount++;
 		return SharedRef;
 	}
 
@@ -33,7 +33,7 @@ namespace Apricot {
 	{
 		TSharedPtr<T> SharedPtr;
 		SharedPtr.m_Pointer = m_Pointer;
-		((TRemoveConst_Type<T>*)SharedPtr.m_Pointer)->IncreaseReferenceCount();
+		SharedPtr.m_Pointer->__m_ReferenceCount++;
 		return SharedPtr;
 	}
 
@@ -52,7 +52,7 @@ namespace Apricot {
 		SharedPtr.m_Pointer = m_Pointer;
 		if (SharedPtr.m_Pointer)
 		{
-			((TRemoveConst_Type<T>*)SharedPtr.m_Pointer)->IncreaseReferenceCount();
+			SharedPtr.m_Pointer->__m_ReferenceCount++;
 		}
 		return SharedPtr;
 	}
@@ -64,7 +64,7 @@ namespace Apricot {
 
 		TSharedRef<T> SharedRef;
 		SharedRef.m_Pointer = m_Pointer;
-		((TRemoveConst_Type<T>*)SharedRef.m_Pointer)->IncreaseReferenceCount();
+		SharedRef.m_Pointer->__m_ReferenceCount++;
 		return SharedRef;
 	}
 

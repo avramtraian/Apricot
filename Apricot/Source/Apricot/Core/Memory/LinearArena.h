@@ -33,10 +33,25 @@ namespace Apricot {
 		void* ArenaMemory = nullptr;
 
 		/**
+		* 
+		*/
+		uint64 ArenaMemoryOffset = 0;
+
+		/**
 		* Tells the arena if it can allocate new pages when it gets out of memory.
 		* If this is false, and the arena runs out of memory, an 'error' will be issued.
 		*/
-		bool8 bShouldGrow = true;
+		bool bShouldGrow = true;
+
+		/**
+		* 
+		*/
+		bool bUseArenaMemoryAlways = false;
+
+		/**
+		* 
+		*/
+		bool bBulkAllocateSpecPages = true;
 	};
 	
 
@@ -50,10 +65,17 @@ namespace Apricot {
 	{
 		ACLASS_CORE()
 
+	public:
+		NODISCARD static uint64 GetPageMemoryRequirement(uint64 PageSizeBytes);
+
+		NODISCARD static uint64 GetMemoryRequirement(const ALinearArenaSpecification& Specification);
+
+		NODISCARD static TSharedPtr<ALinearArena> Create(const ALinearArenaSpecification& Specification);
+
 	/* Constructors & Deconstructor */
 	private:
-		ALinearArena();
-		virtual ~ALinearArena() override = default;
+		ALinearArena(const ALinearArenaSpecification& Specification);
+		virtual ~ALinearArena() override;
 
 		ALinearArena(const ALinearArena&) = delete;
 		ALinearArena(ALinearArena&&) = delete;
@@ -61,7 +83,7 @@ namespace Apricot {
 		ALinearArena& operator=(ALinearArena&&) = delete;
 
 	/* Typedefs */
-	private:
+	public:
 		struct APage
 		{
 			/**
@@ -241,56 +263,8 @@ namespace Apricot {
 
 	/* Friends */
 	private:
-		friend APRICOT_API uint64 GetLinearArenaMemoryRequirementEx(const ALinearArenaSpecification&);
-		friend APRICOT_API ALinearArena* CreateLinearArenaEx(const ALinearArenaSpecification&);
-		friend APRICOT_API void DestroyLinearArena(ALinearArena*);
-
 		template<typename T, typename... Args>
 		friend constexpr T* MemConstruct(void*, Args&&...);
 	};
-
-	/**
-	* Gets the linear arena memory requirement. Called internally by the 'CreateLinearArenaEx'.
-	* Calculates how much memory should be allocated to hold the arena's metadata, pages' metadata and the blocks themselves.
-	* 
-	* @param Specification Linear Arena's specification.
-	* 
-	* @returns Memory requirement.
-	*/
-	NODISCARD APRICOT_API uint64 GetLinearArenaMemoryRequirementEx(const ALinearArenaSpecification& Specification);
-
-	/**
-	* Wrapper for 'GetLinearArenaMemoryRequirementEx'.
-	*/
-	NODISCARD APRICOT_API uint64 GetLinearArenaMemoryRequirement(uint64 SizeBytes);
-
-	/**
-	* Wrapper for 'GetLinearArenaMemoryRequirementEx'.
-	*/
-	NODISCARD APRICOT_API uint64 GetLinearArenaMemoryRequirement(uint64 PagesCount, uint64* PageSizes);
-
-	/**
-	* Allocates & Creates a Linear Arena.
-	* 
-	* @param Specification Linear Arena's specification.
-	* 
-	* @returns Pointer to the newly created arena.
-	*/
-	NODISCARD APRICOT_API ALinearArena* CreateLinearArenaEx(const ALinearArenaSpecification& Specification);
-
-	/**
-	* Wrapper for 'CreateLinearArenaEx'.
-	*/
-	NODISCARD APRICOT_API ALinearArena* CreateLinearArena(uint64 SizeBytes, bool8 bShouldGrow, void* Memory = nullptr);
-
-	/**
-	* Wrapper for 'CreateLinearArenaEx'.
-	*/
-	NODISCARD APRICOT_API ALinearArena* CreateLinearArena(uint64 PagesCount, uint64* PageSizes, bool8 bShouldGrow, void* Memory = nullptr);
-
-	/**
-	* Destroys a Linear Arena.
-	*/
-	APRICOT_API void DestroyLinearArena(ALinearArena* Arena);
 	
 }

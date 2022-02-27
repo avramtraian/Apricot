@@ -31,12 +31,27 @@ namespace Apricot {
 		/**
 		* 
 		*/
-		bool8 bShouldGrow = false;
+		uint64 ArenaMemoryOffset = 0;
 
 		/**
 		* 
 		*/
-		bool8 bAllowAlignment = false;
+		bool bShouldGrow = false;
+
+		/**
+		* 
+		*/
+		bool bAllowAlignment = false;
+
+		/**
+		* 
+		*/
+		bool bUseArenaMemoryAlways = false;
+
+		/**
+		* 
+		*/
+		bool bBulkAllocateSpecPages = true;
 	};
 
 	/**
@@ -48,10 +63,17 @@ namespace Apricot {
 	{
 		ACLASS_CORE()
 
+	public:
+		NODISCARD static TSharedPtr<AStackArena> Create(const AStackArenaSpecification& Specification);
+
+		NODISCARD static uint64 GetPageMemoryRequirement(uint64 PageSize);
+
+		NODISCARD static uint64 GetMemoryRequirement(const AStackArenaSpecification& Specification);
+
 	/* Constructors & Deconstructor */
 	private:
-		AStackArena();
-		virtual ~AStackArena() override = default;
+		AStackArena(const AStackArenaSpecification& Specification);
+		virtual ~AStackArena() override;
 
 		AStackArena(const AStackArena&) = delete;
 		AStackArena(AStackArena&&) = delete;
@@ -59,7 +81,7 @@ namespace Apricot {
 		AStackArena& operator=(AStackArena&&) = delete;
 
 	/* Typedefs */
-	private:
+	public:
 		struct APage
 		{
 			/**
@@ -226,27 +248,8 @@ namespace Apricot {
 
 	/* Friends */
 	private:
-		friend APRICOT_API uint64 GetStackArenaMemoryRequirementEx(const AStackArenaSpecification&);
-		friend APRICOT_API AStackArena* CreateStackArenaEx(const AStackArenaSpecification&);
-		friend APRICOT_API void DestroyStackArena(AStackArena* Arena);
-
 		template<typename T, typename... Args>
 		friend constexpr FORCEINLINE T* MemConstruct(void*, Args&&...);
 	};
-
-	/**
-	* 
-	*/
-	APRICOT_API uint64 GetStackArenaMemoryRequirementEx(const AStackArenaSpecification& Specfication);
-
-	/**
-	* 
-	*/
-	NODISCARD APRICOT_API AStackArena* CreateStackArenaEx(const AStackArenaSpecification& Specfication);
-
-	/**
-	* 
-	*/
-	APRICOT_API void DestroyStackArena(AStackArena* Arena);
 
 }

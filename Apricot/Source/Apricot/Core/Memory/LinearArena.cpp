@@ -6,9 +6,106 @@
 
 namespace Apricot {
 
-	ALinearArena::ALinearArena()
-		: m_CurrentPage(0)
+	namespace Utils {
+
+		static ALinearArena::APage* ConstructNewPage(uint8* ArenaMemory, uint64& Offset, uint64 PageSize)
+		{
+			Offset += GetAlignmentOffset(Offset, sizeof(void*));
+
+			ALinearArena::APage* NewPage = (ALinearArena::APage*)(ArenaMemory + Offset);
+			MemConstruct<ALinearArena::APage>(NewPage);
+			Offset += sizeof(ALinearArena::APage);
+
+			NewPage->MemoryBlock = ArenaMemory + Offset;
+			NewPage->SizeBytes = PageSize;
+			NewPage->AllocatedBytes = 0;
+
+			Offset += NewPage->SizeBytes;
+
+			return NewPage;
+		}
+
+	}
+
+	NODISCARD TSharedPtr<ALinearArena> ALinearArena::Create(const ALinearArenaSpecification& Specification)
 	{
+		return MakeShared<ALinearArena>(Specification);
+	}
+
+	NODISCARD uint64 ALinearArena::GetPageMemoryRequirement(uint64 PageSizeBytes)
+	{
+		uint64 MemoryRequirement = 0;
+
+		MemoryRequirement += sizeof(APage);
+		MemoryRequirement += PageSizeBytes;
+
+		return MemoryRequirement;
+	}
+
+	NODISCARD uint64 ALinearArena::GetMemoryRequirement(const ALinearArenaSpecification& Specification)
+	{
+		uint64 MemoryRequirement = 0;
+
+		for (uint64 Index = 0; Index < Specification.PagesCount; Index++)
+		{
+			MemoryRequirement += GetAlignmentOffset(MemoryRequirement, sizeof(void*));
+			MemoryRequirement += GetPageMemoryRequirement(Specification.PageSizes[Index]);
+		}
+
+		return MemoryRequirement;
+	}
+
+	ALinearArena::ALinearArena(const ALinearArenaSpecification& Specification)
+		: m_Specification(Specification), m_CurrentPage(0)
+	{
+		m_Pages.SetCapacity(m_Specification.PagesCount);
+
+		uint8* ArenaMemory = (uint8*)m_Specification.ArenaMemory;
+
+		if (m_Specification.bBulkAllocateSpecPages || ArenaMemory)
+		{
+			if (!ArenaMemory)
+			{
+				ArenaMemory = (uint8*)GMalloc->Alloc(GetMemoryRequirement(m_Specification));
+			}
+			uint64 MemoryOffset = 0;
+
+			for (uint64 Index = 0; Index < m_Specification.PagesCount; Index++)
+			{
+				m_Pages.PushBack(Utils::ConstructNewPage(ArenaMemory, MemoryOffset, m_Specification.PageSizes[Index]));
+			}
+
+			if (ArenaMemory)
+			{
+				m_Specification.ArenaMemoryOffset = MemoryOffset;
+			}
+		}
+		else
+		{
+			for (uint64 Index = 0; Index < m_Specification.PagesCount; Index++)
+			{
+				uint64 MemoryOffset = 0;
+				uint64 PageSizeBytes = m_Specification.PageSizes[Index];
+
+				ArenaMemory = (uint8*)GMalloc->Alloc(GetPageMemoryRequirement(PageSizeBytes));
+				m_Pages.PushBack(Utils::ConstructNewPage(ArenaMemory, MemoryOffset, PageSizeBytes));
+			}
+		}
+	}
+
+	ALinearArena::~ALinearArena()
+	{
+		if (!m_Specification.bUseArenaMemoryAlways)
+		{
+			for (uint64 Index = m_Specification.PagesCount; Index < m_Pages.Size(); Index++)
+			{
+				GMalloc->Free(m_Pages[Index], GetPageMemoryRequirement(m_Pages[Index]->SizeBytes));
+			}
+		}
+		if (!m_Specification.ArenaMemory && !m_Pages.IsEmpty())
+		{
+			GMalloc->Free(m_Pages[0], GetMemoryRequirement(m_Specification));
+		}
 	}
 
 	uint64 ALinearArena::GetTotalSize() const
@@ -213,131 +310,18 @@ namespace Apricot {
 
 	ALinearArena::APage* ALinearArena::AllocateNewPage(uint64 PageSize)
 	{
-		uint8* Memory = (uint8*)GMalloc->Alloc(sizeof(APage) + PageSize);
-
-		APage* NewPage = (APage*)(Memory);
-		MemConstruct<APage>(NewPage);
-
-		NewPage->MemoryBlock = Memory + sizeof(APage);
-		NewPage->SizeBytes = PageSize;
-		NewPage->AllocatedBytes = 0;
-
-		m_Pages.PushBack(NewPage);
-		return NewPage;
-	}
-
-	APRICOT_API uint64 GetLinearArenaMemoryRequirementEx(const ALinearArenaSpecification& Specification)
-	{
-		uint64 MemoryRequirement = 0;
-
-		MemoryRequirement += sizeof(ALinearArena);
-
-		for (uint64 Index = 0; Index < Specification.PagesCount; Index++)
+		if (m_Specification.bUseArenaMemoryAlways)
 		{
-			MemoryRequirement += GetAlignmentOffset(MemoryRequirement, sizeof(void*));;
-			MemoryRequirement += sizeof(ALinearArena::APage);
-			MemoryRequirement += Specification.PageSizes[Index];
+			APage* NewPage = Utils::ConstructNewPage((uint8*)m_Specification.ArenaMemory, m_Specification.ArenaMemoryOffset, PageSize);
+			m_Pages.PushBack(NewPage);
+			return NewPage;
 		}
-
-		return MemoryRequirement;
-	}
-
-	APRICOT_API uint64 GetLinearArenaMemoryRequirement(uint64 SizeBytes)
-	{
-		ALinearArenaSpecification Specification;
-		Specification.PagesCount = 1;
-		Specification.PageSizes = &SizeBytes;
-
-		return GetLinearArenaMemoryRequirementEx(Specification);
-	}
-
-	APRICOT_API uint64 GetLinearArenaMemoryRequirement(uint64 PagesCount, uint64* PageSizes)
-	{
-		ALinearArenaSpecification Specification;
-		Specification.PagesCount = PagesCount;
-		Specification.PageSizes = PageSizes;
-
-		return GetLinearArenaMemoryRequirementEx(Specification);
-	}
-
-	APRICOT_API ALinearArena* CreateLinearArenaEx(const ALinearArenaSpecification& Specification)
-	{
-		uint8* ArenaMemory = (uint8*)Specification.ArenaMemory;
-		if (!ArenaMemory)
+		else
 		{
-			ArenaMemory = (uint8*)GMalloc->Alloc(GetLinearArenaMemoryRequirementEx(Specification));
-		}
-		uint64 MemoryOffset = 0;
-
-		ALinearArena* Arena = (ALinearArena*)(ArenaMemory + MemoryOffset);
-		MemConstruct<ALinearArena>(Arena);
-
-		Arena->m_Specification = Specification;
-		Arena->m_Pages.SetCapacity(Specification.PagesCount);
-		Arena->m_CurrentPage = 0;
-
-		MemoryOffset += sizeof(ALinearArena);
-		MemoryOffset += GetAlignmentOffset(MemoryOffset, sizeof(void*));
-
-		for (uint64 Index = 0; Index < Specification.PagesCount; Index++)
-		{
-			uint64 PageAlignment = GetAlignmentOffset(MemoryOffset, sizeof(void*));
-			MemoryOffset += PageAlignment;
-
-			ALinearArena::APage* Page = (ALinearArena::APage*)(ArenaMemory + MemoryOffset);
-			Arena->m_Pages.PushBack(Page);
-
-			MemoryOffset += sizeof(ALinearArena::APage);
-
-			Page->MemoryBlock = ArenaMemory + MemoryOffset;
-			Page->SizeBytes = Specification.PageSizes[Index];
-			Page->AllocatedBytes = 0;
-
-			MemoryOffset += Specification.PageSizes[Index];
-		}
-
-		return Arena;
-	}
-
-	APRICOT_API ALinearArena* CreateLinearArena(uint64 SizeBytes, bool8 bShouldGrow, void* Memory /*= nullptr*/)
-	{
-		ALinearArenaSpecification Specification;
-		Specification.PagesCount = 1;
-		Specification.PageSizes = &SizeBytes;
-		Specification.bShouldGrow = bShouldGrow;
-		Specification.ArenaMemory = Memory;
-
-		return CreateLinearArenaEx(Specification);
-	}
-
-	APRICOT_API ALinearArena* CreateLinearArena(uint64 PagesCount, uint64* PageSizes, bool8 bShouldGrow, void* Memory /*= nullptr*/)
-	{
-		ALinearArenaSpecification Specification;
-		Specification.PagesCount = PagesCount;
-		Specification.PageSizes = PageSizes;
-		Specification.bShouldGrow = bShouldGrow;
-		Specification.ArenaMemory = Memory;
-
-		return CreateLinearArenaEx(Specification);
-	}
-
-	APRICOT_API void DestroyLinearArena(ALinearArena* Arena)
-	{
-		if (Arena)
-		{
-			for (uint64 Index = Arena->m_Specification.PagesCount; Index < Arena->m_Pages.Size(); Index++)
-			{
-				uint64 PageSize = (uint64)((uintptr)Arena->m_Pages[Index]->MemoryBlock - (uintptr)Arena->m_Pages[Index]) + Arena->m_Pages[Index]->SizeBytes;
-				GMalloc->Free(Arena->m_Pages[Index], PageSize);
-			}
-
-			uint64 ArenaSize = GetLinearArenaMemoryRequirementEx(Arena->m_Specification);
-			bool8 bOwnsMemory = (Arena->m_Specification.ArenaMemory == nullptr);
-			Arena->~ALinearArena();
-			if (bOwnsMemory)
-			{
-				GMalloc->Free(Arena, ArenaSize);
-			}
+			uint64 Offset = 0;
+			APage* NewPage = Utils::ConstructNewPage((uint8*)GMalloc->Alloc(GetPageMemoryRequirement(PageSize)), Offset, PageSize);
+			m_Pages.PushBack(NewPage);
+			return NewPage;
 		}
 	}
 
