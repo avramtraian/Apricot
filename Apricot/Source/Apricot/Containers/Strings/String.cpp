@@ -28,12 +28,12 @@ namespace Apricot {
 		return wcslen(String);
 	}
 	
-	AString::AString()
+	String::String()
 	{
 		
 	}
 
-	AString::AString(const TChar* Other)
+	String::String(const TChar* Other)
 	{
 		
 	}

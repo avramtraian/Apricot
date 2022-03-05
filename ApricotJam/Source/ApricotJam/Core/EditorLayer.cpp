@@ -25,9 +25,9 @@ namespace Apricot {
 		AE_CORE_INFO(TEXT("EditorLayer detached!"));
 	}
 
-	void EditorLayer::OnUpdate(Timestep Ts)
+	void EditorLayer::OnUpdate(Timestep ts)
 	{
-		// AE_CORE_TRACE(TEXT("Timestep: {}"), Ts.DeltaTime());
+		// AE_CORE_TRACE(TEXT("Timestep: {}"), ts.DeltaTime());
 	}
 
 	void EditorLayer::OnEvent(AEvent* Ev)

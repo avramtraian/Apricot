@@ -24,8 +24,8 @@
 
 	using TChar = char16;
 	
-	#define ___TEXT(Text) L##Text
-	#define TEXT(Text) ___TEXT(Text)
+	#define _IMPL_TEXT(Text) L##Text
+	#define TEXT(Text) _IMPL_TEXT(Text)
 
 	#ifdef AE_COMPILER_MSVC
 		#define AE_FILE         TEXT(__FILE__)

@@ -162,7 +162,8 @@
 
 #define AE_ARRAY_LENGTH(Array) (sizeof(Array) / sizeof(Array[0]))
 
-
+#define _IMPL_CONCATENATE(A, B) A##B
+#define AE_CONCATENATE(A, B) _IMPL_CONCATENATE(A, B)
 
 /* Disables dll-interface compiler warning. It is usually generated around templates. */
 #pragma warning (disable: 4251)

@@ -5,7 +5,7 @@
 
 #include "Base.h"
 #include "Types.h"
-#include "Timestep.h"
+#include "Time.h"
 
 #include "Apricot/Events/Event.h"
 
@@ -30,10 +30,10 @@ namespace Apricot {
 	public:
 		virtual uint64 GetLayerSize() const = 0;
 
-		const AString& GetLayerDebugName() const { return m_DebugName; }
+		const String& GetLayerDebugName() const { return m_DebugName; }
 
 	private:
-		AString m_DebugName;
+		String m_DebugName;
 	};
 
 }

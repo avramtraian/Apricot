@@ -269,4 +269,26 @@ namespace Apricot {
 		return FormatType<uint64>((uint64)Value, Buffer, BufferSize);
 	}
 
+	template<>
+	APRICOT_API uint64 FormatType(const char& Value, TChar* Buffer, uint64 BufferSize)
+	{
+		if (BufferSize < sizeof(char))
+		{
+			return 0;
+		}
+		MemCpy(Buffer, &Value, sizeof(char));
+		return sizeof(char);
+	}
+
+	template<>
+	APRICOT_API uint64 FormatType(const char16& Value, TChar* Buffer, uint64 BufferSize)
+	{
+		if (BufferSize < sizeof(char16))
+		{
+			return 0;
+		}
+		MemCpy(Buffer, &Value, sizeof(char16));
+		return sizeof(char16);
+	}
+
 }

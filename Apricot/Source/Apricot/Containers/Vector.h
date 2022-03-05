@@ -192,12 +192,18 @@ namespace Apricot {
 			{
 				m_Data[Index].~T();
 			}
-			m_Size = NewSize;
 
 			if (NewSize > m_Capacity)
 			{
 				ReAllocateCopy(NewSize);
 			}
+
+			for (uint64 Index = m_Size; Index < NewSize; Index++)
+			{
+				MemConstruct<T>(m_Data + Index);
+			}
+
+			m_Size = NewSize;
 		}
 
 		/*
