@@ -4,7 +4,7 @@ Binaries
 Binaries-Int
 
 # Exceptions
-!Apricot/Vendor/optick/Binaries
+!Apricot/ThirdParty/optick/Binaries
 
 # Project Files
 *.vcxproj

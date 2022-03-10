@@ -11,7 +11,7 @@ project "AE"
 		"Source/**.h",
 		"Source/**.cpp",
 
-		"Vendor/Optick/Include/**.h"
+		"ThirdParty/Optick/Include/**.h"
 	}
 
 	includedirs {
@@ -49,11 +49,11 @@ project "AE"
 			objdir "%{wks.location}/Binaries-Int/Win64/%{prj.name}"
 
 			libdirs {
-				"Vendor/Optick/Binaries/Win64-Debug"
+				"ThirdParty/Optick/Binaries/Win64-Debug"
 			}
 
 			postbuildcommands {
-				"copy Vendor\\Optick\\Binaries\\Win64-Debug\\OptickCore.dll %{wks.location}\\Binaries\\Win64-DebugEd"
+				"copy ThirdParty\\Optick\\Binaries\\Win64-Debug\\OptickCore.dll %{wks.location}\\Binaries\\Win64-DebugEd"
 			}
 			
 	filter { "configurations:Debug_Game" }
@@ -73,11 +73,11 @@ project "AE"
 			objdir "%{wks.location}/Binaries-Int/Win64/%{prj.name}"
 
 			libdirs {
-				"Vendor/Optick/Binaries/Win64-Debug"
+				"ThirdParty/Optick/Binaries/Win64-Debug"
 			}
 
 			postbuildcommands {
-				"copy Vendor\\Optick\\Binaries\\Win64-Debug\\OptickCore.dll %{wks.location}\\Binaries\\Win64-Debug"
+				"copy ThirdParty\\Optick\\Binaries\\Win64-Debug\\OptickCore.dll %{wks.location}\\Binaries\\Win64-Debug"
 			}
 			
 	filter { "configurations:Release_Editor" }
@@ -97,11 +97,11 @@ project "AE"
 			objdir "%{wks.location}/Binaries-Int/Win64/%{prj.name}"
 
 			libdirs {
-				"Vendor/Optick/Binaries/Win64-Release"
+				"ThirdParty/Optick/Binaries/Win64-Release"
 			}
 
 			postbuildcommands {
-				"copy Vendor\\Optick\\Binaries\\Win64-Release\\OptickCore.dll %{wks.location}\\Binaries\\Win64-ReleaseEd"
+				"copy ThirdParty\\Optick\\Binaries\\Win64-Release\\OptickCore.dll %{wks.location}\\Binaries\\Win64-ReleaseEd"
 			}
 			
 	filter { "configurations:Release_Game" }
@@ -121,11 +121,11 @@ project "AE"
 			objdir "%{wks.location}/Binaries-Int/Win64/%{prj.name}"
 
 			libdirs {
-				"Vendor/Optick/Binaries/Win64-Release"
+				"ThirdParty/Optick/Binaries/Win64-Release"
 			}
 
 			postbuildcommands {
-				"copy Vendor\\Optick\\Binaries\\Win64-Release\\OptickCore.dll %{wks.location}\\Binaries\\Win64-Release"
+				"copy ThirdParty\\Optick\\Binaries\\Win64-Release\\OptickCore.dll %{wks.location}\\Binaries\\Win64-Release"
 			}
 			
 	filter { "configurations:Shipping_Game" }
