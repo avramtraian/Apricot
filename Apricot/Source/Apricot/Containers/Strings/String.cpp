@@ -27,15 +27,5 @@ namespace Apricot {
 	{
 		return wcslen(String);
 	}
-	
-	String::String()
-	{
-		
-	}
-
-	String::String(const TChar* Other)
-	{
-		
-	}
 
 }

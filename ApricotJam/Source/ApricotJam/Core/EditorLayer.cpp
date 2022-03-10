@@ -27,10 +27,10 @@ namespace Apricot {
 
 	void EditorLayer::OnUpdate(Timestep ts)
 	{
-		// AE_CORE_TRACE(TEXT("Timestep: {}"), ts.DeltaTime());
+		
 	}
 
-	void EditorLayer::OnEvent(AEvent* Ev)
+	void EditorLayer::OnEvent(AEvent* ev)
 	{
 		
 	}

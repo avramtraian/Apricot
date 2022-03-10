@@ -4,6 +4,8 @@
 #include "aepch.h"
 #include "ApricotMemory.h"
 
+#include "HeapAllocator.h"
+
 #include "Apricot/Core/Platform.h"
 
 #include "Apricot/Profiling/MemoryProfiler.h"
@@ -20,6 +22,12 @@ namespace Apricot {
 			MemConstruct<AMalloc>(GMalloc);
 		}
 
+		if (!GHeapAllocator)
+		{
+			GHeapAllocator = (HeapAllocator*)GMalloc->Alloc(sizeof(HeapAllocator), 0);
+			MemConstruct<HeapAllocator>(GHeapAllocator);
+		}
+
 	#ifdef AE_ENABLE_MEMORY_TRACE
 		AMemoryProfiler::Init();
 	#endif
@@ -30,6 +38,13 @@ namespace Apricot {
 	#ifdef AE_ENABLE_MEMORY_TRACE
 		AMemoryProfiler::Destroy();
 	#endif
+
+		if (GHeapAllocator)
+		{
+			GHeapAllocator->~HeapAllocator();
+			GMalloc->Free(GHeapAllocator, sizeof(HeapAllocator));
+			GHeapAllocator = nullptr;
+		}
 
 		if (GMalloc)
 		{

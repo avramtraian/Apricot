@@ -4,7 +4,6 @@
 #pragma once
 
 #include "Base.h"
-#include "Types.h"
 #include "Time.h"
 
 #include "Apricot/Events/Event.h"

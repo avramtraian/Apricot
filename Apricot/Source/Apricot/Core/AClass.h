@@ -4,7 +4,6 @@
 #pragma once
 
 #include "Base.h"
-#include "Types.h"
 
 #define ACLASS_CORE() \
 	private: \

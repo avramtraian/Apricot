@@ -4,7 +4,6 @@
 #pragma once
 
 #include "Apricot/Core/Base.h"
-#include "Apricot/Core/Types.h"
 #include "Apricot/Core/Memory/ApricotMemory.h"
 
 #include "Apricot/Containers/Null.h"

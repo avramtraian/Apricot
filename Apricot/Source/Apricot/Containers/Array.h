@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "Apricot/Core/Base.h"
-#include "Apricot/Core/Types.h"
+#include "Iterators/VectorIterator.h"
+
 #include "Apricot/Core/Assert.h"
 
 namespace Apricot {
@@ -12,6 +12,12 @@ namespace Apricot {
 	template<typename T, uint64 S>
 	class TArray
 	{
+	public:
+		using TIterator             = TVectorIterator<T>;
+		using TConstIterator        = TVectorIterator<const T>;
+		using TReverseIterator      = TVectorIterator<T>;
+		using TReverseConstIterator = TVectorIterator<const T>;
+
 	public:
 		TArray()
 		{
@@ -31,8 +37,49 @@ namespace Apricot {
 		}
 
 	public:
-		T* Data() const { return (T*)(&m_Data[0]); }
-		uint64 Size() const { return S; }
+		TIterator begin()
+		{
+			return TIterator(m_Data);
+		}
+
+		TIterator end()
+		{
+			return TIterator(m_Data + S);
+		}
+
+		TConstIterator begin() const
+		{
+			return TConstIterator(m_Data);
+		}
+
+		TConstIterator end() const
+		{
+			return TConstIterator(m_Data + S);
+		}
+
+		TReverseIterator rbegin()
+		{
+			return TReverseIterator(m_Data + S - 1);
+		}
+
+		TReverseIterator rend()
+		{
+			return TReverseIterator(m_Data - 1);
+		}
+
+		TReverseConstIterator rbegin() const
+		{
+			return TReverseConstIterator(m_Data + S - 1);
+		}
+
+		TReverseConstIterator rend() const
+		{
+			return TReverseConstIterator(m_Data - 1);
+		}
+
+	public:
+		FORCEINLINE T*     Data() const { return (T*)(&m_Data[0]); }
+		FORCEINLINE uint64 Size() const { return S; }
 
 	private:
 		T m_Data[S];

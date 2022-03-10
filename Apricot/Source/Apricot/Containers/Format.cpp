@@ -6,6 +6,8 @@
 
 #include "Apricot/Core/Memory/ApricotMemory.h"
 
+#include "Apricot/Containers/Strings/ApricotString.h"
+
 namespace Apricot {
 	
 	template<typename T>
@@ -289,6 +291,17 @@ namespace Apricot {
 		}
 		MemCpy(Buffer, &Value, sizeof(char16));
 		return sizeof(char16);
+	}
+
+	template<>
+	APRICOT_API uint64 FormatType(const String& Value, TChar* Buffer, uint64 BufferSize)
+	{
+		if (BufferSize < Value.Size() * sizeof(Value.Data()[0]))
+		{
+			return 0;
+		}
+		MemCpy(Buffer, Value.Data(), Value.Size() * sizeof(Value.Data()[0]));
+		return Value.Size() * sizeof(Value.Data()[0]);
 	}
 
 }
