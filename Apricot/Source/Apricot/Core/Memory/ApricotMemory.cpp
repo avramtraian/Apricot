@@ -24,8 +24,7 @@ namespace Apricot {
 
 		if (!GHeapAllocator)
 		{
-			GHeapAllocator = (HeapAllocator*)GMalloc->Alloc(sizeof(HeapAllocator), 0);
-			MemConstruct<HeapAllocator>(GHeapAllocator);
+			GHeapAllocator = MemNew<HeapAllocator>();
 		}
 
 	#ifdef AE_ENABLE_MEMORY_TRACE
@@ -41,8 +40,7 @@ namespace Apricot {
 
 		if (GHeapAllocator)
 		{
-			GHeapAllocator->~HeapAllocator();
-			GMalloc->Free(GHeapAllocator, sizeof(HeapAllocator));
+			MemDelete<HeapAllocator>(GHeapAllocator);
 			GHeapAllocator = nullptr;
 		}
 

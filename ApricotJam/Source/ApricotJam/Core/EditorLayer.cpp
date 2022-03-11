@@ -18,6 +18,7 @@ namespace Apricot {
 	void EditorLayer::OnAttach()
 	{
 		AE_CORE_INFO(TEXT("EditorLayer attached!"));
+		
 	}
 
 	void EditorLayer::OnDetach()

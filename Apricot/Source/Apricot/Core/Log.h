@@ -42,6 +42,9 @@ namespace Apricot {
 			WriteError(Type, SBuffer);
 		}
 
+		// Wrapper for Platform::IsConsoleAvailable()
+		static bool IsConsoleAvailable();
+
 	private:
 		static TChar SBuffer[32000];
 	};
@@ -52,7 +55,7 @@ namespace Apricot {
 * FATAL - The engine will be forced to shutdown (Severity 0)
 */
 #ifdef AE_ENABLE_LOG_FATAL
-	#define AE_CORE_FATAL(...) Apricot::ALogger::WriteError(Apricot::ELog::Fatal, __VA_ARGS__)
+	#define AE_CORE_FATAL(...) if (Apricot::ALogger::IsConsoleAvailable()) { Apricot::ALogger::WriteError(Apricot::ELog::Fatal, __VA_ARGS__); }
 #else
 	#define AE_CORE_FATAL(...) 
 #endif
@@ -61,7 +64,7 @@ namespace Apricot {
 * ERROR - The engine might recover (Severity 1)
 */
 #ifdef AE_ENABLE_LOG_ERROR
-	#define AE_CORE_ERROR(...) Apricot::ALogger::WriteError(Apricot::ELog::Error, __VA_ARGS__)
+	#define AE_CORE_ERROR(...) if (Apricot::ALogger::IsConsoleAvailable()) { Apricot::ALogger::WriteError(Apricot::ELog::Error, __VA_ARGS__); }
 #else
 	#define AE_CORE_ERROR(...) 
 #endif
@@ -70,7 +73,7 @@ namespace Apricot {
 * WARN - Something suboptimal happened (Severity 2)
 */
 #ifdef AE_ENABLE_LOG_WARN
-	#define AE_CORE_WARN(...) Apricot::ALogger::Write(Apricot::ELog::Warn, __VA_ARGS__)
+	#define AE_CORE_WARN(...) if (Apricot::ALogger::IsConsoleAvailable()) { Apricot::ALogger::Write(Apricot::ELog::Warn, __VA_ARGS__); }
 #else
 	#define AE_CORE_WARN(...) 
 #endif
@@ -79,7 +82,7 @@ namespace Apricot {
 * INFO - Just information about various processes (Severity 3)
 */
 #ifdef AE_ENABLE_LOG_INFO
-	#define AE_CORE_INFO(...) Apricot::ALogger::Write(Apricot::ELog::Info, __VA_ARGS__)
+	#define AE_CORE_INFO(...) if (Apricot::ALogger::IsConsoleAvailable()) { Apricot::ALogger::Write(Apricot::ELog::Info, __VA_ARGS__); }
 #else
 	#define AE_CORE_INFO(...) 
 #endif
@@ -88,7 +91,7 @@ namespace Apricot {
 * DEBUG - Debug information (Severity 4)
 */
 #ifdef AE_ENABLE_LOG_DEBUG
-	#define AE_CORE_DEBUG(...) Apricot::ALogger::Write(Apricot::ELog::Debug, __VA_ARGS__)
+	#define AE_CORE_DEBUG(...) if (Apricot::ALogger::IsConsoleAvailable()) { Apricot::ALogger::Write(Apricot::ELog::Debug, __VA_ARGS__); }
 #else
 	#define AE_CORE_DEBUG(...) 
 #endif
@@ -97,7 +100,7 @@ namespace Apricot {
 * TRACE - Very detailed information about everything is going on internally (Severity 5)
 */
 #ifdef AE_ENABLE_LOG_TRACE
-	#define AE_CORE_TRACE(...) Apricot::ALogger::Write(Apricot::ELog::Trace, __VA_ARGS__)
+	#define AE_CORE_TRACE(...) if (Apricot::ALogger::IsConsoleAvailable()) { Apricot::ALogger::Write(Apricot::ELog::Trace, __VA_ARGS__); }
 #else
 	#define AE_CORE_TRACE(...) 
 #endif

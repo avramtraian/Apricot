@@ -7,6 +7,8 @@
 
 #include "Apricot/Core/Platform.h"
 
+#include "Apricot/Profiling/MemoryProfiler.h"
+
 #ifdef TEXT
 	#undef TEXT
 #endif
@@ -65,11 +67,13 @@ namespace Apricot {
 		{
 			return nullptr;
 		}
+		AMemoryProfiler::SubmitHeapAllocation(Size, Alignment);
 		return ::operator new(Size);
 	}
 
 	void APlatform::Free(void* MemoryBlock, uint64 Size)
 	{
+		AMemoryProfiler::SubmitHeapDeallocation(MemoryBlock, Size);
 		::operator delete(MemoryBlock, Size);
 	}
 
@@ -111,6 +115,11 @@ namespace Apricot {
 	void APlatform::SleepFor(Time duration)
 	{
 		Sleep((DWORD)(duration.Miliseconds()));
+	}
+
+	bool APlatform::IsConsoleAvailable()
+	{
+		return SWindowsPlatformData.bIsConsoleAttached;
 	}
 
 	void APlatform::ConsoleAttach()

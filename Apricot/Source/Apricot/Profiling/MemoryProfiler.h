@@ -4,14 +4,13 @@
 #pragma once
 
 #include "Apricot/Core/Base.h"
-#include "Apricot/Core/AClass.h"
 
 namespace Apricot {
 
 	/**
 	* C++ Core Profiling Tool
 	* 
-	* Keeps track of memory allocation, providing EDITOR & RUNTIME memory informations
+	* Keeps track of memory allocation, providing EDITOR & RUNTIME memory information
 	*/
 	class APRICOT_API AMemoryProfiler
 	{
@@ -26,6 +25,9 @@ namespace Apricot {
 	public:
 		static void Init();
 		static void Destroy();
+
+		static void SubmitHeapAllocation(uint64 size, uint64 alignment);
+		static void SubmitHeapDeallocation(void* block, uint64 size);
 
 	/* Friends */
 	private:

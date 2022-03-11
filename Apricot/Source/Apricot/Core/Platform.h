@@ -55,6 +55,8 @@ namespace Apricot {
 
 	/* Console */
 	public:
+		static bool IsConsoleAvailable();
+
 		static void ConsoleAttach();
 		static void ConsoleFree();
 		static void ConsoleWrite(const TChar* Message, uint64 MessageSize, EConsoleTextColor Color);

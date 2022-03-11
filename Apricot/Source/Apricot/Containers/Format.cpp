@@ -226,22 +226,22 @@ namespace Apricot {
 	{
 		if (Value)
 		{
-			uint64 Size = sizeof("true") - 1;
+			uint64 Size = (sizeof(TEXT("true")) - sizeof(TChar)) / sizeof(TChar);
 			if (Size > BufferSize)
 			{
 				Size = BufferSize;
 			}
-			MemCpy(Buffer, "true", Size);
+			MemCpy(Buffer, TEXT("true"), Size);
 			return Size;
 		}
 		else
 		{
-			uint64 Size = sizeof("false") - 1;
+			uint64 Size = (sizeof(TEXT("false")) - sizeof(TChar)) / sizeof(TChar);
 			if (Size > BufferSize)
 			{
 				Size = BufferSize;
 			}
-			MemCpy(Buffer, "false", Size);
+			MemCpy(Buffer, TEXT("false"), Size);
 			return Size;
 		}
 	}
@@ -274,34 +274,34 @@ namespace Apricot {
 	template<>
 	APRICOT_API uint64 FormatType(const char& Value, TChar* Buffer, uint64 BufferSize)
 	{
-		if (BufferSize < sizeof(char))
+		if (BufferSize <1)
 		{
 			return 0;
 		}
-		MemCpy(Buffer, &Value, sizeof(char));
-		return sizeof(char);
+		*Buffer = (TChar)Value;
+		return 1;
 	}
 
 	template<>
 	APRICOT_API uint64 FormatType(const char16& Value, TChar* Buffer, uint64 BufferSize)
 	{
-		if (BufferSize < sizeof(char16))
+		if (BufferSize < 1)
 		{
 			return 0;
 		}
 		MemCpy(Buffer, &Value, sizeof(char16));
-		return sizeof(char16);
+		return 1;
 	}
 
 	template<>
 	APRICOT_API uint64 FormatType(const String& Value, TChar* Buffer, uint64 BufferSize)
 	{
-		if (BufferSize < Value.Size() * sizeof(Value.Data()[0]))
+		if (BufferSize < Value.Size() - 1)
 		{
 			return 0;
 		}
-		MemCpy(Buffer, Value.Data(), Value.Size() * sizeof(Value.Data()[0]));
-		return Value.Size() * sizeof(Value.Data()[0]);
+		MemCpy(Buffer, Value.Data(), (Value.Size() - 1) * sizeof(Value.Data()[0]));
+		return Value.Size() - 1;
 	}
 
 }

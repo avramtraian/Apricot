@@ -19,7 +19,7 @@
 #define GetAlignmentOffset(MemoryAddress, Alignment) (((uint64)(Alignment) - (uintptr)(MemoryAddress) % (uint64)(Alignment)) % (uint64)(Alignment))
 
 /**
-*
+* 
 */
 #define IsAddressBetween(Address, Begin, End) ( (uintptr)(Begin) <= (uintptr)(Address) && (uintptr)(Address) <= (uintptr)(End) )
 
@@ -80,9 +80,23 @@ namespace Apricot {
 	APRICOT_API void MemZero(void* Destination, uint64 SizeBytes);
 
 	template<typename T, typename... Args>
-	FORCEINLINE constexpr T* MemConstruct(void* Destination, Args&&... args)
+	constexpr T* MemConstruct(void* Destination, Args&&... args)
 	{
 		return (T*)new (Destination) T(Forward<Args>(args)...);
+	}
+
+	template<typename T, typename... Args>
+	constexpr T* MemNew(Args&&... args)
+	{
+		T* memory = static_cast<T*>(GMalloc->Alloc(sizeof(T), alignof(T)));
+		return MemConstruct<T>(memory, Forward<Args>(args)...);
+	}
+
+	template<typename T>
+	constexpr void MemDelete(T* object, uint64 size = 0)
+	{
+		object->~T();
+		GMalloc->Free(object, size == 0 ? sizeof(T) : size);
 	}
 
 	/**

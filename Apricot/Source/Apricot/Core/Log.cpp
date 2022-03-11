@@ -73,4 +73,9 @@ namespace Apricot {
 		APlatform::ConsoleWriteError(SLogBuffer, SLogTypeSize + MessageSize + 1, SLogTypesColors[(uint8)Type]);
 	}
 
+	bool ALogger::IsConsoleAvailable()
+	{
+		return APlatform::IsConsoleAvailable();
+	}
+
 }

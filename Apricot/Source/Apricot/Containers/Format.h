@@ -14,7 +14,7 @@ namespace Apricot {
 	template<typename T>
 	APRICOT_API uint64 FormatType(T* Value, TChar* Buffer, uint64 BufferSize);
 
-	inline void Internal_Format(const TChar* String, uint64 StringSize, TChar* Buffer, uint64 BufferSize)
+	inline void InternalFormat(const TChar* String, uint64 StringSize, TChar* Buffer, uint64 BufferSize)
 	{
 		uint64 Offset = 0;
 
@@ -28,7 +28,7 @@ namespace Apricot {
 	}
 
 	template<typename T, typename... Args>
-	void Internal_Format(const TChar* String, uint64 StringSize, TChar* Buffer, uint64 BufferSize, const T& Value, Args&&... args)
+	void InternalFormat(const TChar* String, uint64 StringSize, TChar* Buffer, uint64 BufferSize, const T& Value, Args&&... args)
 	{
 		uint64 StringOffset = 0;
 		uint64 BufferOffset = 0;
@@ -44,7 +44,7 @@ namespace Apricot {
 			if (String[StringOffset] == '}')
 			{
 				BufferOffset += FormatType(Value, Buffer + BufferOffset, BufferSize - BufferOffset);
-				Internal_Format(String + StringOffset + 1, StringSize - StringOffset, Buffer + BufferOffset, BufferSize - BufferOffset, std::forward<Args>(args)...);
+				InternalFormat(String + StringOffset + 1, StringSize - StringOffset, Buffer + BufferOffset, BufferSize - BufferOffset, std::forward<Args>(args)...);
 				break;
 			}
 			else if (!bIsInsideCurlies)
@@ -65,7 +65,7 @@ namespace Apricot {
 			return false;
 		}
 
-		Internal_Format(String, StringSize + 1, Buffer, BufferSize, std::forward<Args>(args)...);
+		InternalFormat(String, StringSize + 1, Buffer, BufferSize, std::forward<Args>(args)...);
 		return true;
 	}
 

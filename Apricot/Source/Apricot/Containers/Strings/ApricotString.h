@@ -372,8 +372,27 @@ namespace Apricot {
 
 		TString& Insert(const TStringView<CharType>& substring, uint64 where)
 		{
-			TString temp = TString(m_Allocator);
+			CharType* data = m_SSO;
+			uint64 newSize = m_Size + substring.Size() - 1;
+			
+			if (newSize > SSOBufferSize)
+			{
+				if (newSize > m_Capacity)
+				{
+					ReAllocateCopy(newSize);
+				}
+				data = m_Data;
+			}
 
+			for (uint64 index = where; index < m_Size; index++)
+			{
+				data[index + substring.Size() - 1] = data[index];
+			}
+
+			MemCpy(data + where, substring.Data(), (substring.Size() - 1) * sizeof(CharType));
+
+			m_Size = newSize;
+			data[m_Size - 1] = 0;
 			return *this;
 		}
 
