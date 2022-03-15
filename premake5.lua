@@ -12,14 +12,25 @@ workspace "Apricot"
     architecture "x64"
     startproject "ApricotJam"
 
+VULKAN_SDK = os.getenv("VULKAN_SDK")
+
 IncludeDirs = {};
 IncludeDirs["AE"] = "%{wks.location}/Apricot/Source"
+IncludeDirs["VulkanSDK"] = "%{VULKAN_SDK}/Include";
 IncludeDirs["Optick"] = "%{wks.location}/Apricot/ThirdParty/Optick/Include"
+
+LibraryDirs = {};
+LibraryDirs["VulkanSDK"] = "%{VULKAN_SDK}/Lib";
+LibraryDirs["Optick"] = "%{wks.location}/Apricot/ThirdParty/optick/Binaries";
+
+Libraries = {};
+Libraries["Vulkan"] = "vulkan-1.lib"
+Libraries["Optick"] = "OptickCore.lib"
 
 group "Core"
     include "Apricot"
 group "Tools"
     include "ApricotJam"
-group "Dependencies"
+group "ThirdParty"
     
 group ""

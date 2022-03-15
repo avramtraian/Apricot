@@ -11,17 +11,28 @@ project "AE"
 		"Source/**.h",
 		"Source/**.cpp",
 
-		"ThirdParty/Optick/Include/**.h"
+		"%{IncludeDirs.Optick}/**.h",
+		"%{IncludeDirs.VulkanSDK}/**.h",
+		"%{IncludeDirs.VulkanSDK}/**.hpp"
 	}
 
 	includedirs {
 		"Source",
 
-		"%{IncludeDirs.Optick}"
+		"%{IncludeDirs.Optick}",
+		"%{IncludeDirs.VulkanSDK}"
 	}
 
 	defines {
 		"AE_EXPORT_DLL"
+	}
+
+	libdirs {
+		"%{LibraryDirs.VulkanSDK}"
+	}
+
+	links {
+		"%{Libraries.Vulkan}"
 	}
 
 	filter { "system:windows" }
@@ -38,7 +49,7 @@ project "AE"
 		}
 
 		links {
-			"OptickCore.lib"
+			"%{Libraries.Optick}"
 		}
 
 		symbols "on"
@@ -49,7 +60,7 @@ project "AE"
 			objdir "%{wks.location}/Binaries-Int/Win64/%{prj.name}"
 
 			libdirs {
-				"ThirdParty/Optick/Binaries/Win64-Debug"
+				"%{LibraryDirs.Optick}/Win64-Debug"
 			}
 
 			postbuildcommands {
@@ -62,7 +73,7 @@ project "AE"
 		}
 
 		links {
-			"OptickCore.lib"
+			"%{Libraries.Optick}"
 		}
 
 		symbols "on"
@@ -73,7 +84,7 @@ project "AE"
 			objdir "%{wks.location}/Binaries-Int/Win64/%{prj.name}"
 
 			libdirs {
-				"ThirdParty/Optick/Binaries/Win64-Debug"
+				"%{LibraryDirs.Optick}/Win64-Debug"
 			}
 
 			postbuildcommands {
@@ -86,7 +97,7 @@ project "AE"
 		}
 
 		links {
-			"OptickCore.lib"
+			"%{Libraries.Optick}"
 		}
 
 		symbols "off"
@@ -97,7 +108,7 @@ project "AE"
 			objdir "%{wks.location}/Binaries-Int/Win64/%{prj.name}"
 
 			libdirs {
-				"ThirdParty/Optick/Binaries/Win64-Release"
+				"%{LibraryDirs.Optick}/Win64-Release"
 			}
 
 			postbuildcommands {
@@ -110,7 +121,7 @@ project "AE"
 		}
 
 		links {
-			"OptickCore.lib"
+			"%{Libraries.Optick}"
 		}
 
 		symbols "off"
@@ -121,7 +132,7 @@ project "AE"
 			objdir "%{wks.location}/Binaries-Int/Win64/%{prj.name}"
 
 			libdirs {
-				"ThirdParty/Optick/Binaries/Win64-Release"
+				"%{LibraryDirs.Optick}/Win64-Release"
 			}
 
 			postbuildcommands {

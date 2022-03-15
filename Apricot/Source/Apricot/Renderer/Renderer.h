@@ -8,6 +8,37 @@
 
 namespace Apricot {
 	
+	struct RendererID
+	{
+	public:
+		RendererID() = default;
+
+		RendererID(uint32 openGL)
+			: m_ID((void*)(uint64)openGL) {}
+
+		RendererID(void* vulkan)
+			: m_ID(vulkan) {}
+
+	public:
+		template<typename T>
+		T& As()
+		{
+			return (T&)m_ID;
+		}
+
+		template<typename T>
+		const T& As() const
+		{
+			return (const T&)m_ID;
+		}
+
+	private:
+		union
+		{
+			void* m_ID = nullptr;
+		};
+	};
+	
 	enum class ERenderingAPI : uint8
 	{
 		None   = 0,

@@ -3,6 +3,9 @@
 Binaries
 Binaries-Int
 
+# Third Party
+Apricot/ThirdParty/VulkanSDK
+
 # Exceptions
 !Apricot/ThirdParty/optick/Binaries
 

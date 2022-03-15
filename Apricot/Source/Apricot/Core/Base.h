@@ -9,7 +9,7 @@
 #ifdef AE_PLATFORM_WINDOWS
 #else
 	#error "Apricot only supports Windows!"
-#endif
+#endif // AE_PLATFORM_WINDOWS
 
 
 
@@ -24,7 +24,7 @@
 	#else
 		#define APRICOT_API 
 	#endif
-#endif
+#endif // AE_PLATFORM_WINDOWS
 
 
 
@@ -36,7 +36,7 @@
 	#define AE_D3D12
 	#define AE_D3D11
 	#define AE_OPENGL
-#endif
+#endif // AE_PLATFORM_WINDOWS
 
 
 
@@ -131,7 +131,7 @@
 	#define AE_COMPILER_MSVC
 #else
 	#error "Unknown compiler!"
-#endif
+#endif // _MSC_BUILD
 /*
 * Compiler keywords
 */
@@ -151,7 +151,7 @@
 	#define AE_FUNCTION_SIG
 	#define NODISCARD
 	#define FORCEINLINE
-#endif
+#endif // AE_COMPILER_MSVC
 
 #define AE_EXIT_UNKNOWN        -1
 #define AE_EXIT_FAILED_INIT    -2
@@ -163,8 +163,14 @@
 #define _IMPL_CONCATENATE(A, B) A##B
 #define AE_CONCATENATE(A, B) _IMPL_CONCATENATE(A, B)
 
-/* Disables dll-interface compiler warning. It is usually generated around templates. */
-#pragma warning (disable: 4251)
+
+#ifdef AE_COMPILER_MSVC
+	/* Disables dll-interface compiler warning. It is usually generated around templates. */
+	#pragma warning (disable: 4251)
+	
+	/* Disables The enum type is unscoped. Prefer enum class over enum. */
+	#pragma warning (disable: 26812)
+#endif // AE_COMPILER_MSVC
 
 #ifdef AE_COMPILER_MSVC
 
@@ -219,26 +225,26 @@
 
 #endif
 
-AE_STATIC_ASSERT(sizeof(uint8) == 1, "sizeof(uint8) expected to be 8 bits!");
-AE_STATIC_ASSERT(sizeof(uint16) == 2, "sizeof(uint16) expected to be 16 bits!");
-AE_STATIC_ASSERT(sizeof(uint32) == 4, "sizeof(uint32) expected to be 32 bits!");
-AE_STATIC_ASSERT(sizeof(uint64) == 8, "sizeof(uint64) expected to be 64 bits!");
-
-AE_STATIC_ASSERT(sizeof(int8) == 1, "sizeof(int8) expected to be 8 bits!");
-AE_STATIC_ASSERT(sizeof(int16) == 2, "sizeof(int16) expected to be 16 bits!");
-AE_STATIC_ASSERT(sizeof(int32) == 4, "sizeof(int32) expected to be 32 bits!");
-AE_STATIC_ASSERT(sizeof(int64) == 8, "sizeof(int64) expected to be 64 bits!");
-
-AE_STATIC_ASSERT(sizeof(uintptr) == sizeof(void*), "sizeof(uintptr) expected to be sizeof(void*)!");
+AE_STATIC_ASSERT(sizeof(uint8)   == 1, "sizeof(uint8)   expected to be 8 bits!" );
+AE_STATIC_ASSERT(sizeof(uint16)  == 2, "sizeof(uint16)  expected to be 16 bits!");
+AE_STATIC_ASSERT(sizeof(uint32)  == 4, "sizeof(uint32)  expected to be 32 bits!");
+AE_STATIC_ASSERT(sizeof(uint64)  == 8, "sizeof(uint64)  expected to be 64 bits!");
+								 
+AE_STATIC_ASSERT(sizeof(int8)    == 1, "sizeof(int8)    expected to be 8 bits!" );
+AE_STATIC_ASSERT(sizeof(int16)   == 2, "sizeof(int16)   expected to be 16 bits!");
+AE_STATIC_ASSERT(sizeof(int32)   == 4, "sizeof(int32)   expected to be 32 bits!");
+AE_STATIC_ASSERT(sizeof(int64)   == 8, "sizeof(int64)   expected to be 64 bits!");
 
 AE_STATIC_ASSERT(sizeof(float32) == 4, "sizeof(float32) expected to be 32 bits!");
 AE_STATIC_ASSERT(sizeof(float64) == 8, "sizeof(float64) expected to be 64 bits!");
 
-AE_STATIC_ASSERT(sizeof(bool8) == 1, "sizeof(bool8) expected to be 8 bits!");
-AE_STATIC_ASSERT(sizeof(bool32) == 4, "sizeof(bool32) expected to be 32 bits!");
+AE_STATIC_ASSERT(sizeof(bool8)   == 1, "sizeof(bool8)   expected to be 8 bits!" );
+AE_STATIC_ASSERT(sizeof(bool32)  == 4, "sizeof(bool32)  expected to be 32 bits!");
 
-AE_STATIC_ASSERT(sizeof(char8) == 1, "sizeof(TChar) expected to be 8 bits!");
-AE_STATIC_ASSERT(sizeof(char16) == 2, "sizeof(char16) expected to be 16 bits!");
+AE_STATIC_ASSERT(sizeof(char8)   == 1, "sizeof(TChar)   expected to be 8 bits!" );
+AE_STATIC_ASSERT(sizeof(char16)  == 2, "sizeof(char16)  expected to be 16 bits!");
+
+AE_STATIC_ASSERT(sizeof(uintptr) == sizeof(void*), "sizeof(uintptr) expected to be sizeof(void*)!");
 
 #define AE_INT8_MIN   (-127i8 - 1)
 #define AE_INT16_MIN  (-32767i16 - 1)
