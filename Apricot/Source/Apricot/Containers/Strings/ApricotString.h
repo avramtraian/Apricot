@@ -15,7 +15,7 @@
 namespace Apricot {
 
 	/**
-	* 
+	* Direction from where the searching begins
 	*/
 	enum class ESearchDirection : uint8
 	{
@@ -28,26 +28,43 @@ namespace Apricot {
 	};
 
 	/**
-	* 
+	* Specification of the characters matching
 	*/
 	enum class ESearchCase : uint8
 	{
 		None = 0,
 
+		// Doesn't matter if chars are upper or lower case, they match
 		Ignore,
+
+		// Must have the same char value
 		CaseSensitive,
 
 		MaxEnumValue,
 	};
 
-	template<typename CharType>
-	inline CharType ToLowerCase(CharType character)
-	{
-		if ('A' <= character && character <= 'Z')
+	namespace Char {
+
+		template<typename CharType>
+		CharType ToLowerCase(CharType character)
 		{
-			return character + ('a' - 'A');
+			if ('A' <= character && character <= 'Z')
+			{
+				return character + ('a' - 'A');
+			}
+			return character;
 		}
-		return character;
+
+		template<typename CharType>
+		CharType ToUpperCase(CharType character)
+		{
+			if ('a' <= character && character <= 'z')
+			{
+				return character - ('a' - 'A');
+			}
+			return character;
+		}
+
 	}
 
 	// Forward declarations
@@ -56,6 +73,8 @@ namespace Apricot {
 
 	/**
 	* C++ Core Engine Architecture
+	* 
+	* 
 	*/
 	template<typename CharType>
 	class TStringView
@@ -77,8 +96,6 @@ namespace Apricot {
 		FORCEINLINE uint64          Size()    const { return m_Size; }
 		FORCEINLINE const CharType* Data()    const { return m_Data; }
 		FORCEINLINE const CharType* c_str()   const { return m_Data; }
-
-	public:
 		
 	private:
 		const CharType* m_Data = nullptr;
@@ -87,6 +104,10 @@ namespace Apricot {
 
 	/**
 	* C++ Core Engine Architecture
+	* 
+	* @tparam CharType Type of used characters
+	* @tparam SSOBufferSize Size, in elements, of the stack-allocated small string buffer optimization
+	* @tparam AllocatorType Type of the allocator used to manipulate the memory
 	*/
 	template<typename CharType, uint64 SSOBufferSize, typename AllocatorType = HeapAllocator>
 	class TString
@@ -95,7 +116,14 @@ namespace Apricot {
 		static constexpr uint64 InvalidPos = static_cast<uint64>(-1);
 
 	public:
-		TString(AllocatorType* allocator = AllocatorType::GetDefault())
+		TString()
+		{
+			m_Allocator = AllocatorType::GetDefault();
+			m_Size = 1;
+			m_SSO[0] = 0;
+		}
+
+		explicit TString(AllocatorType* allocator)
 			: m_Allocator(allocator)
 		{
 			m_Size = 1;
@@ -227,6 +255,9 @@ namespace Apricot {
 		FORCEINLINE AllocatorType*   GetAllocator() const { return m_Allocator; }
 
 	public:
+		/**
+		* It will cause a reallocation if string data is on the heap
+		*/
 		void SetAllocator(AllocatorType* newAllocator)
 		{
 			if (m_Data)
@@ -240,86 +271,83 @@ namespace Apricot {
 			m_Allocator = newAllocator;
 		}
 
-		void SetCapacity(uint64 newCapacity)
-		{
-			if (newCapacity > SSOBufferSize)
-			{
-				
-			}
-			else
-			{
-				
-			}
-		}
-
 	public:
+		/**
+		* Finds an instance of the substring sequence. Returns InvalidPos is none is found.
+		* 
+		* @param substring The substring to found
+		* @param searchCase Searching character matching specification. See ESearchCase. Default is ESearchCase::CaseSensitive.
+		* @param searchDirection Searching direction. See ESearchDirection. Default is ESearchDirection::FromBeginning.
+		* @param searchOffsetBeginning Offset, from the beginning, of the search area.
+		* @param searchOffsetEnd Offset, from the end, of the search area.
+		* 
+		* @returns The index of the first-found instance of the given substring. Returns InvalidPos is none is found.
+		*/
 		NODISCARD uint64 Find(const TStringView<CharType>& substring, ESearchCase searchCase = ESearchCase::CaseSensitive, ESearchDirection searchDirection = ESearchDirection::FromBeginning, uint64 searchOffsetBeginning = 0, uint64 searchOffsetEnd = 0) const
 		{
 			const CharType* data = Data();
 
-			if (searchDirection == ESearchDirection::FromBeginning)
+			// TODO (Avr): Think about the performance implications of this method.
+			//                 Maybe rewrite it?
+			bool(*PFN_CompareCharacters)(CharType c1, CharType c2) = nullptr;
+			switch (searchCase)
 			{
-				int64 maxStringIndex = (int64)m_Size - (int64)substring.Size() - (int64)searchOffsetEnd;
-				for (int64 stringIndex = searchOffsetBeginning; stringIndex <= maxStringIndex; stringIndex++)
+				case ESearchCase::Ignore:
+					PFN_CompareCharacters = [](CharType c1, CharType c2) -> bool { return (Char::ToLowerCase(c1) == Char::ToLowerCase(c2)); };
+					break;
+				case ESearchCase::CaseSensitive:
+					PFN_CompareCharacters = [](CharType c1, CharType c2) -> bool { return c1 == c2; };
+					break;
+				default:
+					AE_CORE_ASSERT_NO_ENTRY();
+					break;
+			}
+
+			switch(searchDirection)
+			{
+				case ESearchDirection::FromBeginning:
 				{
-					bool bFound = true;
-					for (uint64 substringIndex = 0; substringIndex < substring.Size() - 1; substringIndex++)
+					int64 maxStringIndex = (int64)m_Size - (int64)substring.Size() - (int64)searchOffsetEnd;
+					for (int64 stringIndex = searchOffsetBeginning; stringIndex <= maxStringIndex; stringIndex++)
 					{
-						bool bAreMatching = true;
-						switch (searchCase)
+						bool bFound = true;
+						for (uint64 substringIndex = 0; substringIndex < substring.Size() - 1; substringIndex++)
 						{
-							case ESearchCase::Ignore:
-								bAreMatching = ToLowerCase(data[stringIndex + substringIndex]) == ToLowerCase(substring.Data()[substringIndex]);
+							if (!PFN_CompareCharacters(data[stringIndex + substringIndex], substring.Data()[substringIndex]))
+							{
+								bFound = false;
 								break;
-							case ESearchCase::CaseSensitive:
-								bAreMatching = (data[stringIndex + substringIndex] == substring.Data()[substringIndex]);
-								break;
-							default:
-								AE_CORE_ASSERT_NO_ENTRY();
-								break;
+							}
 						}
-						if (!bAreMatching)
+						if (bFound)
 						{
-							bFound = false;
-							break;
+							return stringIndex;
 						}
-					}
-					if (bFound)
-					{
-						return stringIndex;
 					}
 				}
-			}
-			else if (searchDirection == ESearchDirection::FromEnd)
-			{
-				for (int64 stringIndex = m_Size - substring.Size() - searchOffsetEnd; stringIndex >= (int64)searchOffsetBeginning; stringIndex--)
+				case ESearchDirection::FromEnd:
 				{
-					bool bFound = true;
-					for (uint64 substringIndex = 0; substringIndex < substring.Size() - 1; substringIndex++)
+					for (int64 stringIndex = m_Size - substring.Size() - searchOffsetEnd; stringIndex >= (int64)searchOffsetBeginning; stringIndex--)
 					{
-						bool bAreMatching = true;
-						switch (searchCase)
+						bool bFound = true;
+						for (uint64 substringIndex = 0; substringIndex < substring.Size() - 1; substringIndex++)
 						{
-							case ESearchCase::Ignore:
-								bAreMatching = ToLowerCase(data[stringIndex + substringIndex]) == ToLowerCase(substring.Data()[substringIndex]);
+							if (!PFN_CompareCharacters(data[stringIndex + substringIndex], substring.Data()[substringIndex]))
+							{
+								bFound = false;
 								break;
-							case ESearchCase::CaseSensitive:
-								bAreMatching = (data[stringIndex + substringIndex] == substring.Data()[substringIndex]);
-								break;
-							default:
-								AE_CORE_ASSERT_NO_ENTRY();
-								break;
+							}
 						}
-						if (!bAreMatching)
+						if (bFound)
 						{
-							bFound = false;
-							break;
+							return stringIndex;
 						}
 					}
-					if (bFound)
-					{
-						return stringIndex;
-					}
+				}
+				default:
+				{
+					AE_CORE_ASSERT_NO_ENTRY();
+					break;
 				}
 			}
 
@@ -396,8 +424,52 @@ namespace Apricot {
 			return *this;
 		}
 
+		bool Equals(const TStringView<CharType>& other, ESearchCase searchCase = ESearchCase::CaseSensitive) const
+		{
+			if (m_Size != other.m_Size)
+			{
+				return false;
+			}
+
+			CharType* data = Data();
+			CharType* otherData = other.Data();
+
+			switch (searchCase)
+			{
+				case ESearchCase::Ignore:
+				{
+					for (uint64 index = 0; index < m_Size - 1; index++)
+					{
+						if (Char::ToLowerCase(data[index]) != Char::ToLowerCase(otherData[index]))
+						{
+							return false;
+						}
+					}
+					break;
+				}
+				case ESearchCase::CaseSensitive:
+				{
+					for (uint64 index = 0; index < m_Size - 1; index++)
+					{
+						if (data[index] != otherData[index])
+						{
+							return false;
+						}
+					}
+					break;
+				}
+				default:
+				{
+					AE_CORE_ASSERT_NO_ENTRY();
+					return false;
+				}
+			}
+
+			return true;
+		}
+
 		template<typename NewCharType, typename NewAllocatorType = HeapAllocator, uint64 NewSSOBufferSize = SSOBufferSize>
-		NODISCARD TString<NewCharType, NewSSOBufferSize, NewAllocatorType> As(NewAllocatorType* newAllocator = AllocatorType::GetDefault()) const
+		NODISCARD TString<NewCharType, NewSSOBufferSize, NewAllocatorType> As(NewAllocatorType* newAllocator = NewAllocatorType::GetDefault()) const
 		{
 			TString<NewCharType, NewSSOBufferSize, NewAllocatorType> newString{ newAllocator };
 			newString.m_Size = m_Size;
@@ -420,6 +492,54 @@ namespace Apricot {
 			}
 
 			return newString;
+		}
+
+		NODISCARD TString ToLowerCase(AllocatorType* allocator = nullptr) const
+		{
+			if (allocator == nullptr)
+			{
+				allocator = m_Allocator;
+			}
+
+			TString lowerCase = TString(allocator);
+			lowerCase.m_Size = m_Size;
+			CharType* lowerCaseData = lowerCase.m_SSO;
+
+			if (lowerCase.IsHeapData())
+			{
+				lowerCase.ReAllocate(m_Size);
+				lowerCaseData = lowerCase.m_Data;
+			}
+
+			for (uint64 index = 0; index < m_Size; index++)
+			{
+				lowerCaseData[index] = Char::ToLowerCase(m_Data[index]);
+			}
+			return lowerCase;
+		}
+
+		NODISCARD TString ToUpperCase(AllocatorType* allocator = nullptr) const
+		{
+			if (allocator == nullptr)
+			{
+				allocator = m_Allocator;
+			}
+
+			TString upperCase = TString(allocator);
+			upperCase.m_Size = m_Size;
+			CharType* lowerCaseData = upperCase.m_SSO;
+
+			if (upperCase.IsHeapData())
+			{
+				upperCase.ReAllocate(m_Size);
+				lowerCaseData = upperCase.m_Data;
+			}
+
+			for (uint64 index = 0; index < m_Size; index++)
+			{
+				lowerCaseData[index] = Char::ToUpperCase(m_Data[index]);
+			}
+			return upperCase;
 		}
 
 	public:
@@ -534,6 +654,16 @@ namespace Apricot {
 			return *this;
 		}
 
+		bool operator==(const TStringView<CharType>& other) const
+		{
+			return Equals(other, ESearchCase::CaseSensitive);
+		}
+
+		bool operator!=(const TStringView<CharType>& other) const
+		{
+			return !(*this == other);
+		}
+
 		TString operator+(const TStringView<CharType>& substring) const
 		{
 			TString temp;
@@ -551,6 +681,12 @@ namespace Apricot {
 			MemCpy(tempData + (m_Size - 1), substring.Data(), substring.Size() * sizeof(CharType));
 
 			return temp;
+		}
+
+		TString& operator+=(const TStringView<CharType>& substring)
+		{
+			Append(substring);
+			return *this;
 		}
 
 	private:
@@ -627,17 +763,41 @@ namespace Apricot {
 		m_Size = string.Size();
 	}
 
-	using String = TString<TChar, 16, HeapAllocator>;
+	// Typedefs
 
-	using String8   = TString<TChar, 8,   HeapAllocator>;
-	using String16  = TString<TChar, 16,  HeapAllocator>;
-	using String32  = TString<TChar, 32,  HeapAllocator>;
-	using String48  = TString<TChar, 48,  HeapAllocator>;
-	using String64  = TString<TChar, 64,  HeapAllocator>;
-	using String96  = TString<TChar, 96,  HeapAllocator>;
-	using String128 = TString<TChar, 128, HeapAllocator>;
-	using String256 = TString<TChar, 256, HeapAllocator>;
+	////////////////////////
+	/*    8-bit Strings   */
+	////////////////////////
 
-	using StringView = TStringView<TChar>;
+	using String      = TString<char8,  16,  HeapAllocator>;
+									    
+	using String8     = TString<char8,  8,   HeapAllocator>;
+	using String16    = TString<char8,  16,  HeapAllocator>;
+	using String32    = TString<char8,  32,  HeapAllocator>;
+	using String48    = TString<char8,  48,  HeapAllocator>;
+	using String64    = TString<char8,  64,  HeapAllocator>;
+	using String96    = TString<char8,  96,  HeapAllocator>;
+	using String128   = TString<char8,  128, HeapAllocator>;
+	using String256   = TString<char8,  256, HeapAllocator>;
+
+	using StringView  = TStringView<char8>;
+
+
+	////////////////////////
+	/*   16-bit Strings   */
+	////////////////////////
+
+	using WString     = TString<char16, 16,  HeapAllocator>;
+
+	using WString8    = TString<char16, 8,   HeapAllocator>;
+	using WString16   = TString<char16, 16,  HeapAllocator>;
+	using WString32   = TString<char16, 32,  HeapAllocator>;
+	using WString48   = TString<char16, 48,  HeapAllocator>;
+	using WString64   = TString<char16, 64,  HeapAllocator>;
+	using WString96   = TString<char16, 96,  HeapAllocator>;
+	using WString128  = TString<char16, 128, HeapAllocator>;
+	using WString256  = TString<char16, 256, HeapAllocator>;
+
+	using WStringView = TStringView<char16>;
 
 }

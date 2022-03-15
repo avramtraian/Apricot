@@ -20,8 +20,9 @@ namespace Apricot {
 	{
 		None = 0,
 
-		String,
 		Vector,
+		String,
+		HashMap,
 
 		MaxEnumValue
 	};

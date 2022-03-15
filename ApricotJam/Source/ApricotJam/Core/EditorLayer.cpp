@@ -7,7 +7,7 @@
 namespace Apricot {
 
 	EditorLayer::EditorLayer()
-		: Layer(TEXT("Editor Layer"))
+		: Layer("Editor Layer")
 	{
 	}
 
@@ -18,7 +18,6 @@ namespace Apricot {
 	void EditorLayer::OnAttach()
 	{
 		AE_CORE_INFO(TEXT("EditorLayer attached!"));
-		
 	}
 
 	void EditorLayer::OnDetach()

@@ -23,7 +23,12 @@ namespace Apricot {
 		return Hash;
 	}
 
-	APRICOT_API uint64 StrLength(const TChar* String)
+	APRICOT_API uint64 StrLength(const char* String)
+	{
+		return strlen(String);
+	}
+
+	APRICOT_API uint64 StrLength(const char16* String)
 	{
 		return wcslen(String);
 	}

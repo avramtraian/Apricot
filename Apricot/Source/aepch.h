@@ -15,4 +15,5 @@
 
 #include "Apricot/Containers/Array.h"
 #include "Apricot/Containers/Vector.h"
+#include "Apricot/Containers/HashMap.h"
 #include "Apricot/Containers/Strings/ApricotString.h"

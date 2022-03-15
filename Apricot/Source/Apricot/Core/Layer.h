@@ -13,7 +13,7 @@ namespace Apricot {
 	class APRICOT_API Layer
 	{
 	public:
-		Layer(const TChar* DebugName)
+		Layer(const char* DebugName)
 			: m_DebugName(DebugName)
 		{
 		}
