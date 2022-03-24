@@ -1,0 +1,3 @@
+[submodule "Apricot/ThirdParty/ASTL"]
+	path = Apricot/ThirdParty/ASTL
+	url = https://github.com/avramtraian/ASTL
