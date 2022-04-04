@@ -9,7 +9,8 @@ namespace Apricot {
 	class ApricotJamApplication : public Application
 	{
 	public:
-		ApricotJamApplication()
+		ApricotJamApplication(const ApplicationSpecification& specification)
+			: Application(specification)
 		{
 		}
 
@@ -20,7 +21,15 @@ namespace Apricot {
 
 	extern Application* CreateApplication()
 	{
-		return new ApricotJamApplication();
+		ApplicationSpecification specification;
+		specification.Name = "ApricotJam-Editor";
+		specification.WindowTitle = "ApricotJam -- Windows -- 64 bit -- Release -- Renderer: Vulkan";
+		specification.WindowWidth = 0;
+		specification.WindowHeight = 0;
+		specification.Fullscreen = false;
+		specification.Maximized = true;
+
+		return anew ApricotJamApplication(specification);
 	}
 
 }

@@ -1,14 +1,10 @@
 #pragma once
 
-
-
 #ifdef AE_PLATFORM_WINDOWS
 #else
 	#error "Unknown or unsupported platform!"
 	#error "Apricot currently only supports Windows!"
 #endif
-
-
 
 #ifdef AE_PLATFORM_WINDOWS
 	
@@ -25,15 +21,11 @@
 
 #endif // AE_PLATFORM_WINDOWS
 
-
-
 #ifdef AE_CONFIGURATION_EDITOR_DEBUG
 	#define AE_EDITOR
 	#define AE_DEBUG
 	#define AE_EDITOR_DEBUG
 #endif // AE_CONFIGURATION_EDITOR_DEBUG
-
-
 
 #ifdef AE_CONFIGURATION_EDITOR_RELEASE
 	#define AE_EDITOR
@@ -41,25 +33,17 @@
 	#define AE_EDITOR_RELEASE
 #endif // AE_CONFIGURATION_EDITOR_RELEASE
 
-
-
 #ifdef AE_CONFIGURATION_DEBUG
 	#define AE_DEBUG
 #endif // AE_CONFIGURATION_DEBUG
-
-
 
 #ifdef AE_CONFIGURATION_RELEASE
 	#define AE_RELEASE
 #endif // AE_CONFIGURATION_RELEASE
 
-
-
 #ifdef AE_CONFIGURATION_SHIPPING
 	#define AE_SHIPPING
 #endif // AE_CONFIGURATION_SHIPPING
-
-
 
 #ifdef _MSC_BUILD
 	#define AE_COMPILER_MSVC
@@ -67,4 +51,15 @@
 	#error "Unknown or unsupported compiler!"
 #endif
 
+#include "Compiler.h"
 #include "Types.h"
+
+#pragma COMPILER_DISABLE_WARNING(4251)
+#pragma COMPILER_DISABLE_WARNING(26812)
+
+
+//////////////////////////////////////
+///////// ASTL configuration /////////
+//////////////////////////////////////
+
+#define ASTL_API APRICOT_API

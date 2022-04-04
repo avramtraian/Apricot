@@ -39,6 +39,8 @@ project "ApricotJam-Editor"
 			"AE_IMPORT_CORE_LIBRARY"
 		}
 
+		optimize "off"
+
 		--#### WINDOWS ####--
 		filter { "system:windows", "configurations:Editor_Debug" }
 			debugdir  "%{wks.location}/Binaries/Win64/EdDebug"
@@ -59,6 +61,8 @@ project "ApricotJam-Editor"
 			"AE_CONFIGURATION_EDITOR_RELEASE",
 			"AE_IMPORT_CORE_LIBRARY"
 		}
+
+		optimize "Speed"
 
 		--#### WINDOWS ####--
 		filter { "system:windows", "configurations:Editor_Release" }

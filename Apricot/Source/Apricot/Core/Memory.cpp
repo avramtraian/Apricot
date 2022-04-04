@@ -1,0 +1,113 @@
+#include "aepch.h"
+#include "Memory.h"
+
+namespace Apricot {
+	
+	struct AllocatorData
+	{
+		class AllocationsTableAllocator
+		{
+		public:
+			static void* allocate(uint64 size)
+			{
+				return Allocator::AllocateRaw(size);
+			}
+
+			static void deallocate(void* memory, uint64 size)
+			{
+				Allocator::FreeRaw(memory);
+			}
+		};
+
+		uint64 TotalAllocated = 0;
+		uint64 TotalFreed = 0;
+
+		astl::hash_table<void*, uint64, astl::hash<void*>, AllocationsTableAllocator> AllocationsTable;
+	};
+	static AllocatorData s_Data;
+
+	void* Allocator::AllocateRaw(uint64 size)
+	{
+		return malloc(size);
+	}
+
+	void* Allocator::Allocate(uint64 size)
+	{
+		s_Data.TotalAllocated += size;
+
+		void* memory = AllocateRaw(size);
+		s_Data.AllocationsTable.insert(memory, size);
+
+		return memory;
+	}
+
+	void* Allocator::Allocate(uint64 size, const char* description)
+	{
+		void* memory = AllocateRaw(size);
+
+		s_Data.TotalAllocated += size;
+		s_Data.AllocationsTable.insert(memory, size);
+
+		return memory;
+	}
+
+	void* Allocator::Allocate(uint64 size, const char* file, uint32 line)
+	{
+		void* memory = AllocateRaw(size);
+
+		s_Data.TotalAllocated += size;
+		s_Data.AllocationsTable.insert(memory, size);
+
+		return memory;
+	}
+
+	void Allocator::FreeRaw(void* block)
+	{
+		free(block);
+	}
+
+	void Allocator::Free(void* block)
+	{
+		auto allocation = s_Data.AllocationsTable.find(block);
+		AE_CORE_ASSERT(allocation != s_Data.AllocationsTable.end(), "Allocation was not registered!");
+		s_Data.TotalFreed += allocation->Second;
+		// TODO (Avr): Use the iterator override
+		s_Data.AllocationsTable.erase(allocation->First);
+
+		FreeRaw(block);
+	}
+
+	astl::string GetBytesName(uint64 bytesCount)
+	{
+		constexpr uint64 KB = 1024;
+		constexpr uint64 MB = 1024 * KB;
+		constexpr uint64 GB = 1024 * MB;
+
+		static astl::string fmt = "{.2} {}";
+
+		if (bytesCount >= GB)
+		{
+			double gbs = (double)bytesCount / (double)GB;
+			// return fmt.format(gbs, "GB");
+			return astl::string();
+		}
+		else if (bytesCount >= MB)
+		{
+			double mbs = (double)bytesCount / (double)MB;
+			// return fmt.format(mbs, "MB");
+			return astl::string();
+		}
+		else if (bytesCount >= KB)
+		{
+			double kbs = (double)bytesCount / (double)KB;
+			// return fmt.format(kbs, "KB");
+			return astl::string();
+		}
+		else
+		{
+			// return fmt.format(bytesCount, "B");
+			return astl::string();
+		}
+	}
+
+}

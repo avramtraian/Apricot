@@ -35,6 +35,8 @@ project "AE-Core"
 			"AE_EXPORT_CORE_LIBRARY"
 		}
 
+		optimize "off"
+
 		--#### WINDOWS ####--
 		filter { "system:windows", "configurations:Editor_Debug" }
 			debugdir  "%{wks.location}/Binaries/Win64/EdDebug"
@@ -55,6 +57,8 @@ project "AE-Core"
 			"AE_CONFIGURATION_EDITOR_RELEASE",
 			"AE_EXPORT_CORE_LIBRARY"
 		}
+
+		optimize "speed"
 
 		--#### WINDOWS ####--
 		filter { "system:windows", "configurations:Editor_Release" }
@@ -77,6 +81,8 @@ project "AE-Core"
 			"AE_EXPORT_CORE_LIBRARY"
 		}
 
+		optimize "off"
+
 		--#### WINDOWS
 		filter { "system:windows", "configurations:Debug" }
 			debugdir  "%{wks.location}/Binaries/Win64/Debug"
@@ -98,6 +104,8 @@ project "AE-Core"
 			"AE_EXPORT_CORE_LIBRARY"
 		}
 
+		optimize "speed"
+
 		--#### WINDOWS ####--
 		filter { "system:windows", "configurations:Release" }
 			debugdir  "%{wks.location}/Binaries/Win64/Release"
@@ -118,6 +126,8 @@ project "AE-Core"
 			"AE_CONFIGURATION_SHIPPING",
 			"AE_EXPORT_CORE_LIBRARY"
 		}
+
+		optimize "full"
 
 		--#### WINDOWS ####--
 		filter { "system:windows", "configurations:Shipping" }

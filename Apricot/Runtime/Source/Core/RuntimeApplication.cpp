@@ -1,3 +1,7 @@
+#include "Apricot/Core/Base.h"
+
+#include <ASTL/string.h>
+
 #include "Apricot/Core/Application.h"
 #include "Apricot/Core/EntryPoint.h"
 
@@ -8,7 +12,8 @@ namespace Apricot {
 	class RuntimeApplication : public Application
 	{
 	public:
-		RuntimeApplication()
+		RuntimeApplication(const ApplicationSpecification& specification)
+			: Application(specification)
 		{
 		}
 
@@ -19,7 +24,15 @@ namespace Apricot {
 
 	extern Application* CreateApplication()
 	{
-		return new RuntimeApplication();
+		ApplicationSpecification specification;
+		specification.Name = "ApricotRuntime";
+		specification.WindowTitle = "ApricotRuntime -- Windows -- 64 bit";
+		specification.WindowWidth = 0;
+		specification.WindowHeight = 0;
+		specification.Fullscreen = true;
+		specification.Maximized = false;
+
+		return new RuntimeApplication(specification);
 	}
 
 }

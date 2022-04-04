@@ -63,6 +63,8 @@ project "AE-Runtime"
 			"AE_IMPORT_CORE_LIBRARY"
 		}
 
+		optimize "off"
+
 		--#### WINDOWS
 		filter { "system:windows", "configurations:Debug" }
 			debugdir  "%{wks.location}/Binaries/Win64/Debug"
@@ -84,6 +86,8 @@ project "AE-Runtime"
 			"AE_IMPORT_CORE_LIBRARY"
 		}
 
+		optimize "speed"
+
 		--#### WINDOWS ####--
 		filter { "system:windows", "configurations:Release" }
 			debugdir  "%{wks.location}/Binaries/Win64/Release"
@@ -104,6 +108,8 @@ project "AE-Runtime"
 			"AE_CONFIGURATION_SHIPPING",
 			"AE_IMPORT_CORE_LIBRARY"
 		}
+
+		optimize "full"
 
 		--#### WINDOWS ####--
 		filter { "system:windows", "configurations:Shipping" }
