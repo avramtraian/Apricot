@@ -24,10 +24,15 @@ namespace Apricot {
 	public:
 		virtual ~Application();
 
-		int32 Run(const char* commandLine);
+		int32 Run(int32 argc, char** argv);
+
+		bool OnEngineInit();
+		void OnEngineDestroy();
 
 	private:
 		ApplicationSpecification m_Specification;
+		bool m_Running = true;
+		bool m_Minimized = false;
 	};
 
 	APRICOT_API extern Application* GApplication;

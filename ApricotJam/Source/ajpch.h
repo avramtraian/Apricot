@@ -14,6 +14,7 @@
 #include <ASTL/unordered_set.h>
 #include <ASTL/memory.h>
 
+#include "Apricot/Core/Log.h"
 #include "Apricot/Core/Assert.h"
 #include "Apricot/Core/Memory.h"
 #include "Apricot/Core/Ref.h"

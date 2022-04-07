@@ -2,6 +2,14 @@
 
 #include "Base.h"
 
+#define MemCpy  ::Apricot::MemoryCopy
+#define MemSet  ::Apricot::MemorySet
+#define MemZero ::Apricot::MemoryZero
+
+constexpr uint64 Kilo2Bytes = 1024;
+constexpr uint64 Mega2Bytes = 1024 * 1024;
+constexpr uint64 Giga2Bytes = 1024 * 1024 * 1024;
+
 namespace Apricot {
 
 	class APRICOT_API Allocator
@@ -14,6 +22,10 @@ namespace Apricot {
 		static void FreeRaw(void* block);
 		static void Free(void* block);
 	};
+
+	APRICOT_API void MemoryCopy(void* destination, const void* source, uint64 size);
+	APRICOT_API void MemorySet(void* destination, int32 value, uint64 size);
+	APRICOT_API void MemoryZero(void* destination, uint64 size);
 
 	APRICOT_API astl::string GetBytesName(uint64 bytesCount);
 

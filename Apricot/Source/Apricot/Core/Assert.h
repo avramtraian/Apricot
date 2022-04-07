@@ -2,4 +2,4 @@
 
 #include "Base.h"
 
-#define AE_CORE_ASSERT(Condition, Message) if (!(Condition)) { AE_DEBUGBREAK(); }
+#define AE_CORE_ASSERT(Condition, ...) if (!(Condition)) { AE_DEBUGBREAK(); }

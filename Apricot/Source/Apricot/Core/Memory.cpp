@@ -1,6 +1,8 @@
 #include "aepch.h"
 #include "Memory.h"
 
+#include "Platform.h"
+
 namespace Apricot {
 	
 	struct AllocatorData
@@ -75,6 +77,21 @@ namespace Apricot {
 		s_Data.AllocationsTable.erase(allocation->First);
 
 		FreeRaw(block);
+	}
+
+	void MemoryCopy(void* destination, const void* source, uint64 size)
+	{
+		Platform::MemoryCopy(destination, source, size);
+	}
+
+	void MemorySet(void* destination, int32 value, uint64 size)
+	{
+		Platform::MemorySet(destination, value, size);
+	}
+
+	void MemoryZero(void* destination, uint64 size)
+	{
+		Platform::MemoryZero(destination, size);
 	}
 
 	astl::string GetBytesName(uint64 bytesCount)
