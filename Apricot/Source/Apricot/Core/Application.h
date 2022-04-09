@@ -2,6 +2,8 @@
 
 #include "Base.h"
 
+#include "LayerStack.h"
+
 namespace Apricot {
 	
 	struct ApplicationSpecification
@@ -28,6 +30,9 @@ namespace Apricot {
 
 		bool OnEngineInit();
 		void OnEngineDestroy();
+
+	protected:
+		LayerStack m_LayerStack;
 
 	private:
 		ApplicationSpecification m_Specification;

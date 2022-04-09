@@ -288,13 +288,15 @@ namespace Apricot {
 	{
 		Ref<OutputSink> Sink;
 	};
-	static LoggerData s_LoggerData;
+	static LoggerData* s_LoggerData = nullptr;
 
 	void Logger::Init()
 	{
-		s_LoggerData.Sink = Ref<OutputSink>::Create();
+		s_LoggerData = anew LoggerData();
 
-		OutputSink::Specification& spec = s_LoggerData.Sink->GetSpecification();
+		s_LoggerData->Sink = Ref<OutputSink>::Create();
+
+		OutputSink::Specification& spec = s_LoggerData->Sink->GetSpecification();
 		spec.TextEncoding = OutputSink::Encoding::ASCII;
 		spec.SinkTag = "Apricot Core Sink";
 		spec.StreamsCount = 3;
@@ -317,19 +319,19 @@ namespace Apricot {
 		spec.Streams[2].Severity = OutputSink::ContentSeverity::Fatal;
 		spec.Streams[2].Format = "[{hour}:{minute}:{second}][CRASH_REPORT][{severity}]: {content}\n";
 
-		s_LoggerData.Sink->Init();
+		s_LoggerData->Sink->Init();
 
-		s_LoggerData.Sink->OpenStream(0, [](void*& handle)
+		s_LoggerData->Sink->OpenStream(0, [](void*& handle)
 		{
 			handle = Platform::ConsoleGetNativeHandle();
 		});
 
-		s_LoggerData.Sink->OpenStream(1, [](void*& handle)
+		s_LoggerData->Sink->OpenStream(1, [](void*& handle)
 		{
 			handle = Platform::ConsoleGetNativeHandle();
 		});
 
-		s_LoggerData.Sink->OpenStream(2, [](void*& handle)
+		s_LoggerData->Sink->OpenStream(2, [](void*& handle)
 		{
 			const wchar_t* handleFilePath = L"CrashReport.log";
 			handle = (void*)handleFilePath;
@@ -338,29 +340,31 @@ namespace Apricot {
 
 	void Logger::Destroy()
 	{
-		s_LoggerData.Sink->Destroy();
-		s_LoggerData.Sink.Release();
+		s_LoggerData->Sink->Destroy();
+		s_LoggerData->Sink.Release();
+
+		adelete s_LoggerData;
 	}
 
 	void Logger::SyncWrite(const char* content, OutputSink::ContentSeverity severity)
 	{
-		s_LoggerData.Sink->SetStreamSeverity(0, severity);
+		s_LoggerData->Sink->SetStreamSeverity(0, severity);
 
-		s_LoggerData.Sink->SyncStreamWriteContent(0, content, astl::strlen(content) * sizeof(char));
-		s_LoggerData.Sink->SyncStreamFlushContent(0);
+		s_LoggerData->Sink->SyncStreamWriteContent(0, content, astl::strlen(content) * sizeof(char));
+		s_LoggerData->Sink->SyncStreamFlushContent(0);
 	}
 
 	void Logger::SyncWriteTagged(const char* tag, const char* content, OutputSink::ContentSeverity severity)
 	{
-		s_LoggerData.Sink->SetStreamSeverity(1, severity);
+		s_LoggerData->Sink->SetStreamSeverity(1, severity);
 		
-		auto& stream = s_LoggerData.Sink->GetStream(1);
+		auto& stream = s_LoggerData->Sink->GetStream(1);
 		stream.ParametersCount = 1;
 		stream.Parameters[0].Data = tag;
 		stream.Parameters[0].Size = astl::strlen(tag) * sizeof(char);
 
-		s_LoggerData.Sink->SyncStreamWriteContent(1, content, astl::strlen(content) * sizeof(char));
-		s_LoggerData.Sink->SyncStreamFlushContent(1);
+		s_LoggerData->Sink->SyncStreamWriteContent(1, content, astl::strlen(content) * sizeof(char));
+		s_LoggerData->Sink->SyncStreamFlushContent(1);
 	}
 
 }

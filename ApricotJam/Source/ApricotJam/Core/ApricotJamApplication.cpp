@@ -12,6 +12,7 @@ namespace Apricot {
 		ApricotJamApplication(const ApplicationSpecification& specification)
 			: Application(specification)
 		{
+			m_LayerStack.PushLayer<EditorLayer>();
 		}
 
 		virtual ~ApricotJamApplication() override

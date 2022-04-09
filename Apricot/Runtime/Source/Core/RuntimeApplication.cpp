@@ -1,7 +1,9 @@
 #include "Apricot/Core/Base.h"
 
 #include <ASTL/string.h>
+#include <ASTL/vector.h>
 
+#include "Apricot/Core/Memory.h"
 #include "Apricot/Core/Application.h"
 #include "Apricot/Core/EntryPoint.h"
 
@@ -15,6 +17,7 @@ namespace Apricot {
 		RuntimeApplication(const ApplicationSpecification& specification)
 			: Application(specification)
 		{
+			m_LayerStack.PushLayer<RuntimeLayer>();
 		}
 
 		virtual ~RuntimeApplication() override

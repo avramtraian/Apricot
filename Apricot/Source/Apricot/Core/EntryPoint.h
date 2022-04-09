@@ -11,7 +11,7 @@ namespace Apricot {
 
 		Application* application = CreateApplication();
 		int32 exitCode = application->Run(argc, argv);
-		delete application;
+		adelete application;
 
 		Platform::Destroy();
 
