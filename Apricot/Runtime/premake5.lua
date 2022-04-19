@@ -1,7 +1,7 @@
 ExecutableName = "AE-Runtime"
 
 project "AE-Runtime"
-	kind "ConsoleApp"
+	kind "WindowedApp"
 	language "C++"
 	cppdialect "C++20"
 	staticruntime "off"

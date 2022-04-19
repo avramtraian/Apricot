@@ -45,6 +45,14 @@
 	#define AE_SHIPPING
 #endif // AE_CONFIGURATION_SHIPPING
 
+#if defined(AE_DEBUG)
+	#define AE_ALLOW_CONSOLE
+#elif defined(AE_RELEASE)
+	#define AE_ALLOW_CONSOLE
+#elif defined(AE_SHIPPING)
+	
+#endif
+
 #ifdef _MSC_BUILD
 	#define AE_COMPILER_MSVC
 #else

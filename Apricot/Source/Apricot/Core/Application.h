@@ -3,6 +3,7 @@
 #include "Base.h"
 
 #include "LayerStack.h"
+#include "Window.h"
 
 namespace Apricot {
 	
@@ -17,6 +18,7 @@ namespace Apricot {
 		uint32 WindowWidth = 1, WindowHeight = 1;
 		bool Fullscreen = false;
 		bool Maximized = true;
+		bool Minimized = false;
 	};
 
 	class APRICOT_API Application
@@ -31,6 +33,15 @@ namespace Apricot {
 		bool OnEngineInit();
 		void OnEngineDestroy();
 
+	public:
+		static Application* Get();
+
+		static void Quit(int32 QuitCode);
+
+		static UUID AddWindow(const WindowSpecification& Specification);
+		static void RemoveWindow(UUID WindowUUID);
+		static Window* GetWindow(UUID WindowUUID);
+
 	protected:
 		LayerStack m_LayerStack;
 
@@ -38,9 +49,9 @@ namespace Apricot {
 		ApplicationSpecification m_Specification;
 		bool m_Running = true;
 		bool m_Minimized = false;
-	};
 
-	APRICOT_API extern Application* GApplication;
+		astl::vector<astl::unique_ptr<Window>> m_Windows;
+	};
 
 	extern Application* CreateApplication();
 

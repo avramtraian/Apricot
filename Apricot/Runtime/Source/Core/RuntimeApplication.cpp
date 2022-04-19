@@ -2,6 +2,7 @@
 
 #include <ASTL/string.h>
 #include <ASTL/vector.h>
+#include <ASTL/unique_ptr.h>
 
 #include "Apricot/Core/Memory.h"
 #include "Apricot/Core/Application.h"
@@ -29,7 +30,7 @@ namespace Apricot {
 	{
 		ApplicationSpecification specification;
 		specification.Name = "ApricotRuntime";
-		specification.WindowTitle = "ApricotRuntime -- Windows -- 64 bit";
+		specification.WindowTitle = "ApricotRuntime -- Windows -- 64-bit";
 		specification.WindowWidth = 0;
 		specification.WindowHeight = 0;
 		specification.Fullscreen = true;

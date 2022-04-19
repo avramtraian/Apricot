@@ -9,11 +9,11 @@ project "AE-Core"
 	{
 		"Source/**.h",
 		"Source/**.cpp",
-		"Source/**.hpp",
-		"Source/**.inl",
 
 		"ThirdParty/ASTL/include/**.h"
 	}
+
+	removefiles { "Source/Apricot/Platform/**.h", "Source/Apricot/Platform/**.cpp" }
 
 	includedirs
 	{
@@ -24,6 +24,14 @@ project "AE-Core"
 
 	pchheader "aepch.h"
 	pchsource "Source/aepch.cpp"
+
+	--#### ALL CONFIGURATIONS ####--
+	filter { "system:windows" }
+		files
+		{
+			"Source/Apricot/Platform/Windows/**.h",
+			"Source/Apricot/Platform/Windows/**.cpp"
+		}
 
 	--#### EDITOR DEBUG ####--
 	filter { "configurations:Editor_Debug" }

@@ -24,11 +24,12 @@ namespace Apricot {
 	{
 		ApplicationSpecification specification;
 		specification.Name = "ApricotJam-Editor";
-		specification.WindowTitle = "ApricotJam -- Windows -- 64 bit -- Release -- Renderer: Vulkan";
+		specification.WindowTitle = "ApricotJam -- Windows -- 64-bit -- Release -- Renderer: Vulkan";
 		specification.WindowWidth = 0;
 		specification.WindowHeight = 0;
 		specification.Fullscreen = false;
 		specification.Maximized = true;
+		specification.Minimized = false;
 
 		return anew ApricotJamApplication(specification);
 	}

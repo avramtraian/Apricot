@@ -2,8 +2,6 @@
 
 #include "Apricot/Core/Layer.h"
 
-#include <ASTL/vector.h>
-
 namespace Apricot {
 
 	class RuntimeLayer : public Layer

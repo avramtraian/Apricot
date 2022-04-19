@@ -1,13 +1,10 @@
 #include "aepch.h"
 
-#ifdef AE_PLATFORM_WINDOWS
-
 #include "Apricot/Core/Platform.h"
 
-#include <Windows.h>
-#include <string.h>
+#include "WindowsHeaders.h"
 
-#define WIN_CHECK_RESULT(Expression) if (!(Expression)) { __debugbreak(); AE_CORE_ERROR("Windows call failed!"); }
+#include <string.h>
 
 namespace Apricot {
 
@@ -18,14 +15,14 @@ namespace Apricot {
 
 		HANDLE ConsoleHandle = INVALID_HANDLE_VALUE;
 		HANDLE ErrorConsoleHandle = INVALID_HANDLE_VALUE;
+		bool IsConsoleOpen = false;
+
+		HANDLE Instance = INVALID_HANDLE_VALUE;
 	};
 	static WindowsPlatformData s_WindowsData;
 
 	void Platform::Init()
 	{
-		s_WindowsData.ConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-		s_WindowsData.ErrorConsoleHandle = GetStdHandle(STD_ERROR_HANDLE);
-
 		LARGE_INTEGER frequency = { 0 };
 		WIN_CHECK_RESULT(QueryPerformanceCounter(&s_WindowsData.PerformanceCounterStart));
 		WIN_CHECK_RESULT(QueryPerformanceFrequency(&frequency));
@@ -34,11 +31,25 @@ namespace Apricot {
 
 	void Platform::Destroy()
 	{
-		if (s_WindowsData.ConsoleHandle != INVALID_HANDLE_VALUE)
+		if (s_WindowsData.ConsoleHandle != INVALID_HANDLE_VALUE && s_WindowsData.IsConsoleOpen)
 		{
 			// Default Console Color
-			SetConsoleTextAttribute(s_WindowsData.ConsoleHandle, 7);
+			WIN_CHECK_RESULT(SetConsoleTextAttribute(s_WindowsData.ConsoleHandle, 7));
+
+#ifdef AE_ALLOW_CONSOLE
+			ConsoleClose();
+#endif
 		}
+	}
+
+	void Platform::InitWindows(void* hInstance)
+	{
+		Init();
+		s_WindowsData.Instance = hInstance;
+
+#ifdef AE_ALLOW_CONSOLE
+		ConsoleOpen();
+#endif
 	}
 
 	void Platform::MemoryCopy(void* destination, const void* source, uint64 size)
@@ -59,6 +70,31 @@ namespace Apricot {
 	void* Platform::ConsoleGetNativeHandle()
 	{
 		return (void*)s_WindowsData.ConsoleHandle;
+	}
+
+	void Platform::ConsoleOpen()
+	{
+		if (!s_WindowsData.IsConsoleOpen)
+		{
+			WIN_CHECK_RESULT(AllocConsole());
+			s_WindowsData.ConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+			s_WindowsData.ErrorConsoleHandle = GetStdHandle(STD_ERROR_HANDLE);
+			s_WindowsData.IsConsoleOpen = true;
+		}
+	}
+
+	void Platform::ConsoleClose()
+	{
+		if (s_WindowsData.IsConsoleOpen)
+		{
+			WIN_CHECK_RESULT(FreeConsole());
+			s_WindowsData.IsConsoleOpen = false;
+		}
+	}
+
+	bool Platform::ConsoleIsOpen()
+	{
+		return s_WindowsData.IsConsoleOpen;
 	}
 
 	UTCTime Platform::TimeGetSystemUTCTime()
@@ -92,6 +128,19 @@ namespace Apricot {
 		time.Nanoseconds = elapsedNanoseconds;
 	}
 
-}
+	void* Platform::WindowsGetInstance()
+	{
+		return s_WindowsData.Instance;
+	}
 
-#endif
+	void Platform::WindowsReportError(auto ErrorCode)
+	{
+		LPSTR MessageBuffer = nullptr;
+		FormatMessageA(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL, ErrorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&MessageBuffer, 0, NULL
+		);
+		LocalFree(MessageBuffer);
+	}
+
+}

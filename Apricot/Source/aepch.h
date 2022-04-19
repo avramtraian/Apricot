@@ -12,6 +12,9 @@
 #include <ASTL/map.h>
 #include <ASTL/unordered_map.h>
 #include <ASTL/unordered_set.h>
+#include <ASTL/shared_ptr.h>
+#include <ASTL/unique_ptr.h>
+#include <ASTL/weak_ptr.h>
 #include <ASTL/memory.h>
 
 #include "Apricot/Core/Log.h"

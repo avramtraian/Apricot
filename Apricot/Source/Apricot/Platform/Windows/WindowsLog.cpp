@@ -1,17 +1,16 @@
 #include "aepch.h"
 
-#ifdef AE_PLATFORM_WINDOWS
-
 #include "Apricot/Core/Log.h"
+#include "Apricot/Core/Platform.h"
 
-#include <Windows.h>
+#include "WindowsHeaders.h"
 
 namespace Apricot {
 
 	void OutputSink::SyncWriteToConsole(IOStream& stream)
 	{
 		HANDLE consoleHandle = (HANDLE)stream.Handle;
-		if (consoleHandle == INVALID_HANDLE_VALUE) return;
+		if (consoleHandle == INVALID_HANDLE_VALUE || !Platform::ConsoleIsOpen()) return;
 
 		auto& color = m_Specification.ColorScheme.Colors[(uint32)stream.Severity];
 		SetConsoleTextAttribute(consoleHandle, (WORD)color.Background * 16u + (WORD)color.Foreground);
@@ -34,5 +33,3 @@ namespace Apricot {
 	}
 
 }
-
-#endif
