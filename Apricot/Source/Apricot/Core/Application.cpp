@@ -18,7 +18,7 @@ namespace Apricot {
 	{
 	}
 	
-	int32 Application::Run(int32 argc, char** argv)
+	int32 Application::Run(int32 Argc, char** Argv)
 	{
 		if (!OnEngineInit())
 		{
@@ -26,18 +26,18 @@ namespace Apricot {
 		}
 		AE_CORE_INFO_TAG("Engine", "Initializing done!");
 
-		for (auto it = m_LayerStack.Overlays().rbegin(); it != m_LayerStack.Overlays().rend(); it--)
+		for (auto It = m_LayerStack.Overlays().rbegin(); It != m_LayerStack.Overlays().rend(); It--)
 		{
-			(*it)->OnAttached();
+			(*It)->OnAttached();
 		}
 
-		for (auto it = m_LayerStack.Layers().rbegin(); it != m_LayerStack.Layers().rend(); it--)
+		for (auto It = m_LayerStack.Layers().rbegin(); It != m_LayerStack.Layers().rend(); It--)
 		{
-			(*it)->OnAttached();
+			(*It)->OnAttached();
 		}
 
-		Time lastTime;
-		Platform::TimeGetSystemPerformanceTime(lastTime);
+		Time LastTime;
+		Platform::TimeGetSystemPerformanceTime(LastTime);
 
 		while (m_Running)
 		{
@@ -46,18 +46,18 @@ namespace Apricot {
 				Wnd->UpdateWindow();
 			}
 
-			Time now;
-			Platform::TimeGetSystemPerformanceTime(now);
-			Timestep ts = Timestep(lastTime, now);
+			Time Now;
+			Platform::TimeGetSystemPerformanceTime(Now);
+			Timestep ts = Timestep(LastTime, Now);
 
-			for (auto it = m_LayerStack.Overlays().rbegin(); it != m_LayerStack.Overlays().rend(); it--)
+			for (auto It = m_LayerStack.Overlays().rbegin(); It != m_LayerStack.Overlays().rend(); It--)
 			{
-				(*it)->OnUpdate(ts);
+				(*It)->OnUpdate(ts);
 			}
 
-			for (auto it = m_LayerStack.Layers().rbegin(); it != m_LayerStack.Layers().rend(); it--)
+			for (auto It = m_LayerStack.Layers().rbegin(); It != m_LayerStack.Layers().rend(); It--)
 			{
-				(*it)->OnUpdate(ts);
+				(*It)->OnUpdate(ts);
 			}
 
 			InputManager::OnTick();
@@ -73,7 +73,7 @@ namespace Apricot {
 					m_Windows.erase(Index);
 				}
 			}
-			if (m_Windows.size() == 0)
+			if (m_Windows.empty())
 			{
 				m_Running = false;
 			}

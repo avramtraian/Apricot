@@ -29,6 +29,10 @@ namespace Apricot {
 
 		MemSet(s_InputData.MouseButtonsPressedThisTick.data(), false, s_InputData.MouseButtonsPressedThisTick.size() * sizeof(bool));
 		MemSet(s_InputData.MouseButtonsReleasedThisTick.data(), false, s_InputData.MouseButtonsReleasedThisTick.size() * sizeof(bool));
+		
+		s_InputData.LastTickMousePositionX = s_InputData.MousePositionX;
+		s_InputData.LastTickMousePositionY = s_InputData.MousePositionY;
+		s_InputData.MouseWheelOffset = 0;
 	}
 
 	void InputManager::OnEvent(Event& E)
@@ -37,7 +41,6 @@ namespace Apricot {
 
 		Dispatcher.Dispatch<KeyPressedEvent>([](const KeyPressedEvent& E) -> bool
 		{
-			AE_CORE_TRACE("KeyPressedEvent");
 			s_InputData.KeysPressedStatus[(uint16)E.GetKeyCode()] = true;
 			s_InputData.KeysPressedThisTick[(uint16)E.GetKeyCode()] = true;
 			return false;
@@ -66,6 +69,8 @@ namespace Apricot {
 
 		Dispatcher.Dispatch<MouseMovedEvent>([](const MouseMovedEvent& E) -> bool
 		{
+			s_InputData.MousePositionX = E.GetMouseX();
+			s_InputData.MousePositionY = E.GetMouseY();
 			return false;
 		});
 	}

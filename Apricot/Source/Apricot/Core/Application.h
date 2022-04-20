@@ -28,7 +28,7 @@ namespace Apricot {
 	public:
 		virtual ~Application();
 
-		int32 Run(int32 argc, char** argv);
+		int32 Run(int32 Argc, char** Argv);
 
 		bool OnEngineInit();
 		void OnEngineDestroy();

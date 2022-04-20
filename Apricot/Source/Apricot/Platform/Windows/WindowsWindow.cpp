@@ -15,9 +15,9 @@ namespace Apricot {
 
 	static const wchar_t* s_WindowClassName = L"Apricot Window Class";
 
-	static LRESULT WindowEventProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+	static LRESULT WindowEventCallback(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
-	static Window* s_CurrentUpdatingWindow = nullptr;
+	static Window* s_ActiveWindow = nullptr;
 
 	namespace Utils {
 
@@ -37,7 +37,7 @@ namespace Apricot {
 
 				return TRUE;
 			},
-			(LPARAM)& Primary);
+			(LPARAM)&Primary);
 
 			return Primary;
 		}
@@ -88,7 +88,7 @@ namespace Apricot {
 			WNDCLASSEX WndClass = {};
 			WndClass.cbSize = sizeof(WNDCLASSEX);
 			WndClass.style = 0;
-			WndClass.lpfnWndProc = WindowEventProcedure;
+			WndClass.lpfnWndProc = WindowEventCallback;
 			WndClass.cbClsExtra = 0;
 			WndClass.cbWndExtra = 0;
 			WndClass.hInstance = (HINSTANCE)Platform::WindowsGetInstance();
@@ -111,11 +111,16 @@ namespace Apricot {
 
 	Window::Window(const WindowSpecification& specification)
 	{
+		s_ActiveWindow = this;
+
 		m_Data.Width = specification.Width;
 		m_Data.Height = specification.Height;
+		m_Data.X = specification.X;
+		m_Data.Y = specification.Y;
 		m_Data.Fullscreen = specification.Fullscreen;
 		m_Data.Maximized = specification.Maximized;
 		m_Data.Minimized = specification.Minimized;
+		m_Data.AllowResizing = specification.AllowResizing;
 		m_Data.Title = specification.Title;
 		m_Data.EventCallback = specification.EventCallback;
 
@@ -129,7 +134,13 @@ namespace Apricot {
 		if (!m_Data.Fullscreen)
 		{
 			Style |= WS_BORDER | WS_CAPTION;
-			Style |= WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU;
+			Style |= WS_MINIMIZEBOX | WS_SYSMENU;
+
+			if (m_Data.AllowResizing)
+			{
+				Style |= WS_THICKFRAME;
+				Style |= WS_MAXIMIZEBOX;
+			}
 
 			if (m_Data.Width == 0 || m_Data.Height == 0)
 			{
@@ -164,7 +175,7 @@ namespace Apricot {
 			s_WindowClassName,
 			m_Data.Title.as<wchar_t>().c_str(),
 			Style, 
-			0, 0,
+			m_Data.X, m_Data.Y,
 			Width, Height,
 			NULL, NULL, (HINSTANCE)Platform::WindowsGetInstance(), NULL
 		);
@@ -186,49 +197,61 @@ namespace Apricot {
 		{
 			SetWindowPos((HWND)m_Data.NativeHandle, HWND_TOP, 0, 0, Width, Height, SWP_NOZORDER);
 		}
+
+		s_ActiveWindow = nullptr;
 	}
 
 	Window::~Window()
 	{
-		s_CurrentUpdatingWindow = this;
+		s_ActiveWindow = this;
 		DestroyWindow((HWND)m_Data.NativeHandle);
-		s_CurrentUpdatingWindow = nullptr;
+		s_ActiveWindow = nullptr;
+	}
+
+	void Window::OnWindowMaximized()
+	{
+		
+	}
+
+	void Window::OnWindowMinimized()
+	{
+		
 	}
 
 	void Window::SetMaximized(bool Maximized)
 	{
 		m_Data.Maximized = Maximized;
-		s_CurrentUpdatingWindow = this;
+		s_ActiveWindow = this;
 		ShowWindow((HWND)m_Data.NativeHandle, Maximized ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL);
-		s_CurrentUpdatingWindow = nullptr;
+		s_ActiveWindow = nullptr;
 	}
 
 	void Window::SetMinimized(bool Minimized)
 	{
 		m_Data.Minimized = Minimized;
-		s_CurrentUpdatingWindow = this;
+		s_ActiveWindow = this;
 		ShowWindow((HWND)m_Data.NativeHandle, Minimized ? SW_SHOWMINIMIZED : SW_SHOWNORMAL);
-		s_CurrentUpdatingWindow = nullptr;
+		s_ActiveWindow = nullptr;
 	}
 
 	void Window::SetTitle(astl::string Title)
 	{
 		m_Data.Title = Title;
-		s_CurrentUpdatingWindow = this;
+		s_ActiveWindow = this;
 		SetWindowText((HWND)m_Data.NativeHandle, m_Data.Title.as<wchar_t>().c_str());
-		s_CurrentUpdatingWindow = nullptr;
+		s_ActiveWindow = nullptr;
 	}
 
 	void Window::SetVSync(bool VSync)
 	{
 		m_Data.VSync = VSync;
-		s_CurrentUpdatingWindow = this;
-		s_CurrentUpdatingWindow = nullptr;
+		s_ActiveWindow = this;
+		s_ActiveWindow = nullptr;
 	}
 
 	void Window::UpdateWindow()
 	{
-		s_CurrentUpdatingWindow = this;
+		s_ActiveWindow = this;
 
 		MSG Message = {};
 		while (PeekMessage(&Message, (HWND)m_Data.NativeHandle, 0, 0, PM_REMOVE))
@@ -237,7 +260,7 @@ namespace Apricot {
 			DispatchMessage(&Message);
 		}
 
-		s_CurrentUpdatingWindow = nullptr;
+		s_ActiveWindow = nullptr;
 	}
 
 	namespace Utils {
@@ -264,6 +287,7 @@ namespace Apricot {
 				case VK_MENU:       return Key::Alt;
 				case VK_TAB:        return Key::Tab;
 				case VK_CAPITAL:    return Key::CapsLock;
+				case VK_NUMLOCK:    return Key::NumLock;
 				case VK_ESCAPE:     return Key::Escape;
 				case VK_BACK:       return Key::Backspace;
 				case VK_RETURN:     return Key::Enter;
@@ -274,9 +298,16 @@ namespace Apricot {
 				case VK_DOWN:       return Key::ArrowDown;
 
 				case VK_OEM_PLUS:   return Key::Plus;
-				case VK_OEM_COMMA:  return Key::Plus;
-				case VK_OEM_MINUS:  return Key::Plus;
-				case VK_OEM_PERIOD: return Key::Plus;
+				case VK_OEM_MINUS:  return Key::Minus;
+				case VK_OEM_PERIOD: return Key::Period;
+				case VK_OEM_COMMA:  return Key::Comma;
+				case VK_OEM_1:      return Key::Semicolon;
+				case VK_OEM_3:      return Key::Backtick;
+				case VK_OEM_4:      return Key::LeftSquareBracket;
+				case VK_OEM_6:      return Key::RightSquareBracket;
+				case VK_OEM_2:      return Key::Slash;
+				case VK_OEM_5:      return Key::BackSlash;
+				case VK_OEM_7:      return Key::Quote;
 
 				case VK_NUMPAD0:    return Key::NumpadZero;
 				case VK_NUMPAD1:    return Key::NumpadOne;
@@ -288,6 +319,12 @@ namespace Apricot {
 				case VK_NUMPAD7:    return Key::NumpadSeven;
 				case VK_NUMPAD8:    return Key::NumpadEight;
 				case VK_NUMPAD9:    return Key::NumpadNine;
+
+				case VK_ADD:        return Key::NumpadAdd;
+				case VK_SUBTRACT:   return Key::NumpadSubtract;
+				case VK_MULTIPLY:   return Key::NumpadMultiply;
+				case VK_DIVIDE:     return Key::NumpadDivide;
+				case VK_DECIMAL:    return Key::NumpadDecimal;
 								    
 				case VK_F1:         return Key::F1;
 				case VK_F2:         return Key::F2;
@@ -309,7 +346,7 @@ namespace Apricot {
 		
 	}
 
-	static LRESULT WindowEventProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+	static LRESULT WindowEventCallback(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	{
 		switch (Msg)
 		{
@@ -319,8 +356,8 @@ namespace Apricot {
 			{
 				Key KeyCode = Utils::ConvertWin32KeyCodeToApricot(wParam);
 				uint32 RepeatCount = lParam & (0xffff);
-				KeyPressedEvent E(KeyCode, RepeatCount, s_CurrentUpdatingWindow->GetUUID());
-				s_CurrentUpdatingWindow->GetData().EventCallback(E);
+				KeyPressedEvent E(KeyCode, RepeatCount, s_ActiveWindow->GetUUID());
+				s_ActiveWindow->GetData().EventCallback(E);
 				return 0;
 			}
 
@@ -329,57 +366,105 @@ namespace Apricot {
 			case WM_SYSKEYUP:
 			{
 				Key KeyCode = Utils::ConvertWin32KeyCodeToApricot(wParam);
-				KeyReleasedEvent E(KeyCode, s_CurrentUpdatingWindow->GetUUID());
-				s_CurrentUpdatingWindow->GetData().EventCallback(E);
+				KeyReleasedEvent E(KeyCode, s_ActiveWindow->GetUUID());
+				s_ActiveWindow->GetData().EventCallback(E);
+				return 0;
+			}
+
+			///////////  MouseMovedEvent  ///////////
+			case WM_MOUSEMOVE:
+			{
+				int32 X = GET_X_LPARAM(lParam);
+				int32 Y = GET_Y_LPARAM(lParam);
+				MouseMovedEvent E(X, Y, s_ActiveWindow->GetUUID());
+				s_ActiveWindow->GetData().EventCallback(E);
 				return 0;
 			}
 
 			///////////  MouseButtonPressedEvent  ///////////
 			case WM_LBUTTONDOWN:
 			{
-				MouseButtonPressedEvent E(Button::Left, s_CurrentUpdatingWindow->GetUUID());
-				s_CurrentUpdatingWindow->GetData().EventCallback(E);
+				MouseButtonPressedEvent E(Button::Left, s_ActiveWindow->GetUUID());
+				s_ActiveWindow->GetData().EventCallback(E);
 				return 0;
 			}
 			case WM_RBUTTONDOWN:
 			{
-				MouseButtonPressedEvent E(Button::Right, s_CurrentUpdatingWindow->GetUUID());
-				s_CurrentUpdatingWindow->GetData().EventCallback(E);
+				MouseButtonPressedEvent E(Button::Right, s_ActiveWindow->GetUUID());
+				s_ActiveWindow->GetData().EventCallback(E);
 				return 0;
 			}
 			case WM_MBUTTONDOWN:
 			{
-				MouseButtonPressedEvent E(Button::Middle, s_CurrentUpdatingWindow->GetUUID());
-				s_CurrentUpdatingWindow->GetData().EventCallback(E);
+				MouseButtonPressedEvent E(Button::Middle, s_ActiveWindow->GetUUID());
+				s_ActiveWindow->GetData().EventCallback(E);
 				return 0;
 			}
 
 			///////////  MouseButtonReleasedEvent  ///////////
 			case WM_LBUTTONUP:
 			{
-				MouseButtonReleasedEvent E(Button::Left, s_CurrentUpdatingWindow->GetUUID());
-				s_CurrentUpdatingWindow->GetData().EventCallback(E);
+				MouseButtonReleasedEvent E(Button::Left, s_ActiveWindow->GetUUID());
+				s_ActiveWindow->GetData().EventCallback(E);
 				return 0;
 			}
 			case WM_RBUTTONUP:
 			{
-				MouseButtonReleasedEvent E(Button::Right, s_CurrentUpdatingWindow->GetUUID());
-				s_CurrentUpdatingWindow->GetData().EventCallback(E);
+				MouseButtonReleasedEvent E(Button::Right, s_ActiveWindow->GetUUID());
+				s_ActiveWindow->GetData().EventCallback(E);
 				return 0;
 			}
 			case WM_MBUTTONUP:
 			{
-				MouseButtonReleasedEvent E(Button::Middle, s_CurrentUpdatingWindow->GetUUID());
-				s_CurrentUpdatingWindow->GetData().EventCallback(E);
+				MouseButtonReleasedEvent E(Button::Middle, s_ActiveWindow->GetUUID());
+				s_ActiveWindow->GetData().EventCallback(E);
 				return 0;
 			}
 
 			///////////  WindowEvents  ///////////
 			case WM_DESTROY:
 			{
-				s_CurrentUpdatingWindow->ScheduleClose();
-				WindowClosedEvent E(s_CurrentUpdatingWindow->GetUUID());
-				s_CurrentUpdatingWindow->GetData().EventCallback(E);
+				s_ActiveWindow->ScheduleClose();
+				WindowClosedEvent E(s_ActiveWindow->GetUUID());
+				s_ActiveWindow->GetData().EventCallback(E);
+				return 0;
+			}
+			case WM_MOVE:
+			{
+				int32 X = (short)LOWORD(lParam);
+				int32 Y = (short)HIWORD(lParam);
+
+				s_ActiveWindow->GetData().X = X;
+				s_ActiveWindow->GetData().Y = Y;
+
+				WindowMovedEvent E(X, Y, s_ActiveWindow->GetUUID());
+				s_ActiveWindow->GetData().EventCallback(E);
+				return 0;
+			}
+			case WM_SIZE:
+			{
+				uint32 Width = LOWORD(lParam);
+				uint32 Height = HIWORD(lParam);
+
+				s_ActiveWindow->GetData().Width = Width;
+				s_ActiveWindow->GetData().Height = Height;
+
+				switch (wParam)
+				{
+					case SIZE_MAXIMIZED:
+					{
+						s_ActiveWindow->OnWindowMaximized();
+						break;
+					}
+					case SIZE_MINIMIZED:
+					{
+						s_ActiveWindow->OnWindowMinimized();
+						break;
+					}
+				}
+
+				WindowResizedEvent E(Width, Height, s_ActiveWindow->GetUUID());
+				s_ActiveWindow->GetData().EventCallback(E);
 				return 0;
 			}
 		}

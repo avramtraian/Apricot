@@ -7,6 +7,7 @@
 #else
 	
 	#include <Windows.h>
+	#include <Windowsx.h>
 
 	#if defined(AE_DEBUG) || defined(AE_RELEASE)
 		#define WIN_CHECK_RESULT(Expression) if (!(Expression)) { Platform::WindowsReportError(GetLastError()); AE_DEBUGBREAK(); }

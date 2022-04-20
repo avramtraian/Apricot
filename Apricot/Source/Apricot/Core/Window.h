@@ -11,10 +11,12 @@ namespace Apricot {
 	{
 		astl::string Title;
 		uint32 Width = 0, Height = 0;
+		int32 X = 0, Y = 0;
 		bool VSync = true;
 		bool Minimized = false;
 		bool Maximized = true;
 		bool Fullscreen = false;
+		bool AllowResizing = true;
 
 		PFN_WindowEventCallback EventCallback = nullptr;
 	};
@@ -26,10 +28,12 @@ namespace Apricot {
 		{
 			astl::string Title;
 			uint32 Width = 0, Height = 0;
+			int32 X = 0, Y = 0;
 			bool VSync = true;
 			bool Minimized = false;
 			bool Maximized = true;
 			bool Fullscreen = false;
+			bool AllowResizing = true;
 
 			PFN_WindowEventCallback EventCallback = nullptr;
 
@@ -47,6 +51,9 @@ namespace Apricot {
 		Window& operator=(const Window&) = delete;
 
 	public:
+		void OnWindowMaximized();
+		void OnWindowMinimized();
+
 		void SetMaximized(bool Maximized);
 		void SetMinimized(bool Minimized);
 		void SetTitle(astl::string Title);
