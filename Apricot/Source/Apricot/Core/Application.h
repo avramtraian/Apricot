@@ -33,12 +33,14 @@ namespace Apricot {
 		bool OnEngineInit();
 		void OnEngineDestroy();
 
+		static void OnEvent(Event& E);
+
 	public:
 		static Application* Get();
 
 		static void Quit(int32 QuitCode);
 
-		static UUID AddWindow(const WindowSpecification& Specification);
+		static Window* AddWindow(const WindowSpecification& Specification);
 		static void RemoveWindow(UUID WindowUUID);
 		static Window* GetWindow(UUID WindowUUID);
 

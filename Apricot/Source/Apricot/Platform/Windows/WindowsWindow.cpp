@@ -6,16 +6,18 @@
 
 #include "WindowsHeaders.h"
 
-namespace Apricot {
+#include "Apricot/Core/Events/Event.h"
+#include "Apricot/Core/Events/WindowEvents.h"
+#include "Apricot/Core/Events/KeyEvents.h"
+#include "Apricot/Core/Events/MouseEvents.h"
 
-	struct WindowsWindowData
-	{
-		HWND Handle;
-	};
+namespace Apricot {
 
 	static const wchar_t* s_WindowClassName = L"Apricot Window Class";
 
-	static LRESULT WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+	static LRESULT WindowEventProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+
+	static Window* s_CurrentUpdatingWindow = nullptr;
 
 	namespace Utils {
 
@@ -86,7 +88,7 @@ namespace Apricot {
 			WNDCLASSEX WndClass = {};
 			WndClass.cbSize = sizeof(WNDCLASSEX);
 			WndClass.style = 0;
-			WndClass.lpfnWndProc = WindowProcedure;
+			WndClass.lpfnWndProc = WindowEventProcedure;
 			WndClass.cbClsExtra = 0;
 			WndClass.cbWndExtra = 0;
 			WndClass.hInstance = (HINSTANCE)Platform::WindowsGetInstance();
@@ -115,6 +117,7 @@ namespace Apricot {
 		m_Data.Maximized = specification.Maximized;
 		m_Data.Minimized = specification.Minimized;
 		m_Data.Title = specification.Title;
+		m_Data.EventCallback = specification.EventCallback;
 
 		Utils::RegisterWindowClass();
 
@@ -187,49 +190,197 @@ namespace Apricot {
 
 	Window::~Window()
 	{
+		s_CurrentUpdatingWindow = this;
 		DestroyWindow((HWND)m_Data.NativeHandle);
+		s_CurrentUpdatingWindow = nullptr;
 	}
 
 	void Window::SetMaximized(bool Maximized)
 	{
 		m_Data.Maximized = Maximized;
+		s_CurrentUpdatingWindow = this;
 		ShowWindow((HWND)m_Data.NativeHandle, Maximized ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL);
+		s_CurrentUpdatingWindow = nullptr;
 	}
 
 	void Window::SetMinimized(bool Minimized)
 	{
 		m_Data.Minimized = Minimized;
+		s_CurrentUpdatingWindow = this;
 		ShowWindow((HWND)m_Data.NativeHandle, Minimized ? SW_SHOWMINIMIZED : SW_SHOWNORMAL);
+		s_CurrentUpdatingWindow = nullptr;
 	}
 
 	void Window::SetTitle(astl::string Title)
 	{
 		m_Data.Title = Title;
+		s_CurrentUpdatingWindow = this;
 		SetWindowText((HWND)m_Data.NativeHandle, m_Data.Title.as<wchar_t>().c_str());
+		s_CurrentUpdatingWindow = nullptr;
 	}
 
 	void Window::SetVSync(bool VSync)
 	{
 		m_Data.VSync = VSync;
+		s_CurrentUpdatingWindow = this;
+		s_CurrentUpdatingWindow = nullptr;
 	}
 
 	void Window::UpdateWindow()
 	{
-		MSG Message;
+		s_CurrentUpdatingWindow = this;
+
+		MSG Message = {};
 		while (PeekMessage(&Message, (HWND)m_Data.NativeHandle, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&Message);
 			DispatchMessage(&Message);
 		}
+
+		s_CurrentUpdatingWindow = nullptr;
 	}
 
-	static LRESULT WindowProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+	namespace Utils {
+
+		static Key ConvertWin32KeyCodeToApricot(WPARAM Win32Code)
+		{
+			// Win32 Codes '0' - '9' are the same as ASCII codes => the same as Apricot codes
+			if ('0' <= Win32Code && Win32Code <= '9')
+			{
+				return (Key)Win32Code;
+			}
+
+			// Win32 Codes 'A' - 'Z' are the same as ASCII codes => the same as Apricot codes
+			if ('A' <= Win32Code && Win32Code <= 'Z')
+			{
+				return (Key)Win32Code;
+			}
+
+			switch (Win32Code)
+			{
+				case VK_SPACE:      return Key::Space;
+				case VK_SHIFT:      return Key::Shift;
+				case VK_CONTROL:    return Key::Control;
+				case VK_MENU:       return Key::Alt;
+				case VK_TAB:        return Key::Tab;
+				case VK_CAPITAL:    return Key::CapsLock;
+				case VK_ESCAPE:     return Key::Escape;
+				case VK_BACK:       return Key::Backspace;
+				case VK_RETURN:     return Key::Enter;
+				case VK_DELETE:     return Key::Escape;
+				case VK_LEFT:       return Key::ArrowLeft;
+				case VK_RIGHT:      return Key::ArrowRight;
+				case VK_UP:         return Key::ArrowUp;
+				case VK_DOWN:       return Key::ArrowDown;
+
+				case VK_OEM_PLUS:   return Key::Plus;
+				case VK_OEM_COMMA:  return Key::Plus;
+				case VK_OEM_MINUS:  return Key::Plus;
+				case VK_OEM_PERIOD: return Key::Plus;
+
+				case VK_NUMPAD0:    return Key::NumpadZero;
+				case VK_NUMPAD1:    return Key::NumpadOne;
+				case VK_NUMPAD2:    return Key::NumpadTwo;
+				case VK_NUMPAD3:    return Key::NumpadThree;
+				case VK_NUMPAD4:    return Key::NumpadFour;
+				case VK_NUMPAD5:    return Key::NumpadFive;
+				case VK_NUMPAD6:    return Key::NumpadSix;
+				case VK_NUMPAD7:    return Key::NumpadSeven;
+				case VK_NUMPAD8:    return Key::NumpadEight;
+				case VK_NUMPAD9:    return Key::NumpadNine;
+								    
+				case VK_F1:         return Key::F1;
+				case VK_F2:         return Key::F2;
+				case VK_F3:         return Key::F3;
+				case VK_F4:         return Key::F4;
+				case VK_F5:         return Key::F5;
+				case VK_F6:         return Key::F6;
+				case VK_F7:         return Key::F7;
+				case VK_F8:         return Key::F8;
+				case VK_F9:         return Key::F9;
+				case VK_F10:        return Key::F10;
+				case VK_F11:        return Key::F11;
+				case VK_F12:        return Key::F12;
+			}
+
+			AE_CORE_WARN_TAG("INPUT", "Unreconized Win32 KeyCode! '{}'"/*, Win32Code*/);
+			return Key::None;
+		}
+		
+	}
+
+	static LRESULT WindowEventProcedure(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	{
 		switch (Msg)
 		{
+			///////////  KeyPressedEvent  ///////////
+			case WM_KEYDOWN:
+			case WM_SYSKEYDOWN:
+			{
+				Key KeyCode = Utils::ConvertWin32KeyCodeToApricot(wParam);
+				uint32 RepeatCount = lParam & (0xffff);
+				KeyPressedEvent E(KeyCode, RepeatCount, s_CurrentUpdatingWindow->GetUUID());
+				s_CurrentUpdatingWindow->GetData().EventCallback(E);
+				return 0;
+			}
+
+			///////////  KeyReleasedEvent  ///////////
+			case WM_KEYUP:
+			case WM_SYSKEYUP:
+			{
+				Key KeyCode = Utils::ConvertWin32KeyCodeToApricot(wParam);
+				KeyReleasedEvent E(KeyCode, s_CurrentUpdatingWindow->GetUUID());
+				s_CurrentUpdatingWindow->GetData().EventCallback(E);
+				return 0;
+			}
+
+			///////////  MouseButtonPressedEvent  ///////////
+			case WM_LBUTTONDOWN:
+			{
+				MouseButtonPressedEvent E(Button::Left, s_CurrentUpdatingWindow->GetUUID());
+				s_CurrentUpdatingWindow->GetData().EventCallback(E);
+				return 0;
+			}
+			case WM_RBUTTONDOWN:
+			{
+				MouseButtonPressedEvent E(Button::Right, s_CurrentUpdatingWindow->GetUUID());
+				s_CurrentUpdatingWindow->GetData().EventCallback(E);
+				return 0;
+			}
+			case WM_MBUTTONDOWN:
+			{
+				MouseButtonPressedEvent E(Button::Middle, s_CurrentUpdatingWindow->GetUUID());
+				s_CurrentUpdatingWindow->GetData().EventCallback(E);
+				return 0;
+			}
+
+			///////////  MouseButtonReleasedEvent  ///////////
+			case WM_LBUTTONUP:
+			{
+				MouseButtonReleasedEvent E(Button::Left, s_CurrentUpdatingWindow->GetUUID());
+				s_CurrentUpdatingWindow->GetData().EventCallback(E);
+				return 0;
+			}
+			case WM_RBUTTONUP:
+			{
+				MouseButtonReleasedEvent E(Button::Right, s_CurrentUpdatingWindow->GetUUID());
+				s_CurrentUpdatingWindow->GetData().EventCallback(E);
+				return 0;
+			}
+			case WM_MBUTTONUP:
+			{
+				MouseButtonReleasedEvent E(Button::Middle, s_CurrentUpdatingWindow->GetUUID());
+				s_CurrentUpdatingWindow->GetData().EventCallback(E);
+				return 0;
+			}
+
+			///////////  WindowEvents  ///////////
 			case WM_DESTROY:
 			{
-				Application::Quit(0);
+				s_CurrentUpdatingWindow->ScheduleClose();
+				WindowClosedEvent E(s_CurrentUpdatingWindow->GetUUID());
+				s_CurrentUpdatingWindow->GetData().EventCallback(E);
+				return 0;
 			}
 		}
 

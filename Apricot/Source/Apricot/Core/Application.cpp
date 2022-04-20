@@ -2,6 +2,7 @@
 #include "Application.h"
 
 #include "Platform.h"
+#include "InputCore.h"
 
 namespace Apricot {
 
@@ -58,6 +59,24 @@ namespace Apricot {
 			{
 				(*it)->OnUpdate(ts);
 			}
+
+			InputManager::OnTick();
+
+			for (uint64 Index = 0; Index < m_Windows.size(); Index++)
+			{
+				if (m_Windows[Index]->ShouldClose())
+				{
+					if (m_Windows[Index]->IsPrimary())
+					{
+						m_Running = false;
+					}
+					m_Windows.erase(Index);
+				}
+			}
+			if (m_Windows.size() == 0)
+			{
+				m_Running = false;
+			}
 		}
 
 		for (auto& layer : m_LayerStack.Layers())
@@ -68,6 +87,8 @@ namespace Apricot {
 		{
 			overlay->OnDetached();
 		}
+
+		m_Windows.clear();
 
 		AE_CORE_INFO_TAG("Engine", "Shutting down!");
 		OnEngineDestroy();
@@ -86,7 +107,9 @@ namespace Apricot {
 		MainWindowSpecification.Minimized = m_Specification.Minimized;
 		MainWindowSpecification.Fullscreen = m_Specification.Fullscreen;
 		MainWindowSpecification.Title = m_Specification.WindowTitle;
-		s_Application->AddWindow(MainWindowSpecification);
+		MainWindowSpecification.EventCallback = Application::OnEvent;
+		Window* MainWindow = s_Application->AddWindow(MainWindowSpecification);
+		MainWindow->SetPrimary(true);
 
 		return true;
 	}
@@ -94,6 +117,11 @@ namespace Apricot {
 	void Application::OnEngineDestroy()
 	{
 		Logger::Destroy();
+	}
+
+	void Application::OnEvent(Event& E)
+	{
+		InputManager::OnEvent(E);
 	}
 
 	Application* Application::Get()
@@ -106,10 +134,10 @@ namespace Apricot {
 		s_Application->m_Running = false;
 	}
 
-	UUID Application::AddWindow(const WindowSpecification& Specification)
+	Window* Application::AddWindow(const WindowSpecification& Specification)
 	{
 		auto& NewWindow = s_Application->m_Windows.emplace_back(Window::Create(Specification));
-		return NewWindow->GetUUID();
+		return NewWindow.get();
 	}
 
 	void Application::RemoveWindow(UUID WindowUUID)

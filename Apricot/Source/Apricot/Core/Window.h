@@ -1,8 +1,11 @@
 #pragma once
 
 #include "Base.h"
+#include "Events/Event.h"
 
 namespace Apricot {
+
+	using PFN_WindowEventCallback = void(*)(Event& E);
 
 	struct WindowSpecification
 	{
@@ -12,6 +15,8 @@ namespace Apricot {
 		bool Minimized = false;
 		bool Maximized = true;
 		bool Fullscreen = false;
+
+		PFN_WindowEventCallback EventCallback = nullptr;
 	};
 
 	class APRICOT_API Window
@@ -25,6 +30,8 @@ namespace Apricot {
 			bool Minimized = false;
 			bool Maximized = true;
 			bool Fullscreen = false;
+
+			PFN_WindowEventCallback EventCallback = nullptr;
 
 			void* NativeHandle = nullptr;
 		};
@@ -48,10 +55,20 @@ namespace Apricot {
 		void UpdateWindow();
 
 		UUID GetUUID() const { return m_UUID; }
+		WindowData& GetData() { return m_Data; }
+		const WindowData& GetData() const { return m_Data; }
+
+		bool ShouldClose() const { return m_ShouldClose; }
+		bool IsPrimary() const { return m_Primary; }
+
+		void ScheduleClose() { m_ShouldClose = true; }
+		void SetPrimary(bool Primary) { m_Primary = Primary; }
 
 	private:
 		WindowData m_Data;
 		UUID m_UUID;
+		bool m_ShouldClose = false;
+		bool m_Primary = false;
 	};
 
 }
