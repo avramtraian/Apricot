@@ -16,10 +16,12 @@ namespace Apricot {
 	{
 	public:
 		static void* AllocateRaw(uint64 size);
+		static void FreeRaw(void* block);
+
 		static void* Allocate(uint64 size);
 		static void* Allocate(uint64 size, const char* description);
 		static void* Allocate(uint64 size, const char* file, uint32 line);
-		static void FreeRaw(void* block);
+
 		static void Free(void* block);
 	};
 
@@ -28,6 +30,39 @@ namespace Apricot {
 	APRICOT_API void MemoryZero(void* destination, uint64 size);
 
 	APRICOT_API astl::string GetBytesName(uint64 bytesCount);
+
+	template<typename AllocatorTypeT, typename AllocatorTypeS>
+	bool CompareAllocators(const AllocatorTypeT& T, const AllocatorTypeS& S)
+	{
+		if constexpr (AllocatorTypeT::GetStaticType() == AllocatorTypeS::GetStaticType())
+		{
+			return T == S;
+		}
+		return false;
+	}
+
+	class APRICOT_API HeapAllocator
+	{
+	public:
+		static constexpr uint64 GetStaticType() { return 1; }
+
+	public:
+		void* Allocate(SizeType Size)
+		{
+			return Allocator::Allocate(Size);
+		}
+
+		void Free(void* Block, SizeType Size)
+		{
+			Allocator::Free(Block);
+		}
+
+	public:
+		constexpr bool operator==(const HeapAllocator& Other) const
+		{
+			return true;
+		}
+	};
 
 }
 

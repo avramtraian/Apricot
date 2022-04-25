@@ -21,8 +21,6 @@
 	using bool8   = bool;
 	using bool32  = __int32;
 
-	using uintptr = uint64;
-
 #else
 	#error "Unknown or unsupported compiler!"
 
@@ -45,6 +43,17 @@
 	using bool8   = bool;
 	using bool32  = int;
 
-	using uintptr = uint64;
-
 #endif
+
+// Apricot runs only on x64
+using uintptr = uint64;
+
+namespace Apricot {
+
+	using SizeType = uint64;
+
+	using CharType = char;
+
+	typedef decltype(__nullptr) NullptrType;
+	
+}

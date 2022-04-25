@@ -62,7 +62,7 @@ namespace Apricot {
 
 			InputManager::OnTick();
 
-			for (uint64 Index = 0; Index < m_Windows.size(); Index++)
+			for (uint64 Index = 0; Index < m_Windows.Size(); Index++)
 			{
 				if (m_Windows[Index]->ShouldClose())
 				{
@@ -70,10 +70,10 @@ namespace Apricot {
 					{
 						m_Running = false;
 					}
-					m_Windows.erase(Index);
+					m_Windows.RemoveAt(Index);
 				}
 			}
-			if (m_Windows.empty())
+			if (m_Windows.IsEmpty())
 			{
 				m_Running = false;
 			}
@@ -88,7 +88,7 @@ namespace Apricot {
 			overlay->OnDetached();
 		}
 
-		m_Windows.clear();
+		m_Windows.Clear();
 
 		AE_CORE_INFO_TAG("Engine", "Shutting down!");
 		OnEngineDestroy();
@@ -136,17 +136,17 @@ namespace Apricot {
 
 	Window* Application::AddWindow(const WindowSpecification& Specification)
 	{
-		auto& NewWindow = s_Application->m_Windows.emplace_back(Window::Create(Specification));
+		auto& NewWindow = s_Application->m_Windows.EmplaceGetRef(Window::Create(Specification));
 		return NewWindow.get();
 	}
 
 	void Application::RemoveWindow(UUID WindowUUID)
 	{
-		for (uint64 Index = 0; Index < s_Application->m_Windows.size(); Index++)
+		for (uint64 Index = 0; Index < s_Application->m_Windows.Size(); Index++)
 		{
 			if (s_Application->m_Windows[Index]->GetUUID() == WindowUUID)
 			{
-				s_Application->m_Windows.erase(Index);
+				s_Application->m_Windows.RemoveAt(Index);
 				break;
 			}
 		}

@@ -30,11 +30,21 @@ namespace Apricot {
 
 	void* Allocator::AllocateRaw(uint64 size)
 	{
+		if (size == 0)
+		{
+			return nullptr;
+		}
+
 		return malloc(size);
 	}
 
 	void* Allocator::Allocate(uint64 size)
 	{
+		if (size == 0)
+		{
+			return nullptr;
+		}
+
 		s_Data.TotalAllocated += size;
 
 		void* memory = AllocateRaw(size);
@@ -45,6 +55,11 @@ namespace Apricot {
 
 	void* Allocator::Allocate(uint64 size, const char* description)
 	{
+		if (size == 0)
+		{
+			return nullptr;
+		}
+
 		void* memory = AllocateRaw(size);
 
 		s_Data.TotalAllocated += size;
@@ -55,6 +70,11 @@ namespace Apricot {
 
 	void* Allocator::Allocate(uint64 size, const char* file, uint32 line)
 	{
+		if (size == 0)
+		{
+			return nullptr;
+		}
+
 		void* memory = AllocateRaw(size);
 
 		s_Data.TotalAllocated += size;
@@ -65,13 +85,23 @@ namespace Apricot {
 
 	void Allocator::FreeRaw(void* block)
 	{
+		if (block == nullptr)
+		{
+			return;
+		}
+
 		free(block);
 	}
 
 	void Allocator::Free(void* block)
 	{
+		if (block == nullptr)
+		{
+			return;
+		}
+
 		auto allocation = s_Data.AllocationsTable.find(block);
-		AE_CORE_ASSERT(allocation != s_Data.AllocationsTable.end(), "Allocation was not registered!");
+		AE_CORE_ASSERT(allocation != s_Data.AllocationsTable.end()); // Allocation was not registered
 		s_Data.TotalFreed += allocation->Second;
 		// TODO (Avr): Use the iterator override
 		s_Data.AllocationsTable.erase(allocation->First);

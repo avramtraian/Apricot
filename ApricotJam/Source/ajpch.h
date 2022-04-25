@@ -20,8 +20,13 @@
 #include "Apricot/Core/Log.h"
 #include "Apricot/Core/Assert.h"
 #include "Apricot/Core/Memory.h"
-#include "Apricot/Core/Ref.h"
+
+#include "Apricot/Core/Containers/Array.h"
+#include "Apricot/Core/Containers/Vector.h"
+#include "Apricot/Core/Containers/Ref.h"
+#include "Apricot/Core/Containers/WeakRef.h"
+#include "Apricot/Core/Containers/Scope.h"
 
 #ifdef AE_PLATFORM_WINDOWS
-#include <Windows.h>
+	#include <Windows.h>
 #endif

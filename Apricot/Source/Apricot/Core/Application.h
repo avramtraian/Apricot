@@ -28,6 +28,9 @@ namespace Apricot {
 	public:
 		virtual ~Application();
 
+		Application(const Application&) = delete;
+		Application& operator=(const Application&) = delete;
+
 		int32 Run(int32 Argc, char** Argv);
 
 		bool OnEngineInit();
@@ -52,9 +55,9 @@ namespace Apricot {
 		bool m_Running = true;
 		bool m_Minimized = false;
 
-		astl::vector<astl::unique_ptr<Window>> m_Windows;
+		Vector<astl::unique_ptr<Window>> m_Windows;
 	};
 
-	extern Application* CreateApplication();
+	Application* CreateApplication();
 
 }

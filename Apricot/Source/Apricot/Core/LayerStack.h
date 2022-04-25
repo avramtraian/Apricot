@@ -30,16 +30,16 @@ namespace Apricot {
 		}
 
 	public:
-		astl::vector<Layer*>& Layers() { return m_Layers; }
-		astl::vector<Layer*>& Overlays() { return m_Overlays; }
+		Vector<Layer*>& Layers() { return m_Layers; }
+		Vector<Layer*>& Overlays() { return m_Overlays; }
 
-		const astl::vector<Layer*>& Layers() const { return m_Layers; }
-		const astl::vector<Layer*>& Overlays() const { return m_Overlays; }
+		const Vector<Layer*>& Layers() const { return m_Layers; }
+		const Vector<Layer*>& Overlays() const { return m_Overlays; }
 
 
 	private:
-		astl::vector<Layer*> m_Layers;
-		astl::vector<Layer*> m_Overlays;
+		Vector<Layer*> m_Layers;
+		Vector<Layer*> m_Overlays;
 	};
 
 }

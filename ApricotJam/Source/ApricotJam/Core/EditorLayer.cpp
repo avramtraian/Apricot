@@ -14,10 +14,12 @@ namespace Apricot {
 
 	void EditorLayer::OnAttached()
 	{
+		
 	}
 
 	void EditorLayer::OnDetached()
 	{
+		
 	}
 
 	void EditorLayer::OnUpdate(Timestep ts)

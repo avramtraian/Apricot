@@ -8,7 +8,8 @@
 
 namespace Apricot {
 
-	typedef decltype(__nullptr) NullptrType;
+	template<typename T>
+	class WeakRef;
 
 	class APRICOT_API RefCounted
 	{
@@ -26,17 +27,16 @@ namespace Apricot {
 	class Ref
 	{
 	public:
+		static_assert(std::is_base_of<RefCounted, T>::value, "Ref<T> - T is not derived from RefCounted!");
+
 		Ref()
 			: m_Pointer(nullptr)
 		{
-			static_assert(std::is_base_of<RefCounted, T>::value, "Ref<T> - T is not derived from RefCounted!");
 		}
 
 		Ref(const Ref& other)
 			: m_Pointer(other.m_Pointer)
 		{
-			static_assert(std::is_base_of<RefCounted, T>::value, "Ref<T> - T is not derived from RefCounted!");
-
 			if (m_Pointer)
 			{
 				IncrementRef();
@@ -46,16 +46,12 @@ namespace Apricot {
 		Ref(Ref&& other) noexcept
 			: m_Pointer(other.m_Pointer)
 		{
-			static_assert(std::is_base_of<RefCounted, T>::value, "Ref<T> - T is not derived from RefCounted!");
-
 			other.m_Pointer = nullptr;
 		}
 
 		explicit Ref(T* pointer)
 			: m_Pointer(pointer)
 		{
-			static_assert(std::is_base_of<RefCounted, T>::value, "Ref<T> - T is not derived from RefCounted!");
-
 			if (m_Pointer)
 			{
 				IncrementRef();
@@ -65,7 +61,6 @@ namespace Apricot {
 		Ref(NullptrType)
 			: m_Pointer(nullptr)
 		{
-			static_assert(std::is_base_of<RefCounted, T>::value, "Ref<T> - T is not derived from RefCounted!");
 		}
 
 		~Ref()
@@ -93,7 +88,7 @@ namespace Apricot {
 
 		Ref& operator=(Ref&& other) noexcept
 		{
-			AE_CORE_ASSERT(this != &other, "Moving a Ref<T> to himself could result in undefined behaviour!");
+			AE_CORE_ASSERT(this != &other); // Moving a Ref<T> to himself could result in undefined behavior
 
 			if (m_Pointer)
 			{
@@ -112,25 +107,25 @@ namespace Apricot {
 
 		T* operator->()
 		{
-			AE_CORE_ASSERT(m_Pointer != nullptr, "Trying to dereference an invalid pointer!");
+			AE_CORE_ASSERT(m_Pointer != nullptr); // Trying to dereference an invalid pointer
 			return m_Pointer;
 		}
 
 		const T* operator->() const
 		{
-			AE_CORE_ASSERT(m_Pointer != nullptr, "Trying to dereference an invalid pointer!");
+			AE_CORE_ASSERT(m_Pointer != nullptr); // Trying to dereference an invalid pointer
 			return m_Pointer;
 		}
 
 		T& operator*()
 		{
-			AE_CORE_ASSERT(m_Pointer != nullptr, "Trying to dereference an invalid pointer!");
+			AE_CORE_ASSERT(m_Pointer != nullptr); // Trying to dereference an invalid pointer
 			return *m_Pointer;
 		}
 
 		const T& operator*() const
 		{
-			AE_CORE_ASSERT(m_Pointer != nullptr, "Trying to dereference an invalid pointer!");
+			AE_CORE_ASSERT(m_Pointer != nullptr); // Trying to dereference an invalid pointer
 			return *m_Pointer;
 		}
 
@@ -196,6 +191,9 @@ namespace Apricot {
 
 	private:
 		T* m_Pointer;
+
+		template<typename FriendT>
+		friend class WeakRef;
 	};
 
 }

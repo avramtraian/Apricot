@@ -2,7 +2,7 @@
 
 #include "Apricot/Core/Base.h"
 #include "Apricot/Core/Memory.h"
-#include "Apricot/Core/Ref.h"
+#include "Apricot/Core/Containers/Ref.h"
 
 namespace Apricot {
 
@@ -231,7 +231,7 @@ namespace Apricot {
 		template<typename T>
 		T* AllocateRaw()
 		{
-			AE_CORE_ASSERT(Offset + sizeof(T) <= m_Buffer.Size, "Buffer out of data!");
+			AE_CORE_ASSERT(Offset + sizeof(T) <= m_Buffer.Size); // Buffer out of data
 			uint8* memory = (uint8*)m_Buffer.Data + Offset;
 			Offset += sizeof(T);
 			return (T*)memory;
