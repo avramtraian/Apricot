@@ -29,6 +29,8 @@ project "ApricotJam-Editor"
 	pchheader "ajpch.h"
 	pchsource "Source/ajpch.cpp"
 
+	characterset ("Unicode")
+
 	--#### EDITOR DEBUG ####--
 	filter { "configurations:Editor_Debug" }
 		

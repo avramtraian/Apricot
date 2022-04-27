@@ -29,6 +29,8 @@ project "AE-Runtime"
 		"AE-Core"
 	}
 
+	characterset ("Unicode")
+
 	--#### EDITOR DEBUG ####--
 	filter { "configurations:Editor_Debug" }
 		

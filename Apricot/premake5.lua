@@ -25,6 +25,8 @@ project "AE-Core"
 	pchheader "aepch.h"
 	pchsource "Source/aepch.cpp"
 
+	characterset ("Unicode")
+
 	--#### ALL CONFIGURATIONS ####--
 	filter { "system:windows" }
 		files
