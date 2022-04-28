@@ -1,29 +1,38 @@
 #pragma once
 
 #include "Base.h"
+#include "Compiler.h"
 #include "CrashReporter.h"
 
-#ifdef AE_DEBUG
-	#define AE_ENABLE_ASSERTS
-	#define AE_ENABLE_VERIFIES
+#ifdef DEBUG_BUILD
+	#define COMPILER_WITH_ASSERTS  (1)
+	#define COMPILER_WITH_VERIFIES (1)
 #endif // AE_DEBUG
 
-#ifdef AE_RELEASE
-	#define AE_ENABLE_ASSERTS
-	#define AE_ENABLE_VERIFIES
+#ifdef RELEASE_BUILD
+	#define COMPILER_WITH_ASSERTS  (1)
+	#define COMPILER_WITH_VERIFIES (1)
 #endif // AE_RELEASE
 
-#ifdef AE_SHIPPING
+#ifdef SHIPPING_BUILD
 	
 #endif // AE_SHIPPING
 
-#ifdef AE_ENABLE_ASSERTS
+#ifndef COMPILER_WITH_ASSERTS
+	#define COMPILER_WITH_ASSERTS (0)
+#endif
+
+#ifndef COMPILER_WITH_VERIFIES
+	#define COMPILER_WITH_VERIFIES (0)
+#endif
+
+#if COMPILER_WITH_ASSERTS
 
 	#define AE_CORE_ASSERT(Expression)                                             \
 		if (!(Expression))                                                         \
 		{                                                                          \
 			Apricot::CrashReporter::OnCoreAssert(#Expression, __FILE__, __LINE__); \
-			AE_DEBUGBREAK();                                                       \
+			DEBUGBREAK();                                                       \
 		}
 
 #else
@@ -32,13 +41,13 @@
 
 #endif // AE_ENABLE_ASSERTS
 
-#ifdef AE_ENABLE_VERIFIES
+#if COMPILER_WITH_VERIFIES
 
 	#define AE_CORE_VERIFY(Expression) \
 		if (!(Expression)) \
 		{ \
 			Apricot::CrashReporter::OnCoreAssert(#Expression, __FILE__, __LINE__); \
-			AE_DEBUGBREAK(); \
+			DEBUGBREAK(); \
 		}
 
 #else

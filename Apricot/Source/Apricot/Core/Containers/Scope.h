@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Apricot/Core/Base.h"
-#include "Apricot/Core/TypeTraits.h"
+#include "Apricot/Core/Core.h"
 #include "Apricot/Core/Memory.h"
 
 namespace Apricot {
@@ -13,7 +13,7 @@ namespace Apricot {
 		template<typename... Args>
 		static Scope<T> Create(Args&&... args)
 		{
-			return Scope<T>(anew T(Apricot::Forward<Args>(args)...));
+			return Scope<T>(anew T(AE::Forward<Args>(args)...));
 		}
 
 	public:

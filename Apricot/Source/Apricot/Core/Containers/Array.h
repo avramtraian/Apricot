@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Apricot/Core/TypeTraits.h"
+#include "Apricot/Core/Core.h"
 #include "Apricot/Core/Assert.h"
 #include "Apricot/Core/Memory.h"
 
@@ -35,7 +35,7 @@ namespace Apricot {
 		{
 			for (SizeType Index = 0; Index < S; Index++)
 			{
-				m_Data[Index] = Apricot::Move(Other.m_Data[Index]);
+				m_Data[Index] = AE::Move(Other.m_Data[Index]);
 			}
 		}
 
@@ -58,7 +58,7 @@ namespace Apricot {
 		{
 			for (SizeType Index = 0; Index < S; Index++)
 			{
-				m_Data[Index] = Apricot::Move(Other.m_Data[Index]);
+				m_Data[Index] = AE::Move(Other.m_Data[Index]);
 			}
 
 			return *this;

@@ -203,7 +203,7 @@ namespace Apricot {
 	#define AE_ENABLE_WARN_LOGS
 	#define AE_ENABLE_ERROR_LOGS
 	#define AE_ENABLE_FATAL_LOGS
-#elif defined(AE_RELEASE)
+#elif defined(RELEASE_BUILD)
 	#define AE_ENABLE_INFO_LOGS
 	#define AE_ENABLE_WARN_LOGS
 	#define AE_ENABLE_ERROR_LOGS

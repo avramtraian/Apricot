@@ -1,6 +1,8 @@
 #include "ajpch.h"
 #include "EditorLayer.h"
 
+#include "Apricot/Core/Containers/ApricotString.h"
+
 namespace Apricot {
 
 	EditorLayer::EditorLayer()
@@ -14,7 +16,7 @@ namespace Apricot {
 
 	void EditorLayer::OnAttached()
 	{
-		
+		::FString s = TEXT("hmmm");
 	}
 
 	void EditorLayer::OnDetached()

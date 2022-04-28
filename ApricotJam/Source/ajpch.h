@@ -23,10 +23,7 @@
 
 #include "Apricot/Core/Containers/Array.h"
 #include "Apricot/Core/Containers/Vector.h"
+#include "Apricot/Core/Containers/ApricotString.h"
 #include "Apricot/Core/Containers/Ref.h"
 #include "Apricot/Core/Containers/WeakRef.h"
 #include "Apricot/Core/Containers/Scope.h"
-
-#ifdef AE_PLATFORM_WINDOWS
-	#include <Windows.h>
-#endif

@@ -1,8 +1,11 @@
 #pragma once
 
 #include "Application.h"
+#include "Core.h"
 #include "Platform.h"
 #include "Memory.h"
+
+#include "CString.h"
 
 namespace Apricot {
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Apricot/Core/TypeTraits.h"
+#include "Apricot/Core/Core.h"
 #include "Apricot/Core/Assert.h"
 #include "Apricot/Core/Memory.h"
 
@@ -74,7 +74,7 @@ namespace Apricot {
 			, m_Capacity(0)
 			, m_Size(0)
 		{
-			MoveConstruct<AllocatorType>(Other);
+			MoveConstruct<AllocatorType>(AE::Move(Other));
 		}
 
 		/**
@@ -168,7 +168,7 @@ namespace Apricot {
 		*/
 		Vector& operator=(Vector&& Other) noexcept
 		{
-			MoveAssign<AllocatorType>(Other);
+			MoveAssign<AllocatorType>(AE::Move(Other));
 			return *this;
 		}
 
@@ -292,7 +292,7 @@ namespace Apricot {
 		*/
 		Vector& operator+=(Vector&& Other)
 		{
-			Append(Apricot::Move(Other));
+			Append(AE::Move(Other));
 			return *this;
 		}
 
@@ -396,7 +396,7 @@ namespace Apricot {
 				ReAllocate(m_Capacity + m_Capacity / 2 + 1);
 			}
 
-			new(&m_Data[m_Size++]) ElementType(Apricot::Move(Element));
+			new(&m_Data[m_Size++]) ElementType(AE::Move(Element));
 			return m_Size - 1;
 		}
 
@@ -410,7 +410,7 @@ namespace Apricot {
 		*/
 		ElementType& AddGetRef(ElementType&& Element)
 		{
-			SizeType Index = Add(Apricot::Move(Element));
+			SizeType Index = Add(AE::Move(Element));
 			return m_Data[Index];
 		}
 
@@ -575,7 +575,7 @@ namespace Apricot {
 				}
 			}
 
-			Add(Apricot::Move(Element));
+			Add(AE::Move(Element));
 			return m_Size - 1;
 		}
 
@@ -589,7 +589,7 @@ namespace Apricot {
 		*/
 		ElementType& AddUniqueGetRef(ElementType&& Element)
 		{
-			SizeType Index = AddUnique(Apricot::Move(Element));
+			SizeType Index = AddUnique(AE::Move(Element));
 			return m_Data[Index];
 		}
 
@@ -654,7 +654,7 @@ namespace Apricot {
 				}
 			}
 
-			Add(Apricot::Move(Element));
+			Add(AE::Move(Element));
 			return m_Size - 1;
 		}
 
@@ -671,7 +671,7 @@ namespace Apricot {
 		*/
 		ElementType& AddUniqueGetRef(ElementType&& Element, PFN_Equal EqualFunc)
 		{
-			SizeType Index = AddUnique(Apricot::Move(Element), EqualFunc);
+			SizeType Index = AddUnique(AE::Move(Element), EqualFunc);
 			return m_Data[Index];
 		}
 
@@ -724,7 +724,7 @@ namespace Apricot {
 		{
 			AE_CORE_ASSERT(Index <= m_Size);
 			ShiftElementsRight(Index, 1);
-			m_Data[Index] = Apricot::Move(Element);
+			m_Data[Index] = AE::Move(Element);
 			return Index;
 		}
 
@@ -741,7 +741,7 @@ namespace Apricot {
 		*/
 		ElementType& InsertGetRef(ElementType&& Element, SizeType Index)
 		{
-			SizeType Idx = Insert(Apricot::Move(Element), Index);
+			SizeType Idx = Insert(AE::Move(Element), Index);
 			return m_Data[Idx];
 		}
 
@@ -880,7 +880,7 @@ namespace Apricot {
 				ReAllocate(m_Capacity + m_Capacity / 2 + 1);
 			}
 
-			new(&m_Data[m_Size++]) ElementType(Apricot::Forward<Args>(args)...);
+			new(&m_Data[m_Size++]) ElementType(AE::Forward<Args>(args)...);
 			return m_Size - 1;
 		}
 
@@ -895,7 +895,7 @@ namespace Apricot {
 		template<typename... Args>
 		ElementType& EmplaceGetRef(Args&&... args)
 		{
-			SizeType Index = Emplace(Apricot::Forward<Args>(args)...);
+			SizeType Index = Emplace(AE::Forward<Args>(args)...);
 			return m_Data[Index];
 		}
 
@@ -952,7 +952,7 @@ namespace Apricot {
 
 			for (SizeType Index = 0; Index < Source.m_Size; Index++)
 			{
-				new(m_Data + m_Size + Index) ElementType(Apricot::Move(Source.m_Data[Index]));
+				new(m_Data + m_Size + Index) ElementType(AE::Move(Source.m_Data[Index]));
 			}
 
 			m_Size += Source.m_Size;
@@ -1338,6 +1338,21 @@ namespace Apricot {
 		}
 
 		/**
+		* Reallocates the internal array.
+		* 
+		* @param NewCapacity The capacity that the array will be reallocated to.
+		*/
+		void SetCapacity(SizeType NewCapacity)
+		{
+			if (NewCapacity == m_Capacity)
+			{
+				return;
+			}
+
+			ReAllocate(NewCapacity);
+		}
+
+		/**
 		* Will destruct all elements. It will not shrink the array.
 		*/
 		void Clear()
@@ -1387,11 +1402,11 @@ namespace Apricot {
 			// NOTE (Avr): Think about using only constructors (and deconstructors).
 			for (SizeType Index = m_Size; Index < m_Size + Offset; Index++)
 			{
-				new(&m_Data[Index]) ElementType(Apricot::Move(m_Data[Index - Offset]));
+				new(&m_Data[Index]) ElementType(AE::Move(m_Data[Index - Offset]));
 			}
 			for (SizeType Index = m_Size - 1; Index >= StartingIndex + Offset; Index--)
 			{
-				m_Data[Index] = Apricot::Move(m_Data[Index - Offset]);
+				m_Data[Index] = AE::Move(m_Data[Index - Offset]);
 			}
 
 			// Just in case
@@ -1422,7 +1437,7 @@ namespace Apricot {
 
 			for (SizeType Index = StartingIndex; Index < m_Size - Offset; Index++)
 			{
-				m_Data[Index] = Apricot::Move(m_Data[Index + Offset]);
+				m_Data[Index] = AE::Move(m_Data[Index + Offset]);
 			}
 			for (SizeType Index = 0; Index < Offset; Index++)
 			{
@@ -1445,7 +1460,7 @@ namespace Apricot {
 				
 				for (SizeType Index = 0; Index < m_Size; Index++)
 				{
-					new(NewBlock + Index) ElementType(Apricot::Move(m_Data[Index]));
+					new(NewBlock + Index) ElementType(AE::Move(m_Data[Index]));
 					m_Data[Index].~ElementType();
 				}
 
@@ -1516,7 +1531,7 @@ namespace Apricot {
 
 			for (SizeType Index = 0; Index < NewSize; Index++)
 			{
-				new (NewBlock + Index) ElementType(Apricot::Move(m_Data[Index]));
+				new (NewBlock + Index) ElementType(AE::Move(m_Data[Index]));
 			}
 
 			Clear();
@@ -1584,7 +1599,7 @@ namespace Apricot {
 
 				for (SizeType Index = 0; Index < Other.m_Size; Index++)
 				{
-					new(m_Data + Index) ElementType(Apricot::Move(Other.m_Data[Index]));
+					new(m_Data + Index) ElementType(AE::Move(Other.m_Data[Index]));
 				}
 
 				Other.Clear();
@@ -1653,7 +1668,7 @@ namespace Apricot {
 
 				for (SizeType Index = 0; Index < Other.m_Size; Index++)
 				{
-					new(m_Data + Index) ElementType(Apricot::Move(Other.m_Data[Index]));
+					new(m_Data + Index) ElementType(AE::Move(Other.m_Data[Index]));
 				}
 
 				Other.Clear();
@@ -1751,6 +1766,8 @@ namespace Apricot {
 
 		template<typename FriendElementType, typename FriendAllocatorType>
 		friend class Vector;
+
+		friend class FString;
 	};
 
 }
