@@ -25,6 +25,8 @@ project "AE-Core"
 	pchheader "aepch.h"
 	pchsource "Source/aepch.cpp"
 
+	exceptionhandling ("Off")
+	rtti ("Off")
 	characterset ("Unicode")
 
 	--#### ALL CONFIGURATIONS ####--

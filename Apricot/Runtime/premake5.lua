@@ -29,6 +29,8 @@ project "AE-Runtime"
 		"AE-Core"
 	}
 
+	exceptionhandling ("Off")
+	rtti ("Off")
 	characterset ("Unicode")
 
 	--#### EDITOR DEBUG ####--

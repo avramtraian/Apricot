@@ -29,6 +29,8 @@ project "ApricotJam-Editor"
 	pchheader "ajpch.h"
 	pchsource "Source/ajpch.cpp"
 
+	exceptionhandling ("Off")
+	rtti ("Off")
 	characterset ("Unicode")
 
 	--#### EDITOR DEBUG ####--
