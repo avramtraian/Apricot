@@ -3,6 +3,8 @@
 #include "Base.h"
 #include "Apricot/Utils/Buffer.h"
 
+#include "Apricot/Core/Containers/Array.h"
+
 namespace Apricot {
 
 	class OutputSink : public RefCounted
@@ -72,7 +74,7 @@ namespace Apricot {
 				const void* Data = nullptr;
 				uint64 Size = 0;
 			};
-			astl::array<Param, 4> Parameters;
+			Array<Param, 4> Parameters;
 			uint64 ParametersCount = 0;
 
 			void* Handle = nullptr;
@@ -107,7 +109,7 @@ namespace Apricot {
 		{
 			const char* SinkTag = "Unnamed Sink";
 
-			astl::array<IOStream, 8> Streams;
+			Array<IOStream, 8> Streams;
 			uint64 StreamsCount = 0;
 
 			Encoding TextEncoding = Encoding::None;

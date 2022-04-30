@@ -13,8 +13,8 @@ namespace Apricot {
 		ApplicationSpecification(const ApplicationSpecification&) = default;
 		ApplicationSpecification(ApplicationSpecification&&) noexcept = default;
 
-		astl::string Name;
-		astl::string WindowTitle;
+		FString Name;
+		FString WindowTitle;
 		uint32 WindowWidth = 1, WindowHeight = 1;
 		bool Fullscreen = false;
 		bool Maximized = true;
@@ -55,7 +55,7 @@ namespace Apricot {
 		bool m_Running = true;
 		bool m_Minimized = false;
 
-		Vector<astl::unique_ptr<Window>> m_Windows;
+		Vector<Scope<Window>> m_Windows;
 	};
 
 	Application* CreateApplication();

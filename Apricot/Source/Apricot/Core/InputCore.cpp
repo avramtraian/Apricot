@@ -8,13 +8,13 @@ namespace Apricot {
 
 	struct InputManagerData
 	{
-		astl::array<bool, (uint16)Key::MaxEnumValue> KeysPressedStatus;
-		astl::array<bool, (uint16)Key::MaxEnumValue> KeysPressedThisTick;
-		astl::array<bool, (uint16)Key::MaxEnumValue> KeysReleasedThisTick;
-
-		astl::array<bool, (uint8)Button::MaxEnumValue> MouseButtonsPressedStatus;
-		astl::array<bool, (uint8)Button::MaxEnumValue> MouseButtonsPressedThisTick;
-		astl::array<bool, (uint8)Button::MaxEnumValue> MouseButtonsReleasedThisTick;
+		Array<bool, (uint16)Key::MaxEnumValue> KeysPressedStatus;
+		Array<bool, (uint16)Key::MaxEnumValue> KeysPressedThisTick;
+		Array<bool, (uint16)Key::MaxEnumValue> KeysReleasedThisTick;
+		
+		Array<bool, (uint8)Button::MaxEnumValue> MouseButtonsPressedStatus;
+		Array<bool, (uint8)Button::MaxEnumValue> MouseButtonsPressedThisTick;
+		Array<bool, (uint8)Button::MaxEnumValue> MouseButtonsReleasedThisTick;
 
 		int32 MousePositionX = 0, MousePositionY = 0;
 		int32 LastTickMousePositionX = 0, LastTickMousePositionY = 0;
@@ -24,11 +24,11 @@ namespace Apricot {
 
 	void InputManager::OnTick()
 	{
-		MemSet(s_InputData.KeysPressedThisTick.data(), false, s_InputData.KeysPressedThisTick.size() * sizeof(bool));
-		MemSet(s_InputData.KeysReleasedThisTick.data(), false, s_InputData.KeysReleasedThisTick.size() * sizeof(bool));
+		MemSet(s_InputData.KeysPressedThisTick.Data(), false, s_InputData.KeysPressedThisTick.Size() * sizeof(bool));
+		MemSet(s_InputData.KeysReleasedThisTick.Data(), false, s_InputData.KeysReleasedThisTick.Size() * sizeof(bool));
 
-		MemSet(s_InputData.MouseButtonsPressedThisTick.data(), false, s_InputData.MouseButtonsPressedThisTick.size() * sizeof(bool));
-		MemSet(s_InputData.MouseButtonsReleasedThisTick.data(), false, s_InputData.MouseButtonsReleasedThisTick.size() * sizeof(bool));
+		MemSet(s_InputData.MouseButtonsPressedThisTick.Data(), false, s_InputData.MouseButtonsPressedThisTick.Size() * sizeof(bool));
+		MemSet(s_InputData.MouseButtonsReleasedThisTick.Data(), false, s_InputData.MouseButtonsReleasedThisTick.Size() * sizeof(bool));
 		
 		s_InputData.LastTickMousePositionX = s_InputData.MousePositionX;
 		s_InputData.LastTickMousePositionY = s_InputData.MousePositionY;
@@ -77,13 +77,13 @@ namespace Apricot {
 
 	void InputManager::OnApplicationMinimized()
 	{
-		MemSet(s_InputData.KeysPressedStatus.data(), false, s_InputData.KeysPressedStatus.size() * sizeof(bool));
-		MemSet(s_InputData.KeysPressedThisTick.data(), false, s_InputData.KeysPressedThisTick.size() * sizeof(bool));
-		MemSet(s_InputData.KeysReleasedThisTick.data(), false, s_InputData.KeysReleasedThisTick.size() * sizeof(bool));
+		MemSet(s_InputData.KeysPressedStatus.Data(), false, s_InputData.KeysPressedStatus.Size() * sizeof(bool));
+		MemSet(s_InputData.KeysPressedThisTick.Data(), false, s_InputData.KeysPressedThisTick.Size() * sizeof(bool));
+		MemSet(s_InputData.KeysReleasedThisTick.Data(), false, s_InputData.KeysReleasedThisTick.Size() * sizeof(bool));
 
-		MemSet(s_InputData.MouseButtonsPressedStatus.data(), false, s_InputData.MouseButtonsPressedStatus.size() * sizeof(bool));
-		MemSet(s_InputData.MouseButtonsPressedThisTick.data(), false, s_InputData.MouseButtonsPressedThisTick.size() * sizeof(bool));
-		MemSet(s_InputData.MouseButtonsReleasedThisTick.data(), false, s_InputData.MouseButtonsReleasedThisTick.size() * sizeof(bool));
+		MemSet(s_InputData.MouseButtonsPressedStatus.Data(), false, s_InputData.MouseButtonsPressedStatus.Size() * sizeof(bool));
+		MemSet(s_InputData.MouseButtonsPressedThisTick.Data(), false, s_InputData.MouseButtonsPressedThisTick.Size() * sizeof(bool));
+		MemSet(s_InputData.MouseButtonsReleasedThisTick.Data(), false, s_InputData.MouseButtonsReleasedThisTick.Size() * sizeof(bool));
 
 		s_InputData.MousePositionX = 0;
 		s_InputData.MousePositionY = 0;

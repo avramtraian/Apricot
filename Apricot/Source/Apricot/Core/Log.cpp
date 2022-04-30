@@ -2,6 +2,7 @@
 #include "Log.h"
 
 #include "Platform.h"
+#include "CString.h"
 #include "Apricot/Utils/Buffer.h"
 
 namespace Apricot {
@@ -110,7 +111,7 @@ namespace Apricot {
 	void OutputSink::SyncStreamWriteContent(uint64 streamIndex, const void* content, uint64 contentSize)
 	{
 		IOStream& stream = m_Specification.Streams[streamIndex];
-		uint64 formatSize = astl::strlen(stream.Format);
+		uint64 formatSize = FCStringAnsiCalls::Strlen(stream.Format);
 		uint64 encodingSize = s_EncodingSizes[(uint32)m_Specification.TextEncoding];
 
 		uint64 copyPosition = 0;
@@ -140,14 +141,14 @@ namespace Apricot {
 						MemCpy(parameter, stream.Format + parameterPosition, (index - parameterPosition) * sizeof(char));
 						parameter[index - parameterPosition] = 0;
 
-						if (astl::strcmp(parameter, "content"))
+						if (FCStringAnsiCalls::Strcmp(parameter, "content"))
 						{
 							void* buffer = stream.m_SinkBuffer->Allocate(contentSize);
 							MemCpy(buffer, content, contentSize);
 						}
-						else if (astl::strcmp(parameter, "severity"))
+						else if (FCStringAnsiCalls::Strcmp(parameter, "severity"))
 						{
-							uint64 severitySize = astl::strlen(s_LogSeveritiesASCII[(uint32)stream.Severity]) * encodingSize;
+							uint64 severitySize = FCStringAnsiCalls::Strlen(s_LogSeveritiesASCII[(uint32)stream.Severity]) * encodingSize;
 							uint8* buffer = (uint8*)stream.m_SinkBuffer->Allocate(severitySize);
 							switch (m_Specification.TextEncoding)
 							{
@@ -163,7 +164,7 @@ namespace Apricot {
 								}
 							}
 						}
-						else if (astl::strcmp(parameter, "hour"))
+						else if (FCStringAnsiCalls::Strcmp(parameter, "hour"))
 						{
 							void* buffer = stream.m_SinkBuffer->Allocate(2 * encodingSize);
 							UTCTime time = Platform::TimeGetSystemUTCTime();
@@ -182,7 +183,7 @@ namespace Apricot {
 								}
 							}
 						}
-						else if (astl::strcmp(parameter, "minute"))
+						else if (FCStringAnsiCalls::Strcmp(parameter, "minute"))
 						{
 							void* buffer = stream.m_SinkBuffer->Allocate(2 * encodingSize);
 							UTCTime time = Platform::TimeGetSystemUTCTime();
@@ -201,7 +202,7 @@ namespace Apricot {
 								}
 							}
 						}
-						else if (astl::strcmp(parameter, "second"))
+						else if (FCStringAnsiCalls::Strcmp(parameter, "second"))
 						{
 							void* buffer = stream.m_SinkBuffer->Allocate(2 * encodingSize);
 							UTCTime time = Platform::TimeGetSystemUTCTime();
@@ -220,22 +221,22 @@ namespace Apricot {
 							}
 							}
 						}
-						else if (astl::strcmp(parameter, "param0"))
+						else if (FCStringAnsiCalls::Strcmp(parameter, "param0"))
 						{
 							void* buffer = stream.m_SinkBuffer->Allocate(stream.Parameters[0].Size);
 							MemCpy(buffer, stream.Parameters[0].Data, stream.Parameters[0].Size);
 						}
-						else if (astl::strcmp(parameter, "param1"))
+						else if (FCStringAnsiCalls::Strcmp(parameter, "param1"))
 						{
 							void* buffer = stream.m_SinkBuffer->Allocate(stream.Parameters[1].Size);
 							MemCpy(buffer, stream.Parameters[1].Data, stream.Parameters[1].Size);
 						}
-						else if (astl::strcmp(parameter, "param2"))
+						else if (FCStringAnsiCalls::Strcmp(parameter, "param2"))
 						{
 							void* buffer = stream.m_SinkBuffer->Allocate(stream.Parameters[2].Size);
 							MemCpy(buffer, stream.Parameters[2].Data, stream.Parameters[2].Size);
 						}
-						else if (astl::strcmp(parameter, "param3"))
+						else if (FCStringAnsiCalls::Strcmp(parameter, "param3"))
 						{
 							void* buffer = stream.m_SinkBuffer->Allocate(stream.Parameters[3].Size);
 							MemCpy(buffer, stream.Parameters[3].Data, stream.Parameters[3].Size);
@@ -350,7 +351,7 @@ namespace Apricot {
 	{
 		s_LoggerData->Sink->SetStreamSeverity(0, severity);
 
-		s_LoggerData->Sink->SyncStreamWriteContent(0, content, astl::strlen(content) * sizeof(char));
+		s_LoggerData->Sink->SyncStreamWriteContent(0, content, FCStringAnsiCalls::Strlen(content) * sizeof(char));
 		s_LoggerData->Sink->SyncStreamFlushContent(0);
 	}
 
@@ -361,9 +362,9 @@ namespace Apricot {
 		auto& stream = s_LoggerData->Sink->GetStream(1);
 		stream.ParametersCount = 1;
 		stream.Parameters[0].Data = tag;
-		stream.Parameters[0].Size = astl::strlen(tag) * sizeof(char);
+		stream.Parameters[0].Size = FCStringAnsiCalls::Strlen(tag) * sizeof(char);
 
-		s_LoggerData->Sink->SyncStreamWriteContent(1, content, astl::strlen(content) * sizeof(char));
+		s_LoggerData->Sink->SyncStreamWriteContent(1, content, FCStringAnsiCalls::Strlen(content) * sizeof(char));
 		s_LoggerData->Sink->SyncStreamFlushContent(1);
 	}
 

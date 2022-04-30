@@ -9,7 +9,7 @@ namespace Apricot {
 
 	struct WindowSpecification
 	{
-		astl::string Title;
+		FString Title;
 		uint32 Width = 0, Height = 0;
 		int32 X = 0, Y = 0;
 		bool VSync = true;
@@ -26,7 +26,7 @@ namespace Apricot {
 	public:
 		struct WindowData
 		{
-			astl::string Title;
+			FString Title;
 			uint32 Width = 0, Height = 0;
 			int32 X = 0, Y = 0;
 			bool VSync = true;
@@ -56,7 +56,7 @@ namespace Apricot {
 
 		void SetMaximized(bool Maximized);
 		void SetMinimized(bool Minimized);
-		void SetTitle(astl::string Title);
+		void SetTitle(const FString& Title);
 		void SetVSync(bool VSync);
 
 		void UpdateWindow();

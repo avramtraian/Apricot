@@ -29,7 +29,7 @@ namespace Apricot {
 	APRICOT_API void MemorySet(void* destination, int32 value, uint64 size);
 	APRICOT_API void MemoryZero(void* destination, uint64 size);
 
-	APRICOT_API astl::string GetBytesName(uint64 bytesCount);
+	APRICOT_API class FString GetBytesName(uint64 bytesCount);
 
 	template<typename AllocatorTypeT, typename AllocatorTypeS>
 	bool CompareAllocators(const AllocatorTypeT& T, const AllocatorTypeS& S)

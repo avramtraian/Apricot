@@ -6,6 +6,8 @@
 
 #include "ArrayIterator.h"
 
+#include <initializer_list>
+
 namespace Apricot {
 
 	/**
@@ -364,7 +366,7 @@ namespace Apricot {
 				ReAllocate(m_Capacity + m_Capacity / 2 + 1);
 			}
 
-			new(&m_Data[m_Size++]) ElementType(Element);
+			::new(&m_Data[m_Size++]) ElementType(Element);
 			return m_Size - 1;
 		}
 
@@ -396,7 +398,7 @@ namespace Apricot {
 				ReAllocate(m_Capacity + m_Capacity / 2 + 1);
 			}
 
-			new(&m_Data[m_Size++]) ElementType(AE::Move(Element));
+			::new(&m_Data[m_Size++]) ElementType(AE::Move(Element));
 			return m_Size - 1;
 		}
 
@@ -434,7 +436,7 @@ namespace Apricot {
 
 			for (SizeType Index = 0; Index < Count; Index++)
 			{
-				new(m_Data + m_Size + Index) ElementType();
+				::new(m_Data + m_Size + Index) ElementType();
 			}
 
 			m_Size += Count;
@@ -764,7 +766,7 @@ namespace Apricot {
 			for (SizeType Idx = Index; Idx < Index + Count; Idx++)
 			{
 				m_Data[Idx].~ElementType();
-				new(m_Data + Idx) ElementType();
+				::new(m_Data + Idx) ElementType();
 			}
 
 			return Index;
@@ -880,7 +882,7 @@ namespace Apricot {
 				ReAllocate(m_Capacity + m_Capacity / 2 + 1);
 			}
 
-			new(&m_Data[m_Size++]) ElementType(AE::Forward<Args>(args)...);
+			::new(&m_Data[m_Size++]) ElementType(AE::Forward<Args>(args)...);
 			return m_Size - 1;
 		}
 
@@ -922,7 +924,7 @@ namespace Apricot {
 
 			for (SizeType Index = 0; Index < Source.m_Size; Index++)
 			{
-				new(m_Data + m_Size + Index) ElementType(Source.m_Data[Index]);
+				::new(m_Data + m_Size + Index) ElementType(Source.m_Data[Index]);
 			}
 
 			m_Size += Source.m_Size;
@@ -952,7 +954,7 @@ namespace Apricot {
 
 			for (SizeType Index = 0; Index < Source.m_Size; Index++)
 			{
-				new(m_Data + m_Size + Index) ElementType(AE::Move(Source.m_Data[Index]));
+				::new(m_Data + m_Size + Index) ElementType(AE::Move(Source.m_Data[Index]));
 			}
 
 			m_Size += Source.m_Size;
@@ -983,7 +985,7 @@ namespace Apricot {
 
 			for (SizeType Index = 0; Index < Count; Index++)
 			{
-				new(m_Data + m_Size + Index) ElementType(Elements[Index]);
+				::new(m_Data + m_Size + Index) ElementType(Elements[Index]);
 			}
 
 			m_Size += Count;
@@ -1246,7 +1248,7 @@ namespace Apricot {
 
 			for (SizeType Index = m_Size; Index < NewSize; Index++)
 			{
-				new(m_Data + Index) ElementType();
+				::new(m_Data + Index) ElementType();
 			}
 			for (SizeType Index = NewSize; Index < m_Size; Index++)
 			{
@@ -1402,7 +1404,7 @@ namespace Apricot {
 			// NOTE (Avr): Think about using only constructors (and deconstructors).
 			for (SizeType Index = m_Size; Index < m_Size + Offset; Index++)
 			{
-				new(&m_Data[Index]) ElementType(AE::Move(m_Data[Index - Offset]));
+				::new(&m_Data[Index]) ElementType(AE::Move(m_Data[Index - Offset]));
 			}
 			for (SizeType Index = m_Size - 1; Index >= StartingIndex + Offset; Index--)
 			{
@@ -1460,7 +1462,7 @@ namespace Apricot {
 				
 				for (SizeType Index = 0; Index < m_Size; Index++)
 				{
-					new(NewBlock + Index) ElementType(AE::Move(m_Data[Index]));
+					::new(NewBlock + Index) ElementType(AE::Move(m_Data[Index]));
 					m_Data[Index].~ElementType();
 				}
 
@@ -1487,7 +1489,7 @@ namespace Apricot {
 
 			for (SizeType Index = 0; Index < m_Size; Index++)
 			{
-				new(Result.m_Data + Index) AsT((const AsT&)(m_Data[Index]));
+				::new(Result.m_Data + Index) AsT((const AsT&)(m_Data[Index]));
 			}
 
 			return Result;
@@ -1531,7 +1533,7 @@ namespace Apricot {
 
 			for (SizeType Index = 0; Index < NewSize; Index++)
 			{
-				new (NewBlock + Index) ElementType(AE::Move(m_Data[Index]));
+				::new (NewBlock + Index) ElementType(AE::Move(m_Data[Index]));
 			}
 
 			Clear();
@@ -1569,7 +1571,7 @@ namespace Apricot {
 
 			for (SizeType Index = 0; Index < Count; Index++)
 			{
-				new(m_Data + Index) ElementType(Elements[Index]);
+				::new(m_Data + Index) ElementType(Elements[Index]);
 			}
 		}
 
@@ -1599,7 +1601,7 @@ namespace Apricot {
 
 				for (SizeType Index = 0; Index < Other.m_Size; Index++)
 				{
-					new(m_Data + Index) ElementType(AE::Move(Other.m_Data[Index]));
+					::new(m_Data + Index) ElementType(AE::Move(Other.m_Data[Index]));
 				}
 
 				Other.Clear();
@@ -1630,7 +1632,7 @@ namespace Apricot {
 
 			for (SizeType Index = 0; Index < Count; Index++)
 			{
-				new(m_Data + Index) ElementType(Elements[Index]);
+				::new(m_Data + Index) ElementType(Elements[Index]);
 			}
 		}
 
@@ -1668,7 +1670,7 @@ namespace Apricot {
 
 				for (SizeType Index = 0; Index < Other.m_Size; Index++)
 				{
-					new(m_Data + Index) ElementType(AE::Move(Other.m_Data[Index]));
+					::new(m_Data + Index) ElementType(AE::Move(Other.m_Data[Index]));
 				}
 
 				Other.Clear();

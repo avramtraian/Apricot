@@ -23,7 +23,7 @@ namespace Apricot {
 
 		static Ref<Buffer> Create(Buffer&& other)
 		{
-			return Ref<Buffer>::Create(astl::move(other));
+			return Ref<Buffer>::Create(AE::Move(other));
 		}
 
 		static Ref<Buffer> Create(void* data, uint64 size)
@@ -155,7 +155,7 @@ namespace Apricot {
 
 		static Ref<StreamingBuffer> Create(StreamingBuffer&& other)
 		{
-			return Ref<StreamingBuffer>::Create(astl::move(other));
+			return Ref<StreamingBuffer>::Create(AE::Move(other));
 		}
 
 		static Ref<StreamingBuffer> Create(void* data, uint64 size)
@@ -215,8 +215,8 @@ namespace Apricot {
 
 		StreamingBuffer& operator=(StreamingBuffer&& other) noexcept
 		{
-			m_Buffer     = astl::move(other.m_Buffer);
-			Offset       = astl::move(other.Offset);
+			m_Buffer     = AE::Move(other.m_Buffer);
+			Offset       = AE::Move(other.Offset);
 			other.Offset = 0;
 			return *this;
 		}
@@ -241,7 +241,7 @@ namespace Apricot {
 		T* Allocate(Args&&... args)
 		{
 			T* object = AllocateRaw<T>();
-			new (object) T(astl::forward<Args>(args)...);
+			new (object) T(AE::Forward<Args>(args)...);
 			return object;
 		}
 

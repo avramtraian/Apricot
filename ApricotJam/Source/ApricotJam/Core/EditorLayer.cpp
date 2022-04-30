@@ -16,7 +16,7 @@ namespace Apricot {
 
 	void EditorLayer::OnAttached()
 	{
-		::FString s = TEXT("hmmm");
+		FString s = TEXT("hmmm");
 	}
 
 	void EditorLayer::OnDetached()

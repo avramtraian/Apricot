@@ -173,7 +173,7 @@ namespace Apricot {
 		m_Data.NativeHandle = CreateWindowEx(
 			ExStyle,
 			s_WindowClassName,
-			m_Data.Title.as<wchar_t>().c_str(),
+			m_Data.Title.CStr(),
 			Style, 
 			m_Data.X, m_Data.Y,
 			Width, Height,
@@ -234,11 +234,11 @@ namespace Apricot {
 		s_ActiveWindow = nullptr;
 	}
 
-	void Window::SetTitle(astl::string Title)
+	void Window::SetTitle(const FString& Title)
 	{
 		m_Data.Title = Title;
 		s_ActiveWindow = this;
-		SetWindowText((HWND)m_Data.NativeHandle, m_Data.Title.as<wchar_t>().c_str());
+		SetWindowText((HWND)m_Data.NativeHandle, m_Data.Title.CStr());
 		s_ActiveWindow = nullptr;
 	}
 

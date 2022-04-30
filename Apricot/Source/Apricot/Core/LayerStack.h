@@ -20,13 +20,13 @@ namespace Apricot {
 		template<typename T, typename... Args>
 		void PushLayer(Args&&... args)
 		{
-			PushLayer(anew T(astl::forward<Args>(args)...));
+			PushLayer(anew T(AE::Forward<Args>(args)...));
 		}
 
 		template<typename T, typename... Args>
 		void PushOverlay(Args&&... args)
 		{
-			PushOverlay(anew T(astl::forward<Args>(args)...));
+			PushOverlay(anew T(AE::Forward<Args>(args)...));
 		}
 
 	public:

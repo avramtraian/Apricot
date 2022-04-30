@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Base.h"
-#include "Assert.h"
-#include "Memory.h"
+#include "Apricot/Core/Base.h"
+#include "Apricot/Core/Assert.h"
+#include "Apricot/Core/Memory.h"
 
 #include <type_traits>
 
@@ -148,7 +148,7 @@ namespace Apricot {
 		template<typename... Args>
 		static Ref Create(Args&&... args)
 		{
-			return Ref<T>(anew T(astl::forward<Args>(args)...));
+			return Ref<T>(anew T(AE::Forward<Args>(args)...));
 		}
 
 	public:

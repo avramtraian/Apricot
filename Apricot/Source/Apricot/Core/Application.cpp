@@ -137,7 +137,7 @@ namespace Apricot {
 	Window* Application::AddWindow(const WindowSpecification& Specification)
 	{
 		auto& NewWindow = s_Application->m_Windows.EmplaceGetRef(Window::Create(Specification));
-		return NewWindow.get();
+		return NewWindow.Get();
 	}
 
 	void Application::RemoveWindow(UUID WindowUUID)
@@ -158,7 +158,7 @@ namespace Apricot {
 		{
 			if (Win->GetUUID() == WindowUUID)
 			{
-				return Win.get();
+				return Win.Get();
 			}
 		}
 		return nullptr;

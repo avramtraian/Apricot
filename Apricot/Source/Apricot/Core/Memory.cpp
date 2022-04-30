@@ -1,6 +1,8 @@
 #include "aepch.h"
 #include "Memory.h"
 
+#include "Containers/ApricotString.h"
+
 #include "Platform.h"
 
 namespace Apricot {
@@ -24,7 +26,7 @@ namespace Apricot {
 		uint64 TotalAllocated = 0;
 		uint64 TotalFreed = 0;
 
-		astl::hash_table<void*, uint64, astl::hash<void*>, AllocationsTableAllocator> AllocationsTable;
+		// astl::hash_table<void*, uint64, astl::hash<void*>, AllocationsTableAllocator> AllocationsTable;
 	};
 	static AllocatorData s_Data;
 
@@ -48,7 +50,7 @@ namespace Apricot {
 		s_Data.TotalAllocated += size;
 
 		void* memory = AllocateRaw(size);
-		s_Data.AllocationsTable.insert(memory, size);
+		// s_Data.AllocationsTable.insert(memory, size);
 
 		return memory;
 	}
@@ -63,7 +65,7 @@ namespace Apricot {
 		void* memory = AllocateRaw(size);
 
 		s_Data.TotalAllocated += size;
-		s_Data.AllocationsTable.insert(memory, size);
+		// s_Data.AllocationsTable.insert(memory, size);
 
 		return memory;
 	}
@@ -78,7 +80,7 @@ namespace Apricot {
 		void* memory = AllocateRaw(size);
 
 		s_Data.TotalAllocated += size;
-		s_Data.AllocationsTable.insert(memory, size);
+		// s_Data.AllocationsTable.insert(memory, size);
 
 		return memory;
 	}
@@ -100,11 +102,11 @@ namespace Apricot {
 			return;
 		}
 
-		auto allocation = s_Data.AllocationsTable.find(block);
-		AE_CORE_ASSERT(allocation != s_Data.AllocationsTable.end()); // Allocation was not registered
-		s_Data.TotalFreed += allocation->Second;
+		// auto allocation = s_Data.AllocationsTable.find(block);
+		// AE_CORE_ASSERT(allocation != s_Data.AllocationsTable.end()); // Allocation was not registered
+		// s_Data.TotalFreed += allocation->Second;
 		// TODO (Avr): Use the iterator override
-		s_Data.AllocationsTable.erase(allocation->First);
+		// s_Data.AllocationsTable.erase(allocation->First);
 
 		FreeRaw(block);
 	}
@@ -124,36 +126,36 @@ namespace Apricot {
 		Platform::MemoryZero(destination, size);
 	}
 
-	astl::string GetBytesName(uint64 bytesCount)
+	FString GetBytesName(uint64 bytesCount)
 	{
 		constexpr uint64 KB = 1024;
 		constexpr uint64 MB = 1024 * KB;
 		constexpr uint64 GB = 1024 * MB;
 
-		static astl::string fmt = "{.2} {}";
+		static FString fmt = "{.2} {}";
 
 		if (bytesCount >= GB)
 		{
 			double gbs = (double)bytesCount / (double)GB;
 			// return fmt.format(gbs, "GB");
-			return astl::string();
+			return FString();
 		}
 		else if (bytesCount >= MB)
 		{
 			double mbs = (double)bytesCount / (double)MB;
 			// return fmt.format(mbs, "MB");
-			return astl::string();
+			return FString();
 		}
 		else if (bytesCount >= KB)
 		{
 			double kbs = (double)bytesCount / (double)KB;
 			// return fmt.format(kbs, "KB");
-			return astl::string();
+			return FString();
 		}
 		else
 		{
 			// return fmt.format(bytesCount, "B");
-			return astl::string();
+			return FString();
 		}
 	}
 

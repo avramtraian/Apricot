@@ -43,7 +43,7 @@ namespace Apricot {
 		{
 		}
 
-	private:
+	public:
 		Array& operator=(const Array& Other)
 		{
 			for (SizeType Index = 0; Index < S; Index++)
